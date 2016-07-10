@@ -1,0 +1,14 @@
+WAIFor's Trigger Effects and Modding Patch Updates
+========================================================
+
+v1.00.0.0002:
+- Fixed problems in Change Units' Graphics to eye candies.
+- Added Change Protounits' Icons.
+
+v1.00.1.0000:
+- Added:
+  - Change Units' Angles
+  - Move Sight By Unit
+- Changed allocations for patches.
+- Install mode attached.
+- Modding functions attached.

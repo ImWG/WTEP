@@ -1,0 +1,124 @@
+=============================================================
+
+          WAIFor's Trigger Effects and Modding Patch
+                      For UserPatch 1.4
+                    Beta Version 1.00.1.0000
+
+                      By WAIFor, 2016
+
+=============================================================
+
+This is a launcher that provides several pretty effects for your Age of Empires: 
+The Conquerors. You need only edit the ini file "wtep.ini" to set target exe, 
+then run "wtep.exe", you'll get some amazing new effects!
+Besides, you can use this for modding. You can set modding settings in ini file.
+Currently there are only one modding patch, making every building has page button.
+
+Please use newest UserPatch 1.4 RC core file. The size of main exe file should be 
+3,072 KB. Daniel Pereira's Trigger Patch 1.5 is okay, too.
+Before first run for one exe, this launcher would change size of the exe file,
+as well as allocations, making pathces able to place in.
+You can also install patches into exe file permanently instead of injecting, by
+modifying ini contents.
+
+
+----------------------------------------
+  Trigger Effects
+----------------------------------------
+
+- To activate WAIFor's trigger effects, please set General->triggers as 1.
+
+- All offical effects were attached with "number" inputs. Some certain effects
+  have extra inputs, like Kill Object, also has "quantity" box now.
+  
+- New effects by setting different "number"s:
+
+    [Task Object]
+    1 - Teleport source units to destination point OR UNIT.
+   *6 - Change ids of source units to id of the destination unit.
+   *7 - Change source units into the destination unit. You can use this beyond 
+        civilization restrictions (e.g. change human player's units into deers).
+ **#8 - Change sounds of protounits of source units as the destination's. This 
+        means that you can create female units or speakable ships. The "protounits"
+        is what the player's standard unit like, so once sound changed, all new 
+        units created of this player after changed as well.
+ **#9 - Change graphics of protounits of source units as the destination's. The
+        graphics include standing, walking, dying and attacking graphics. If you
+        choose eye candies as dest, their graphics of all 4 actions might become 
+        all the same. If you set a farm as the dest, protounits would be invisible 
+        at all.
+	NOTE: except 6 and 8, all other effects would not do immediately in visual, 
+	    units must do some action after to update their appearance.
+        
+    [Kill Object]
+    1 - Make source units undead, bringing'em infinite HP instantly.
+   *2 - Make ids source units into positive or negative ones. Units with negative
+        ids are unable to control, even with triggers (kill or remove are available).
+        If you set "quantity" as 0, ids of units would be negative, else positive.
+   #3 - Change how source protounits display on minimap. Quantity determines the
+        result. 0 makes protounits invisible on minimap, 1 makes them visible as 
+        squares, while 2 changes marks into smaller diamonds.
+   #4 - Change source protounits visibility in fog. Quantity determines the result.
+        0 makes protounits invisible in fog, 1 contributes visible, and 3 could make
+        protounits throughly invisible in scene.
+    7 - Set current angles of source units as the quantity shows. 0 stands for
+        east, 1 rotates one delta clockwise and so on.
+   #8 - Set icon ids of source protounits as the quantity shows.
+   #9 - Set death unit ids of source protounits as the quantity shows.
+
+    [Move Sight]
+    2 - Move sight to source unit.
+    3 - Cut sight to source unit.
+    
+    [Tribute]
+   #7 - Let the DESTINATION player get or lose line of sight of the player set by
+        quantity. Quantity 0 stands for gaia, 1 to 8 the others. To make the dest 
+        player lose LoS, please plus 100 to the quantity - 100, 101, 102 ... If 
+        you lose LoS of yourself, you'll see buildings of yours standing in black
+        area.
+   #8 - Let the DESTINATION player get or lose fields explored by the player set by
+        quantity.
+    9 - Set civilization of dest player as the quantity stands. 0 is gaia, 1 is 
+        British, 2 is French, etc. This would only change civ name and sounds of 
+        units, does not affect tech tree. But, this effect would change tech tree
+        after loading saved games!
+        
+    * These effects are unstable, they probably cause crashes, especially in returning 
+      to the map editor.
+   ** They are not robust, you must confirm the destination player, or bug splats.
+    # Effects would be restored after save and load, so you need to create loops to
+      keep them affected.
+    
+- In "Display Instructions", you can set 65536 types of color set for text. To do 
+  this, please add prefix "<????>". The four characters represent various colors.
+  Each character can be CAPTIAL A to P, AA to PP are colors #0 to #255 on palette
+  50500. The former 2 are for text color, while the latter 2 outline color. For
+  example, "<EDIH>" makes gold text and white outline. Specially, AB stands for
+  transparent color.
+  
+- Removed prohibition of projectile as source units in "Task Object". You can 
+  control projectiles' action now, even replace their graphics by man! Don't worry 
+  about moving projectiles shot by others unwillingly, because they're of negative 
+  ids!
+
+
+----------------------------------------
+  Modding
+----------------------------------------
+
+- To activate Modding functions, please set General->Modding as 1.
+
+- Functions could be set in the ini file. Generally, set values to 0 makes mapped 
+  functions disabled.
+
+- At present, there is only one modding function - attaching all buildings with 
+  "Next Page" button. Value of "SecondPage" set as 2 would enable this.
+
+
+----------------------------------------
+  Install Into EXE
+----------------------------------------
+
+- Set General->Install larger than 0, and the launcher would try to put patches
+  into the exe file. After that, you can play by run game directly!
+- Please do backup before install.

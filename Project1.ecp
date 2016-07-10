@@ -1,0 +1,33 @@
+;Do not modify this file!!!
+Easy Code 1.06.0.0016
+Begin ECProject = WTEP
+  EasyCodeProject=0
+  FileType=3
+  Processor=.486
+  Align=4
+  DebugInfo=1
+  AsmFiles=1
+  GlobalVariables=1
+  MLOptions=
+  LinkOptions=
+  MMXOptions=0
+  CommonControls=0
+  RichEdit=0
+  PackFile=1
+  Macros=0
+  ECMacros=1
+  Unicode=0
+  Masm32Unicode=0
+  StartupWindow=Main
+  Title=Easy Code Masm classic project
+  Resources=WTEP.ecr
+  Module=config.asm
+  Module=Defines.asm
+  Module=Effects.asm
+  Module=main.asm
+  Module=modding.asm
+  Include=Kernel32.inc
+  Include=User32.inc
+  Library=Kernel32.lib
+  Library=User32.lib
+End
