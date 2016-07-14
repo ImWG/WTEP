@@ -3,9 +3,10 @@ Include	defines.asm
 
 .Const
 
-IFNDEF CustomColorInfo@
 ; Combined patches
 CustomColorInfo@ 	DD 0051CF28H
+MoreResources@		DD 004EE724H ; Add more resources in list
+
 EnableInputs@ 		DD 007DD2DDH
 TaskObject@ 		DD 0043797FH
 KillObject@			DD 004379DDH
@@ -13,24 +14,32 @@ MoveSight@			DD 007D8B10H
 Tribute@			DD 004377C0H
 
 ; Isolated patches
-EnableTaskProj@		DD 00437973H ; Enable task object on projectiles
+EnableTaskProj@		DD 00437973H ; Enable Task Object for projectiles.
+MoreTributeRes@		DD 004EE738H ; Make resources list same with Accumulate Attribute's.
+NonNumInQuantity@	DD 004EAD97H ; Allow non-number characters in Quantity box. negative figures could be typed instantly
 
-ENDIF
 
-
-.Data?
 .Data
 
-IFNDEF EnableTaskProj
 ; For isolated patches
 EnableTaskProj		DB 000H
 EnableTaskProjN		DD 1H
 
-ENDIF
+MoreTributeRes		DB 0E9H, 1AH, 0FFH, 0FFH, 0FFH
+MoreTributeResN		DD 5H
+
+NonNumInQuantity	DB 00H
+NonNumInQuantityN	DD 01H
 
 
 .Code
 
+; Constatnt
+Float100 Equ 006355D8H
+Float05 Equ 00635978H
+
+
+; Patch Content
 __PatchEffectsStart:
 	DB 'WAIFor effects', 0
 
@@ -105,15 +114,50 @@ EnableInputs_Back:
 	FakeJmp 007DD2E4H
 
 
+MoreResources:
+	Mov Ecx, DWord Ptr Ss:[Ebp] ; Pop Limitation
+	Push 4
+	Push 9747
+MoreResources_1:
+	FakeCall 00550870H
+	Mov Ecx, DWord Ptr Ss:[Ebp] ; Building Rate
+	Push 195
+	Push 7054
+MoreResources_2:
+	FakeCall 00550870H
+	Mov Ecx, DWord Ptr Ss:[Ebp] ; Market Rate
+	Push 78
+	Push 7015
+MoreResources_3:
+	FakeCall 00550870H
+	Mov Ecx, DWord Ptr Ss:[Ebp] ; Current Age
+	Push 6
+	Push 10336
+MoreResources_4:
+	FakeCall 00550870H
+	Mov Ecx, DWord Ptr Ss:[Ebp] ; Monk Heal Rate
+	Push 89
+	Push 4124
+MoreResources_5:
+	FakeCall 00550870H
+
+	Mov Ecx, DWord Ptr Ss:[Ebp]
+	Push 0
+
+MoreResources_Back:
+	FakeJmp 004EE729H
+
+
+
 CustomColorInfo:
 	Add Esp, 8
 	Test Eax, Eax
-	Je CustomColorInfo_other
+	Je CustomColorInfo_Other
 
 CustomColorInfo_White:
 	FakeJmp 0051CF2FH
 
-CustomColorInfo_other:
+CustomColorInfo_Other:
 	Cmp Byte Ptr Ds:[Esi], 03CH
 	Jne CustomColorInfo_Normal
 	Cmp Byte Ptr Ds:[Esi + 5], 03EH
@@ -227,7 +271,10 @@ TaskObject_Teleport_Point:
 TaskObject_Transform:
 	Mov Edx, DWord Ptr Ds:[Esp + 24H]
 	Mov Edx, DWord Ptr Ds:[Edx + 8H]
-	Mov DWord Ptr Ds:[Ecx + 8H], Edx
+	Push Edx
+TaskObject_Transform_:
+	FakeCall 004C1A50H
+
 	Jmp TaskObject_End
 
 TaskObject_Voice:
@@ -264,11 +311,14 @@ KillObject:
 	Cmp Ax, 2H
 	Je KillObject_ToggleId
 	Cmp Ax, 3H
-	Je KillObject_MinimapMode
-	Cmp Ax, 4H
-	Je KillObject_VisibilityInFog
-	Cmp Ax, 7H
 	Je KillObject_Angle
+
+	Cmp Ax, 5H
+	Je KillObject_Walkable
+	Cmp Ax, 6H
+	Je KillObject_MinimapMode
+	Cmp Ax, 7H
+	Je KillObject_VisibilityInFog
 	Cmp Ax, 8H
 	Je KillObject_Icon
 	Cmp Ax, 9H
@@ -283,6 +333,18 @@ KillObject_CommonLoop:
 	Mov Ecx, DWord Ptr Ds:[Edi]
 	Cmp Esi, DWord Ptr Ss:[Esp + 14H]
 	Retn
+
+; Originally I used this for loading saved file causes restore problems. I referred UserPatch's Effect, but it doesn't work.
+; I think it is because AOC doesn't save those attributes.
+; Use "Call KillObject_GetProtoUnit" replace "Mov Ebx, DWord Ptr Ds:[Ecx + 08H]".
+;KillObject_GetProtoUnit:
+;	Mov Ebx, DWord Ptr Ds:[Ecx + 0CH]
+;	Mov Ebx, DWord Ptr Ds:[Ebx + 74H]
+;	Mov Ecx, DWord Ptr Ds:[Ecx + 8H]
+;	Mov Cx, Word Ptr Ds:[Ecx + 10H]
+;	And Ecx, 0FFFFH
+;	Mov Ebx, DWord Ptr Ds:[Ebx + Ecx * 4]
+;	Retn
 
 KillObject_Undead:
 	Mov DWord Ptr Ds:[Ecx + 30H], 7F800000H
@@ -315,11 +377,22 @@ KillObject_ToggleId:
 			Jl KillObject_ToggleId_P
 			Jmp KillObject_End
 
+; On Quantity=0, Units would keep their select rings in original positions!
+KillObject_Walkable:
+	Shr Eax, 10H
+KillObject_Walkable_:
+	Mov Ebx, DWord Ptr Ds:[Ecx + 08H]
+	Mov Byte Ptr Ds:[Ebx + 0A2H], Al
+	Call KillObject_CommonLoop
+	Jl KillObject_Walkable_
+	Jmp KillObject_End
+
+
 KillObject_MinimapMode:
 	Shr Eax, 10H
 KillObject_MinimapMode_:
-	Mov Ecx, DWord Ptr Ds:[Ecx + 8H]
-	Mov Byte Ptr Ds:[Ecx + 96H], Al
+	Mov Ebx, DWord Ptr Ds:[Ecx + 08H]
+	Mov Byte Ptr Ds:[Ebx + 96H], Al
 	Call KillObject_CommonLoop
 	Jl KillObject_MinimapMode_
 	Jmp KillObject_End
@@ -327,8 +400,8 @@ KillObject_MinimapMode_:
 KillObject_VisibilityInFog:
 	Shr Eax, 10H
 KillObject_VisibilityInFog_:
-	Mov Ecx, DWord Ptr Ds:[Ecx + 8H]
-	Mov Byte Ptr Ds:[Ecx + 6DH], Al
+	Mov Ebx, DWord Ptr Ds:[Ecx + 08H]
+	Mov Byte Ptr Ds:[Ebx + 6DH], Al
 	Call KillObject_CommonLoop
 	Jl KillObject_VisibilityInFog_
 	Jmp KillObject_End
@@ -344,8 +417,8 @@ KillObject_Angle_:
 KillObject_DeathUnit:
 	Shr Eax, 10H
 KillObject_DeathUnit_:
-	Mov Ecx, DWord Ptr Ds:[Ecx + 8H]
-	Mov Word Ptr Ds:[Ecx + 50H], Ax
+	Mov Ebx, DWord Ptr Ds:[Ecx + 08H]
+	Mov Word Ptr Ds:[Ebx + 50H], Ax
 	Call KillObject_CommonLoop
 	Jl KillObject_DeathUnit_
 	Jmp KillObject_End
@@ -353,8 +426,8 @@ KillObject_DeathUnit_:
 KillObject_Icon:
 	Shr Eax, 10H
 KillObject_Icon_:
-	Mov Ecx, DWord Ptr Ds:[Ecx + 8H]
-	Mov Word Ptr Ds:[Ecx + 54H], Ax
+	Mov Ebx, DWord Ptr Ds:[Ecx + 08H]
+	Mov Word Ptr Ds:[Ebx + 54H], Ax
 	Call KillObject_CommonLoop
 	Jl KillObject_Icon_
 
@@ -397,11 +470,51 @@ Tribute:
 	Je Tribute_LoS
 	Cmp Edx, 8H
 	Je Tribute_Field
+	Cmp Edx, 1H
+	Je Tribute_Instant
+	Cmp Edx, 3H
+	Je Tribute_Instant_100Div
+	Cmp Edx, 4H
+	Je Tribute_Product_100Div
 
 	Fild DWord Ptr Ds:[Edi + 10H]
+	Cmp Edx, 2H
+	Jne Tribute_Other_
+	Fdiv DWord Ptr Ds:[Float100] ; X = X / 100
+Tribute_Other_:
 	Mov Edx, DWord Ptr Ss:[Esp + 20H]
+
 Tribute_Other:
 	FakeJmp 004377C7H
+
+Tribute_Instant:
+	Fild DWord Ptr Ds:[Edi + 10H]
+Tribute_Instant_:
+	Mov Edx, DWord Ptr Ss:[Esp + 20H]
+	Mov Edx, DWord Ptr Ds:[Edx + 0A8H]
+	Mov Eax, DWord Ptr Ds:[Edi + 14H]
+	Fstp DWord Ptr Ds:[Edx + Eax * 4]
+	Jmp Tribute_End
+
+Tribute_Instant_100Div:
+	Fild DWord Ptr Ds:[Edi + 10H]
+	Fdiv DWord Ptr Ds:[Float100]
+	Jmp Tribute_Instant_
+
+Tribute_Product_100Div:
+	Fild DWord Ptr Ds:[Edi + 10H]
+	Fdiv DWord Ptr Ds:[Float100]
+
+	Mov Eax, DWord Ptr Ds:[Edi + 14H]
+	Mov Edx, DWord Ptr Ss:[Esp + 18H]
+	Mov Edx, DWord Ptr Ds:[Edx + 0A8H]
+	Fmul DWord Ptr Ds:[Edx + Eax * 4]
+
+	Mov Edx, DWord Ptr Ss:[Esp + 20H]
+	Mov Edx, DWord Ptr Ds:[Edx + 0A8H]
+	Fstp DWord Ptr Ds:[Edx + Eax * 4]
+
+	Jmp Tribute_End
 
 Tribute_Civil:
 	Mov Edx, DWord Ptr Ss:[Esp + 20H]
@@ -468,5 +581,44 @@ Tribute_End:
 	FakeJmp 004377E1H
 
 
-
 __PatchEffectsEnd:
+
+
+
+.Const
+
+; Interfaces
+_PatchEffectsStart DD Offset __PatchEffectsStart
+_PatchEffectsEnd DD Offset __PatchEffectsEnd
+
+_EnableInputs DD Offset EnableInputs
+_EnableInputs_Back DD Offset EnableInputs_Back
+
+_MoreResources DD Offset MoreResources
+_MoreResources_1 DD Offset MoreResources_1
+_MoreResources_2 DD Offset MoreResources_2
+_MoreResources_3 DD Offset MoreResources_3
+_MoreResources_4 DD Offset MoreResources_4
+_MoreResources_5 DD Offset MoreResources_5
+_MoreResources_Back DD Offset MoreResources_Back
+
+_CustomColorInfo DD Offset CustomColorInfo
+_CustomColorInfo_White DD Offset CustomColorInfo_White
+_CustomColorInfo_Normal DD Offset CustomColorInfo_Normal
+
+_TaskObject DD Offset TaskObject
+_TaskObject_Other DD Offset TaskObject_Other
+_TaskObject_End DD Offset TaskObject_End
+_TaskObject_Transform_ DD Offset TaskObject_Transform_
+
+_KillObject DD Offset KillObject
+_KillObject_Other DD Offset KillObject_Other
+_KillObject_End DD Offset KillObject_End
+
+_MoveSight DD Offset MoveSight
+_MoveSight_Jle DD Offset MoveSight_Jle
+_MoveSight_End DD Offset MoveSight_End
+
+_Tribute DD Offset Tribute
+_Tribute_Other DD Offset Tribute_Other
+_Tribute_End DD Offset Tribute_End

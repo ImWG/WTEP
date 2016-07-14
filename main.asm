@@ -8,8 +8,8 @@ Include	kernel32.inc
 IncludeLib	user32.lib
 IncludeLib	kernel32.lib
 
-Include	effects.asm
-Include	modding.asm
+;Include	effects.asm
+;Include	modding.asm
 
 .Const
 
@@ -65,16 +65,8 @@ __PatchStart@	DD 00812000H ; = UPGameSize + PatchDelta
 __OffsetStart	DD 00000000H
 
 
-
-; ---------------------
-; Patches
-; ---------------------
-
-
-;Custom Fore&Back Colors of Statements - <AAAA> to <PPPP>
-
-
 .Code
+
 
 IncreasePatchAddress Proc _From, _To
 	Mov Eax, __PatchStart@
@@ -325,34 +317,47 @@ PatchIsReady:
 	Invoke GetINI, Offset iniSection0, Offset iniKeyTriggers, 0
 
 	.If Eax == 1
-		Mov Eax, Offset __PatchEffectsStart
+		Mov Eax, _PatchEffectsStart
 		Mov __OffsetStart, Eax
 
 		; Triggers related
-		Invoke	WritePatchCode, __PatchStart@, Offset __PatchEffectsStart, Offset __PatchEffectsEnd
+		Invoke	WritePatchCode, __PatchStart@, _PatchEffectsStart, _PatchEffectsEnd
 
-		Invoke	WriteAddress, Offset CustomColorInfo_Normal
-		Invoke	WriteJmp, CustomColorInfo@, Offset CustomColorInfo
+		Invoke	WriteAddress, _CustomColorInfo_White
+		Invoke	WriteAddress, _CustomColorInfo_Normal
+		Invoke	WriteJmp, CustomColorInfo@, _CustomColorInfo
 
-		Invoke	WriteJmp, EnableInputs@, Offset EnableInputs
-		Invoke	WriteAddress, Offset EnableInputs_Back
+		Invoke	WriteJmp, EnableInputs@, _EnableInputs
+		Invoke	WriteAddress, _EnableInputs_Back
 
-		Invoke	WriteJmp, TaskObject@, Offset TaskObject
-		Invoke	WriteAddress, Offset TaskObject_Other
-		Invoke	WriteAddress, Offset TaskObject_End
+		Invoke	WriteJmp, TaskObject@, _TaskObject
+		Invoke	WriteAddress, _TaskObject_Other
+		Invoke	WriteAddress, _TaskObject_End
+		Invoke	WriteAddress, _TaskObject_Transform_
 		Invoke	WritePatch, EnableTaskProj@, Offset EnableTaskProj, EnableTaskProjN
 
-		Invoke	WriteJmp, KillObject@, Offset KillObject
-		Invoke	WriteAddress, Offset KillObject_Other
-		Invoke	WriteAddress, Offset KillObject_End
+		Invoke	WriteJmp, KillObject@, _KillObject
+		Invoke	WriteAddress, _KillObject_Other
+		Invoke	WriteAddress, _KillObject_End
 
-		Invoke	WriteJmp, MoveSight@, Offset MoveSight
-		Invoke	WriteAddress, Offset MoveSight_End
-		Invoke	WriteAddress, Offset MoveSight_Jle
+		Invoke	WriteJmp, MoveSight@, _MoveSight
+		Invoke	WriteAddress, _MoveSight_End
+		Invoke	WriteAddress, _MoveSight_Jle
 
-		Invoke	WriteJmp, Tribute@, Offset Tribute
-		Invoke	WriteAddress, Offset Tribute_Other
-		Invoke	WriteAddress, Offset Tribute_End
+		Invoke	WriteJmp, Tribute@, _Tribute
+		Invoke	WriteAddress, _Tribute_Other
+		Invoke	WriteAddress, _Tribute_End
+
+		Invoke	WritePatch, MoreTributeRes@, Offset MoreTributeRes, MoreTributeResN
+		Invoke	WriteJmp, MoreResources@, _MoreResources
+		Invoke	WriteAddress, _MoreResources_1
+		Invoke	WriteAddress, _MoreResources_2
+		Invoke	WriteAddress, _MoreResources_3
+		Invoke	WriteAddress, _MoreResources_4
+		Invoke	WriteAddress, _MoreResources_5
+		Invoke	WriteAddress, _MoreResources_Back
+
+		Invoke	WritePatch, NonNumInQuantity@, Offset NonNumInQuantity, NonNumInQuantityN
 
 	.EndIf
 
@@ -360,14 +365,31 @@ PatchIsReady:
 	Invoke GetINI, Offset iniSection0, Offset iniKeyModding, 0
 
 	.If Eax == 1
-		Mov Eax, Offset __PatchModdingStart
+		Mov Eax, _PatchModdingStart
 		Mov __OffsetStart, Eax
 
-		Invoke IncreasePatchAddress, Offset __PatchEffectsStart, Offset __PatchEffectsEnd
-		Invoke	WritePatchCode, __PatchStart@, Offset __PatchModdingStart, Offset __PatchModdingEnd
+		Invoke IncreasePatchAddress, _PatchEffectsStart, _PatchEffectsEnd
+		Invoke	WritePatchCode, __PatchStart@, _PatchModdingStart, _PatchModdingEnd
 
 		Invoke	WritePatch, SecondPageA@, Offset SecondPageA, SecondPageAN
 		Invoke	WritePatch, SecondPage2@, Offset SecondPage2, SecondPage2N
+
+		Invoke	WriteJmp, NewButtons@, _NewButtons
+		Invoke	WriteAddress, _NewButtons_1
+		Invoke	WriteAddress, _NewButtons_Back
+
+		Invoke	WritePatch, AllBuildFnd@, Offset AllBuildFnd, AllBuildFndN
+		Invoke	WriteJmp, AllHeal@, _AllHeal
+		Invoke	WriteAddress, _AllHeal_Monk
+		Invoke	WriteAddress, _AllHeal_1
+		Invoke	WriteAddress, _AllHeal_2
+		Invoke	WriteAddress, _AllHeal_3
+
+		Invoke	WriteJmp, FreeDrop@, _FreeDrop
+		Invoke	WriteAddress, _FreeDrop_1
+		Invoke	WriteAddress, _FreeDrop_Back
+		Invoke	WriteAddress, _FreeDrop_Other
+		Invoke	WritePatch, FreeDrop2@, Offset FreeDrop2, FreeDrop2N
 
 	.EndIf
 
