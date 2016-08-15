@@ -136,6 +136,8 @@ modifying ini contents.
         20 - Secondary Projectile Id.
         21 - Train Location Id. Changing isolated units doesn't make any sense,
         22 - Train Button Id. 1~15 is first page, 21~35 is second.
+        98 - Tower Mode. For modding skill function.
+        99 - Attribute Piece. For modding skill function.
         
     [Move Sight]
     2 - Move sight to source unit. You have to set a target point to make the effect
