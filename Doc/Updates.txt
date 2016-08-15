@@ -1,6 +1,8 @@
 WAIFor's Trigger Effects and Modding Patch Updates
 ========================================================
 
+
+
 v1.00.0.0002:
 - Fixed problems in Change Units' Graphics to eye candies.
 - Added Change Protounits' Icons.
@@ -11,4 +13,71 @@ v1.00.1.0000:
   - Move Sight By Unit
 - Changed allocations for patches.
 - Install mode attached.
-- Modding functions attached.
+- Modding functions attached. Second Page is available now.
+
+v1.00.2.0000:
+- Allowed instant negate operator in "Quantity" field.
+- More tributes type in list - pop cap, trade rate, kill rate,
+  build rate, etc.
+- Fixed visual refresh problems in Change Unit and Change 
+  Unit Graphics.
+- More tribute-related effects added.
+- Added modding functions:
+  - New Skill Buttons - spawn, non-trebuchet transform, heal,
+    build foundations and pack/unpack command for buildings.
+  - Enable non-monk units to heal others.
+  - Enable units to put foundations without villager class.
+- Modding functions could be set in ini file.
+- Better in coding.
+
+v1.00.6.0000:
+- Fixed Teleport Units problems.
+- New effects in Damage Units.
+- Added Market ability for New Skills.
+- Custom icons of new skills within set in ini.
+- Massive other enhanced functions.
+
+v1.00.6.0002:
+- Skill of teleporting would be failed if destination point is
+  unavailable (such as, no room or bad terrain).
+- Fixed crash problem in Monk With Relic's deposit.
+- Fixed market icons bugs.
+- Fixed problems in "All Heal" right-click function. At past,
+  units cannot do anything except heal in right click. In fact,
+  this code only affects unit's right-click, no button function.
+- Added Convert Skill, but it doesn't work now.
+
+v1.00.6.0004:
+- Fixed problems on "AllClassBuildFoundations" enabled. Before,
+  units were not able to move by clicking in minimap.
+- Added some special attacks: by destination's max hp, current
+  hp or lost hp.
+- Automatic adjusting: if second page enabled, buttons of new
+  skills would be placed in 14th instead of corner spot.
+
+v1.00.6.0005:
+- Transform skill can do for all selected units now (of course,
+  units to transform should have same skills).
+- Added villager's couter attack bug fix.
+
+v1.00.6.0006:
+- Added three more attack types: figures were by source unit's
+  hp.
+- Added more garrison types.
+
+v1.00.6.0007:
+- Use a temporary solution to teleporting skills.
+- Fixed problems of units without dll name shown as blank items
+  in trigger building list.
+- "Create Unit" can drop array units across zone select now.
+
+v1.00.7.0000:
+- Added an effect to isolate units from protounits in "Kill Object".
+- Added some effects for changing attributes of units.
+- "Number" can contain 5 characters at most.
+
+v1.00.7.0005:
+- Improved branch algorithm in some effects.
+- Some more protounit attribute modify effects.
+- Move player LoS and field vision effects into "Change Diplomacy".
+- Fixed train button mistakes of trebuchets.
