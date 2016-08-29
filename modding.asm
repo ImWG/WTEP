@@ -776,15 +776,28 @@ AttackGround2_1:
 ; 8th Unit Attribute determines isolated build page
 CustomBuilder: ; ECX = Player Addr.
 	Lea Ebx, [Esi + 1240H]
-	Mov Eax, Ds:[Ecx + 1C0H]
+	Push Esi
+	Lea Esi, Ds:[Ecx + 1C4H]
+CustomBuilder_Loop: ; Avoid Fish Net
+	Mov Eax, DWord Ptr Ds:[Esi]
+	Test Eax, Eax
+	Je CustomBuilder_
 	Mov Eax, Ds:[Eax + 8H]
+	Cmp Byte Ptr Ds:[Eax + 97H], 09H
+	Je CustomBuilder_LoopEnd
+	Add Esi, 4
+	Jmp CustomBuilder_Loop
+
+CustomBuilder_LoopEnd:
 	Test Byte Ptr Ds:[Eax + 0A4H], 80H
 	Jz CustomBuilder_
+	Pop Esi
 	Movsx Eax, Word Ptr Ds:[Eax + 10H] ; Isolated build page
 	Push Eax
 CustomBuilder_1:
 	FakeJmp 00525E24H
 CustomBuilder_: ; Common build page
+	Pop Esi
 	Push 0DH
 	Jmp CustomBuilder_1
 
