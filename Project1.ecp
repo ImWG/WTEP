@@ -21,6 +21,7 @@ Begin ECProject = WTEP
   StartupWindow=Main
   Title=Easy Code Masm classic project
   Resources=WTEP.ecr
+  Module=Cheats.asm
   Module=config.asm
   Module=Defines.asm
   Module=Effects.asm

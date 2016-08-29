@@ -64,58 +64,67 @@ MoreGarrison2@	DD 00434EB4H
 MoreGarrison3@	DD 004342AAH
 
 Repulse@		DD 005CE7DCH
+PickRelic@ 		DD 004B080AH, 004B0824H, 004B083EH, 004B0858H, 004B0872H, 004B088CH
+				DD 004B08A6H, 004B08C0H, 004B08DAH, 004B08F4H, 0H
+PickRelic2@		DD 00469416H
+PickRelic3@		DD 004B18F8H
+PickRelic4@		DD 004B0908H
 
 
 ; Interfaces
-_PatchModdingStart DD Offset __PatchModdingStart
-_PatchModdingEnd   DD Offset __PatchModdingEnd
-_SecondPage        DD Offset SecondPage
-_NewButtons        DD Offset NewButtons
-_NewButtons2       DD Offset NewButtons2
-_AllHeal		   DD Offset AllHeal
-_FreeDrop          DD Offset FreeDrop
-_ExplosionUnit1    DD Offset ExplosionUnit1
-_ExplosionUnit2    DD Offset ExplosionUnit2
-_SelfDestructUnit1 DD Offset SelfDestructUnit1
-_SelfDestructUnit2 DD Offset SelfDestructUnit2
-_SelfHealUnit1     DD Offset SelfHealUnit1
-_SelfHealUnit2     DD Offset SelfHealUnit2
-_AttackGround      DD Offset AttackGround
-_AttackGround2     DD Offset AttackGround2
-_CustomBuilder     DD Offset CustomBuilder
-_CustomBuilder2    DD Offset CustomBuilder2
-_CustomBuilder3    DD Offset CustomBuilder3
-_DepositResource   DD Offset DepositResource
-_HeroMode          DD Offset HeroMode
-_HeroMode2         DD Offset HeroMode2
-_AdvTrainButton    DD Offset AdvancedTrainButton
-_FreeGather        DD Offset FreeGatherPoint
-_MarketInit        DD Offset MarketInit
-_ExtendAttacks     DD Offset ExtendAttacks
-_VillCounterFix    DD Offset VillagerCounterFix
-_Repulse           DD Offset Repulse
+$__PatchModdingStart DD Offset __PatchModdingStart
+$__PatchModdingEnd   DD Offset __PatchModdingEnd
+$SecondPage        DD Offset SecondPage
+$NewButtons        DD Offset NewButtons
+$NewButtons2       DD Offset NewButtons2
+$AllHeal		   DD Offset AllHeal
+$FreeDrop          DD Offset FreeDrop
+$ExplosionUnit1    DD Offset ExplosionUnit1
+$ExplosionUnit2    DD Offset ExplosionUnit2
+$SelfDestructUnit1 DD Offset SelfDestructUnit1
+$SelfDestructUnit2 DD Offset SelfDestructUnit2
+$SelfHealUnit1     DD Offset SelfHealUnit1
+$SelfHealUnit2     DD Offset SelfHealUnit2
+$AttackGround      DD Offset AttackGround
+$AttackGround2     DD Offset AttackGround2
+$CustomBuilder     DD Offset CustomBuilder
+$CustomBuilder2    DD Offset CustomBuilder2
+$CustomBuilder3    DD Offset CustomBuilder3
+$DepositResource   DD Offset DepositResource
+$HeroMode          DD Offset HeroMode
+$HeroMode2         DD Offset HeroMode2
+$AdvTrainButton    DD Offset AdvancedTrainButton
+$FreeGather        DD Offset FreeGatherPoint
+$MarketInit        DD Offset MarketInit
+$ExtendAttacks     DD Offset ExtendAttacks
+$VillCounterFix    DD Offset VillagerCounterFix
+$Repulse           DD Offset Repulse
+$PickRelic         DD Offset PickRelic
+$PickRelic2        DD Offset PickRelic2
+$PickRelic3        DD Offset PickRelic3
+$PickRelic4        DD Offset PickRelic4
 
-_IconHeal          DD Offset IconHeal
-_IconDepositRes    DD Offset IconDepositResource
-_IconBuild         DD Offset IconBuild
-_IconGround        DD Offset IconGround
-_IconTrain         DD Offset IconTrain
-_IconUnload        DD Offset IconUnload
-_IconTeleport      DD Offset IconTeleport
-_IconDrop          DD Offset IconDrop
-_IconUnpack        DD Offset IconUnpack
-_IconPack          DD Offset IconPack
+$IconHeal          DD Offset IconHeal
+$IconDepositRes    DD Offset IconDepositResource
+$IconBuild         DD Offset IconBuild
+$IconGround        DD Offset IconGround
+$IconTrain         DD Offset IconTrain
+$IconUnload        DD Offset IconUnload
+$IconTeleport      DD Offset IconTeleport
+$IconDrop          DD Offset IconDrop
+$IconUnpack        DD Offset IconUnpack
+$IconPack          DD Offset IconPack
 
-_MoreGarrisonTypes DD Offset MoreGarrisonTypes
+$MoreGarrisonTypes DD Offset MoreGarrisonTypes
 
-_NewButtons2_Position DD Offset NewButtons2_Position
+$NewButtons2_Position DD Offset NewButtons2_Position
 
 
 ; Addresses for jmp or call
 PatchModdingAddresses DD Offset NewButtons_0, Offset NewButtons_1, Offset NewButtons_2, Offset NewButtons_3, Offset NewButtons_4
 		DD Offset NewButtons_5, Offset NewButtons_6, Offset NewButtons_7, Offset NewButtons_8
 		DD Offset NewButtons_Back, Offset NewButtons_Back2, Offset NewButtons_9, Offset NewButtons_10, Offset NewButtons_11
-		DD Offset NewButtons_12, Offset NewButtons_13
+		DD Offset NewButtons_12, Offset NewButtons_13, Offset NewButtons_14
 		DD Offset NewButtons2_Back
 		DD Offset NewButtons2_Market_1, Offset NewButtons2_Market_2, Offset NewButtons2_Market_3
 		DD Offset NewButtons2_Market_4, Offset NewButtons2_Market_5, Offset NewButtons2_Market_6
@@ -137,8 +146,12 @@ PatchModdingAddresses DD Offset NewButtons_0, Offset NewButtons_1, Offset NewBut
 		DD Offset VillagerCounterFix_1, Offset VillagerCounterFix_2, Offset VillagerCounterFix_3
 		DD Offset MoreGarrisonTypes_0, Offset MoreGarrisonTypes_1, Offset MoreGarrisonTypes_2
 		DD Offset Repulse_2
+		DD Offset PickRelic_1, Offset PickRelic2_1, Offset PickRelic3_1
 		DD 0H
 
+PatchModdingDirectAddresses DD 0H
+
+PatchModdingDirectAddressArrays DD 0H
 
 .Data?
 
@@ -358,7 +371,7 @@ NewButtons_Sub:
 	Cmp Al, 1
 	Je NewButtons_Deposit
 	Cmp Al, 2
-	Je NewButtons_Deposit
+	Je NewButtons_Transform
 	Cmp Al, 3
 	Je NewButtons_Train
 	Cmp Al, 4
@@ -404,10 +417,27 @@ NewButtons_Deposit:
 	Movsx Edx, Word Ptr Ds:[Eax + 0A6H]
 	Push Ebx
 	Mov Ebx, DWord Ptr Ds:[Ebx + 74H]
+	Cmp Edx, 0
+	Jge NewButtons_Deposit_
+	Xor Edx, Edx
+NewButtons_Deposit_:
 	Mov Ebx, DWord Ptr Ds:[Ebx + Edx * 4]
 	Movsx Ebx, Word Ptr Ds:[Ebx + 54H] ; Get Icon of spawn unit
-	SimpleButtonArgs 1028H, [Ebp], Ebx, 9FH, 0A092H, IconDeposit ; Deposit Relic
+	SimpleButtonArgs 1028H, [Ebp], Ebx, 9FH, 0A092H, _ ; Deposit Relic
 NewButtons_1:
+	FakeCall SUB_DRAWBUTTON
+	Pop Ebx
+	Jmp NewButtons_Done
+
+NewButtons_Transform:
+	Pop Eax
+	Movsx Edx, Word Ptr Ds:[Eax + 0A6H]
+	Push Ebx
+	Mov Ebx, DWord Ptr Ds:[Ebx + 74H]
+	Mov Ebx, DWord Ptr Ds:[Ebx + Edx * 4]
+	Movsx Ebx, Word Ptr Ds:[Ebx + 54H] ; Get Icon of spawn unit
+	SimpleButtonArgs 1028H, [Ebp], Ebx, 9FH, 0A05FH, _ ; Deposit Relic
+NewButtons_14:
 	FakeCall SUB_DRAWBUTTON
 	Pop Ebx
 	Jmp NewButtons_Done
@@ -668,7 +698,7 @@ FreeDrop_Custom:
 	Push Eax
 	Jmp FreeDrop_1
 FreeDrop_Custom_: ; If negative, create gaia's unit
-	Not Eax
+	Neg Eax
 	Push Eax ; arg1 = unit id
 FreeDrop_1:
 	FakeCall 00456A40H ; ECX = Player
@@ -949,6 +979,7 @@ FreeGatherPoint_1:
 ;	Mov [Esi + 0C8H], Ecx
 ;	Xor Ecx, Ecx
 ;	Mov [Esi + 40H], Ecx
+
 FreeGatherPoint_None:
 FreeGatherPoint_2:
 	;FakeJmp 00468E67H
@@ -1152,6 +1183,92 @@ Repulse: ; [Esp] = Source, [Esp + 4] = Target
 	Mov DWord Ptr Ss:[Esp + 1CH], Ecx
 Repulse_2:
 	FakeJmp 005CE7E4H
+
+
+; Make various Monks (Archbishop, Friar Tuck, etc.) can restore correctly after pick and drop relic.
+PickRelic4: ; SPECIAL FOR TURK RELIC - here lies a jump goal
+	Mov Eax, DWord Ptr Ds:[Eax + 4D4H]
+PickRelic: ; 004B080Ah
+	Push DWord Ptr Ds:[Ecx + 8H]
+	Push Eax
+
+	Push Eax
+	Call DWord Ptr Ds:[Edx + 5CH]
+	Mov Esi, DWord Ptr Ss:[Esp + 8H]
+
+	Push Ebp
+	Lea Ebp, [Esp + 4H]
+	Push Ebx
+	Push Ecx
+	Push Edx
+	Push Edi
+	Push Esi
+	Mov Ecx, Esi
+PickRelic_1:
+	FakeCall SUB_UNIQUEUNIT
+	Mov Esi, [Esi + 8H]
+	Mov Edi, DWord Ptr Ss:[Ebp + 4H]
+	Cmp Word Ptr Ds:[Edi + 10H], 07DH ; Normal Monk
+	Je PickRelic_
+
+	;Mov Eax, DWord Ptr Ds:[Edi + 08H]
+	;Mov DWord Ptr Ds:[Esi + 08H], Eax
+	Mov Ax, Word Ptr Ds:[Edi + 0CH]
+	Mov Word Ptr Ds:[Esi + 0CH], Ax
+	Mov Ax, Word Ptr Ds:[Edi + 54H]
+	Mov Word Ptr Ds:[Esi + 54H], Ax
+	Mov Ax, Word Ptr Ds:[Edi + 10H]
+	Mov Word Ptr Ds:[Esi + 162H], Ax ; Stored original id in displayed attack
+PickRelic_:
+	Pop Esi
+	Pop Edi
+	Pop Edx
+	Pop Ecx
+	Pop Ebx
+	Pop Ebp
+
+	Add Esp, 0CH
+	Mov Al, 1
+	Pop Ebx
+	Retn
+
+
+PickRelic2: ;00469416h
+	Push Ebx
+	Push Esi
+	Mov Esi, [Esi + 08H]
+	Movsx Ebx, Word Ptr Ds:[Esi + 162H]
+	Cmp Ebx, 0
+	Jg PickRelic2_More
+	Mov Eax, DWord Ptr Ds:[Ecx + 1F4H] ; Normal Monk
+	Jmp PickRelic2_
+PickRelic2_More:
+	Mov Eax, DWord Ptr Ds:[Ebx * 4 + Ecx]
+PickRelic2_:
+	Pop Esi
+	Pop Ebx
+PickRelic2_1:
+	FakeJmp 0046941CH
+
+
+PickRelic3:
+	Push Ebx
+	Push Esi
+	Mov Esi, [Esi + 08H]
+	Mov Esi, [Esi + 08H]
+	Movsx Ebx, Word Ptr Ds:[Esi + 162H]
+	Cmp Ebx, 0
+	Jg PickRelic3_More
+	Mov Eax, DWord Ptr Ds:[Eax + 1F4H] ; Normal Monk
+	Jmp PickRelic3_
+PickRelic3_More:
+	Mov Eax, DWord Ptr Ds:[Ebx * 4 + Eax]
+PickRelic3_:
+	Pop Esi
+	Pop Ebx
+PickRelic3_1:
+	FakeJmp 004B18FEH
+
 
 
 __PatchModdingEnd:

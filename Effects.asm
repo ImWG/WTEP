@@ -18,34 +18,37 @@ CreateUnitArray@	DD 004378C3H
 ChangeAttack@ 		DD 007D8A94H
 ChangeDiplomacy@	DD 00437605H
 ChangeSpeed@		DD 007DD43EH
+SendChat@			DD 0043764FH
 
 ; Isolated patches
 EnableTaskProj@		DD 00437973H ; Enable Task Object for projectiles.
 MoreTributeRes@		DD 004EE738H ; Make resources list same with Accumulate Attribute's.
 NonNumInQuantity@	DD 004EAD97H ; Allow non-number characters in Quantity box. negative figures could be typed instantly
 GaiaForPlayer@		DD 007CE1C0H ; Allow set gaia civilization for players (shown as "Random")
+GaiaForPlayer2@		DD 007CE1DCH
 BuildingNameFix@	DD 004E1033H ; Fix buildings without language name shown as blank choices in trigger editor.
 ExpandNumberLength@	DD 004EADF9H ; Allow more figures to type in in "Number".
 
 .Const
 
 ; Interfaces
-_PatchEffectsStart DD Offset __PatchEffectsStart
-_PatchEffectsEnd DD Offset __PatchEffectsEnd
+$__PatchEffectsStart DD Offset __PatchEffectsStart
+$__PatchEffectsEnd DD Offset __PatchEffectsEnd
 
-_EnableInputs DD Offset EnableInputs
-_MoreResources DD Offset MoreResources
-_CustomColorInfo DD Offset CustomColorInfo
-_TaskObject DD Offset TaskObject
-_KillObject DD Offset KillObject
-_MoveSight DD Offset MoveSight
-_Tribute DD Offset Tribute
-_ShowInfo DD Offset ShowInfo
-_DamageUnit DD Offset DamageUnit
-_CreateUnitArray DD Offset CreateUnitArray
-_ChangeAttack DD Offset ChangeAttack
-_ChangeDiplomacy DD Offset ChangeDiplomacy
-_ChangeSpeed DD Offset ChangeSpeed
+$EnableInputs DD Offset EnableInputs
+$MoreResources DD Offset MoreResources
+$CustomColorInfo DD Offset CustomColorInfo
+$TaskObject DD Offset TaskObject
+$KillObject DD Offset KillObject
+$MoveSight DD Offset MoveSight
+$Tribute DD Offset Tribute
+$ShowInfo DD Offset ShowInfo
+$DamageUnit DD Offset DamageUnit
+$CreateUnitArray DD Offset CreateUnitArray
+$ChangeAttack DD Offset ChangeAttack
+$ChangeDiplomacy DD Offset ChangeDiplomacy
+$ChangeSpeed DD Offset ChangeSpeed
+$SendChat DD Offset SendChat
 
 
 PatchEffectsAddresses DD Offset CustomColorInfo_White, Offset CustomColorInfo_Normal
@@ -64,6 +67,7 @@ PatchEffectsAddresses DD Offset CustomColorInfo_White, Offset CustomColorInfo_No
 	DD Offset ChangeAttack_1, Offset ChangeAttack_2, Offset ChangeAttack_3
 	DD Offset ChangeDiplomacy_1, Offset ChangeDiplomacy_2, Offset ChangeDiplomacy_3
 	DD Offset ChangeSpeed_2, Offset ChangeSpeed_1
+	DD Offset SendChat_0, Offset SendChat_1, Offset SendChat_2
 	DD 0H
 
 PatchEffectsDirectAddresses DD Offset KillObject_Table_, Offset KillObject_Table, 4
@@ -89,6 +93,8 @@ NonNumInQuantityN	DD 01H
 
 GaiaForPlayer		DB 90H
 GaiaForPlayerN		DD 01H
+GaiaForPlayer2		DB 7EH
+GaiaForPlayer2N		DD 01H
 
 BuildingNameFix		DB 28H
 BuildingNameFixN	DD 01H
@@ -221,19 +227,21 @@ CustomColorInfo_Other:
 	Jne CustomColorInfo_Normal
 	Cmp Byte Ptr Ds:[Esi + 5], 03EH
 	Jne CustomColorInfo_Normal
-	Lea Edx, [Esp + 20]
-	Lea Eax, [Esp + 14]
+	Lea Edx, [Esp + 20H]
+	Lea Eax, [Esp + 14H]
 	Mov Cl, Byte Ptr Ds:[Esi + 1]
 	Sub Cl, 041H
 	Shl Cl, 4
-	Mov Cl, Byte Ptr Ds:[Esi + 2]
-	Sub Cl, 041H
+	Mov Ch, Byte Ptr Ds:[Esi + 2]
+	Sub Ch, 041H
+	Add Cl, Ch
 	Mov Byte Ptr Ds:[Eax], Cl
 	Mov Cl, Byte Ptr Ds:[Esi + 3]
 	Sub Cl, 041H
 	Shl Cl, 4
-	Mov Cl, Byte Ptr Ds:[Esi + 4]
-	Sub Cl, 041H
+	Mov Ch, Byte Ptr Ds:[Esi + 4]
+	Sub Ch, 041H
+	Add Cl, Ch
 	Mov Byte Ptr Ds:[Edx], Cl
 	Add Esi, 6
 
@@ -243,6 +251,8 @@ CustomColorInfo_Normal:
 
 TaskObject:
 	Mov Edx, DWord Ptr Ds:[Edi + 64H]
+	Cmp Edx, 0H
+	Jle TaskObject_Other_
 	Cmp Edx, 1H
 	Je TaskObject_Teleport
 	Cmp Edx, 2H
@@ -255,6 +265,7 @@ TaskObject:
 	Je TaskObject_Voice
 	Cmp Edx, 9H
 	Je TaskObject_Immitate
+TaskObject_Other_:
 	Fild DWord Ptr Ds:[Edi + 48H]
 	Push 0H
 
@@ -409,9 +420,10 @@ KillObject:
 	; General Attributes
 	Cmp Ebx, 10
 	Jl KillObject_Other
-	Cmp Ebx, 23
+	Cmp Ebx, 25
 	Jge KillObject_Other
 	Sub Ebx, 10
+
 KillObject_Table_:
 	Movsx Ebx, Word Ptr Ds:[Ebx * 2 + 11111111H]
 	Test Ebx, 3000H
@@ -514,7 +526,8 @@ KillObject_Undead:
 	Jmp KillObject_End
 
 KillObject_Isolate:
-	Mov Bl, Byte Ptr Ds:[Ecx + 4H]
+	Mov Ebx, DWord Ptr Ds:[Ecx + 8H]
+	Mov Bl, Byte Ptr Ds:[Ebx + 4H]
 	Cmp Bl, 46H
 	Jl KillObject_Isolate_
 KillObject_Isolate_1:
@@ -557,11 +570,11 @@ KillObject_Angle:
 
 ; Id, Class, Icon, LangId, MinimapMode
 ; Visibility, DeathUnit, Walkable, TerrRt, Projectile
-; Projectile2, TrainLocation, TrainButton, 0
+; Projectile2, TrainLocation, TrainButton, CommandID, IntereationMode
 KillObject_Table: ; 5 values per line
 	DW 0010H, 0016H, 0054H, 000CH, 1096H
 	DW 106DH, 0050H, 10A2H, 006EH, 0148H
-	DW 01ACH, 0184H, 1186H, 0
+	DW 01ACH, 0184H, 1186H, 1097H, 1095H
 
 
 MoveSight:
@@ -1033,6 +1046,23 @@ ChangeSpeed_Table:
 	DW 0C8H, 138H, 108H, 088H, 02CH
 	DW 078H, 07CH, 080H, 198H, 13CH
 
+
+; Send Chat
+; 1 - make cheats from source player
+SendChat: ; 043764F
+	Mov Ecx, DWord Ptr Ds:[Plc]
+	Mov Eax, DWord Ptr Ds:[Edi + 64H]
+	Cmp Eax, 1
+	Jne SendChat_0
+	Push DWord Ptr Ds:[Edi + 6CH] ; arg2: Message
+	Push DWord Ptr Ds:[Edi + 28H] ; arg1: Player Id
+SendChat_1:
+	FakeCall 00443EB0H
+SendChat_2:
+	FakeJmp 0043770DH
+
+SendChat_0:
+	FakeJmp 00437655H
 
 __PatchEffectsEnd:
 

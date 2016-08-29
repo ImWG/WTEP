@@ -81,3 +81,11 @@ v1.00.7.0005:
 - Some more protounit attribute modify effects.
 - Move player LoS and field vision effects into "Change Diplomacy".
 - Fixed train button mistakes of trebuchets.
+
+v1.00.7.0006:
+- Fixed the bug of no last civilization displayed in editor.
+- Added Intereation Mode and Command ID attributes in Kill Object.
+
+v1.00.8.0000:
+- Added Monk-Relic Memory function.
+- Fixed mistakes in Custom Color Info.
