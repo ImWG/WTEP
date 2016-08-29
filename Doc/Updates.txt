@@ -89,3 +89,8 @@ v1.00.7.0006:
 v1.00.8.0000:
 - Added Monk-Relic Memory function.
 - Fixed mistakes in Custom Color Info.
+
+v1.00.8.0002:
+- Custom cheats.
+- "Send Chat" can send cheats from the specified player.
+- Changed symbols in source code.

@@ -385,6 +385,32 @@ modifying ini contents.
 
 
 ----------------------------------------
+  Custom Cheats
+----------------------------------------
+
+
+- You can design your own cheats. Please set General->Cheats as 1.
+
+
+- Customizing cheats arguments, they were in section "Cheats".
+
+    [CodeSpawnX=] (X ranged from 1 to 5)
+    Set Xth "spawning from TC" cheat code. All characters must be capital, and
+    codes are 31 chars at most.
+
+    [SpawnUnitX=]
+    Set spawn unit id of Xth "spawning from TC".
+
+    [CodeTechX=]  (X ranged from 1 to 5)
+    Set Xth "do research" cheat code.
+
+    [ResearchX=]
+    Set research id of Xth "do research". The research would be achieved after
+    cheat sent.
+
+
+
+----------------------------------------
   Install Into EXE
 ----------------------------------------
 
