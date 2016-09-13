@@ -15,6 +15,18 @@ iniSection1		DB  'modding', 0
 iniSection2		DB  'effects', 0
 iniSection3		DB  'buttons', 0
 iniSection4		DB  'cheats', 0
+iniSection5		DB  'CustomGarrisionTypes', 0
+
+iniKey1			DB '1', 0
+iniKey2			DB '2', 0
+iniKey3			DB '3', 0
+iniKey4			DB '4', 0
+iniKey5			DB '5', 0
+iniKey6			DB '6', 0
+iniKey7			DB '7', 0
+iniKey8			DB '8', 0
+iniKey9			DB '9', 0
+iniKey10		DB '10', 0
 
 defaultGame		DB	'age2_x1.exe', 0
 noCheat			DB  0
@@ -46,6 +58,8 @@ iniKeyXAtks		DB 'ExtendedAttacks', 0
 iniKeyVillCntr	DB 'FixVillagerCounter', 0
 iniKeyXGarrison	DB 'MoreGarrisonTypes', 0
 iniKeyRelicMem	DB 'MonkRelicMemory', 0
+iniKeyIFV		DB 'FunctionGarrison', 0
+iniKeyRandomUnit DB 'RandomTrain', 0
 
 iniIconHeal		DB 'IconSkillHeal', 0
 iniIconBuild	DB 'IconSkillBuild', 0

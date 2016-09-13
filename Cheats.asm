@@ -8,54 +8,54 @@ CheatEffect@	DD 0042BDE4H
 
 
 ; Interfaces
-$__PatchCheatsStart  DD Offset __PatchCheatsStart
-$__PatchCheatsEnd    DD Offset __PatchCheatsEnd
-$CheatCheck        DD Offset CheatCheck
-$CheatEffect       DD Offset CheatEffect
-$Cheat_1           DD Offset Cheat_1
-$Cheat_2           DD Offset Cheat_2
-$Cheat_3           DD Offset Cheat_3
-$Cheat_4           DD Offset Cheat_4
-$Cheat_5           DD Offset Cheat_5
-$Cheat_6           DD Offset Cheat_6
-$Cheat_7           DD Offset Cheat_7
-$Cheat_8           DD Offset Cheat_8
-$Cheat_9           DD Offset Cheat_9
-$Cheat_10          DD Offset Cheat_10
+$__PatchCheatsStart  DD O __PatchCheatsStart
+$__PatchCheatsEnd    DD O __PatchCheatsEnd
+$CheatCheck        DD O CheatCheck
+$CheatEffect       DD O CheatEffect
+$Cheat_1           DD O Cheat_1
+$Cheat_2           DD O Cheat_2
+$Cheat_3           DD O Cheat_3
+$Cheat_4           DD O Cheat_4
+$Cheat_5           DD O Cheat_5
+$Cheat_6           DD O Cheat_6
+$Cheat_7           DD O Cheat_7
+$Cheat_8           DD O Cheat_8
+$Cheat_9           DD O Cheat_9
+$Cheat_10          DD O Cheat_10
 
-$CheatEffect1_Unit DD Offset CheatEffect1_Unit
-$CheatEffect2_Unit DD Offset CheatEffect2_Unit
-$CheatEffect3_Unit DD Offset CheatEffect3_Unit
-$CheatEffect4_Unit DD Offset CheatEffect4_Unit
-$CheatEffect5_Unit DD Offset CheatEffect5_Unit
-$CheatEffect6_Unit DD Offset CheatEffect6
-$CheatEffect7_Unit DD Offset CheatEffect7
-$CheatEffect8_Unit DD Offset CheatEffect8
-$CheatEffect9_Unit DD Offset CheatEffect9
-$CheatEffect10_Unit DD Offset CheatEffect10
+$CheatEffect1_Unit DD O CheatEffect1_Unit
+$CheatEffect2_Unit DD O CheatEffect2_Unit
+$CheatEffect3_Unit DD O CheatEffect3_Unit
+$CheatEffect4_Unit DD O CheatEffect4_Unit
+$CheatEffect5_Unit DD O CheatEffect5_Unit
+$CheatEffect6_Unit DD O CheatEffect6
+$CheatEffect7_Unit DD O CheatEffect7
+$CheatEffect8_Unit DD O CheatEffect8
+$CheatEffect9_Unit DD O CheatEffect9
+$CheatEffect10_Unit DD O CheatEffect10
 
 
 ; Addresses for jmp or call
-PatchCheatsAddresses DD Offset CheatCheck_0, Offset CheatCheck_1
-		DD Offset CheatCheck_2, Offset CheatCheck_3, Offset CheatCheck_4, Offset CheatCheck_5, Offset CheatCheck_6
-		DD Offset CheatCheck_7, Offset CheatCheck_8, Offset CheatCheck_9, Offset CheatCheck_10, Offset CheatCheck_11
-		DD Offset CheatEffect_0, Offset CheatEffect_1, Offset CheatEffect_2, Offset CheatEffect_3, Offset CheatEffect_4
+PatchCheatsAddresses DD O CheatCheck_0, O CheatCheck_1
+		DD O CheatCheck_2, O CheatCheck_3, O CheatCheck_4, O CheatCheck_5, O CheatCheck_6
+		DD O CheatCheck_7, O CheatCheck_8, O CheatCheck_9, O CheatCheck_10, O CheatCheck_11
+		DD O CheatEffect_0, O CheatEffect_1, O CheatEffect_2, O CheatEffect_3, O CheatEffect_4
 		DD 0H
 
-PatchCheatsDirectAddresses DD Offset CheatEffectTable_, Offset CheatEffectTable, 3
-		DD Offset CheatCheck, Offset Cheat_1, 1
-		DD Offset CheatCheck2, Offset Cheat_2, 1
-		DD Offset CheatCheck3, Offset Cheat_3, 1
-		DD Offset CheatCheck4, Offset Cheat_4, 1
-		DD Offset CheatCheck5, Offset Cheat_5, 1
-		DD Offset CheatCheck6, Offset Cheat_6, 1
-		DD Offset CheatCheck7, Offset Cheat_7, 1
-		DD Offset CheatCheck8, Offset Cheat_8, 1
-		DD Offset CheatCheck9, Offset Cheat_9, 1
-		DD Offset CheatCheck10, Offset Cheat_10, 1
+PatchCheatsDirectAddresses DD O CheatEffectTable_, O CheatEffectTable, 3
+		DD O CheatCheck, O Cheat_1, 1
+		DD O CheatCheck2, O Cheat_2, 1
+		DD O CheatCheck3, O Cheat_3, 1
+		DD O CheatCheck4, O Cheat_4, 1
+		DD O CheatCheck5, O Cheat_5, 1
+		DD O CheatCheck6, O Cheat_6, 1
+		DD O CheatCheck7, O Cheat_7, 1
+		DD O CheatCheck8, O Cheat_8, 1
+		DD O CheatCheck9, O Cheat_9, 1
+		DD O CheatCheck10, O Cheat_10, 1
 		DD 0H
 
-PatchCheatsDirectAddressArrays DD Offset CheatEffectTable, 0H
+PatchCheatsDirectAddressArrays DD O CheatEffectTable, 0H
 
 .Data?
 
@@ -225,8 +225,8 @@ CheatEffectTable_:
 CheatEffect_0:
 	FakeJmp 0042BDEAH
 CheatEffectTable:
-	DD Offset CheatEffect1, Offset CheatEffect2, Offset CheatEffect3, Offset CheatEffect4, Offset CheatEffect5
-	DD Offset CheatEffect6, Offset CheatEffect7, Offset CheatEffect8, Offset CheatEffect9, Offset CheatEffect10
+	DD O CheatEffect1, O CheatEffect2, O CheatEffect3, O CheatEffect4, O CheatEffect5
+	DD O CheatEffect6, O CheatEffect7, O CheatEffect8, O CheatEffect9, O CheatEffect10
 	DD 0
 
 CheatEffect_Other:

@@ -7,6 +7,7 @@ SecondPageA@	DD 00528326H
 SecondPage2@	DD 0052830CH
 NewButtons@  	DD 00525A04H
 NewButtons2@  	DD 00528351H
+NewButtonsGr@  	DD 00525C7CH ;00525CE0H
 ;AllBuildFnd@	DD 005571BBH
 AllBuildFnd@	DD 005571B5H
 AllHeal@		DD 00434AC6H
@@ -62,6 +63,7 @@ VillCounterFix@ DD 005CF005H
 MoreGarrison@	DD 00434321H
 MoreGarrison2@	DD 00434EB4H
 MoreGarrison3@	DD 004342AAH
+MoreGarrison4@	DD 00526A84H
 
 Repulse@		DD 005CE7DCH
 PickRelic@ 		DD 004B080AH, 004B0824H, 004B083EH, 004B0858H, 004B0872H, 004B088CH
@@ -70,88 +72,109 @@ PickRelic2@		DD 00469416H
 PickRelic3@		DD 004B18F8H
 PickRelic4@		DD 004B0908H
 
+IFV@			DD 004C5D24H
+IFV2@			DD 004D27F5H
+
+RandomUnit@ 	DD 004B12ABH
+
 
 ; Interfaces
-$__PatchModdingStart DD Offset __PatchModdingStart
-$__PatchModdingEnd   DD Offset __PatchModdingEnd
-$SecondPage        DD Offset SecondPage
-$NewButtons        DD Offset NewButtons
-$NewButtons2       DD Offset NewButtons2
-$AllHeal		   DD Offset AllHeal
-$FreeDrop          DD Offset FreeDrop
-$ExplosionUnit1    DD Offset ExplosionUnit1
-$ExplosionUnit2    DD Offset ExplosionUnit2
-$SelfDestructUnit1 DD Offset SelfDestructUnit1
-$SelfDestructUnit2 DD Offset SelfDestructUnit2
-$SelfHealUnit1     DD Offset SelfHealUnit1
-$SelfHealUnit2     DD Offset SelfHealUnit2
-$AttackGround      DD Offset AttackGround
-$AttackGround2     DD Offset AttackGround2
-$CustomBuilder     DD Offset CustomBuilder
-$CustomBuilder2    DD Offset CustomBuilder2
-$CustomBuilder3    DD Offset CustomBuilder3
-$DepositResource   DD Offset DepositResource
-$HeroMode          DD Offset HeroMode
-$HeroMode2         DD Offset HeroMode2
-$AdvTrainButton    DD Offset AdvancedTrainButton
-$FreeGather        DD Offset FreeGatherPoint
-$MarketInit        DD Offset MarketInit
-$ExtendAttacks     DD Offset ExtendAttacks
-$VillCounterFix    DD Offset VillagerCounterFix
-$Repulse           DD Offset Repulse
-$PickRelic         DD Offset PickRelic
-$PickRelic2        DD Offset PickRelic2
-$PickRelic3        DD Offset PickRelic3
-$PickRelic4        DD Offset PickRelic4
+$__PatchModdingStart DD O __PatchModdingStart
+$__PatchModdingEnd   DD O __PatchModdingEnd
+$SecondPage        DD O SecondPage
+$NewButtons        DD O NewButtons
+$NewButtons2       DD O NewButtons2
+$NewButtonsGr      DD O NewButtonsGr
+$AllHeal		   DD O AllHeal
+$FreeDrop          DD O FreeDrop
+$ExplosionUnit1    DD O ExplosionUnit1
+$ExplosionUnit2    DD O ExplosionUnit2
+$SelfDestructUnit1 DD O SelfDestructUnit1
+$SelfDestructUnit2 DD O SelfDestructUnit2
+$SelfHealUnit1     DD O SelfHealUnit1
+$SelfHealUnit2     DD O SelfHealUnit2
+$AttackGround      DD O AttackGround
+$AttackGround2     DD O AttackGround2
+$CustomBuilder     DD O CustomBuilder
+$CustomBuilder2    DD O CustomBuilder2
+$CustomBuilder3    DD O CustomBuilder3
+$DepositResource   DD O DepositResource
+$HeroMode          DD O HeroMode
+$HeroMode2         DD O HeroMode2
+$AdvTrainButton    DD O AdvancedTrainButton
+$FreeGather        DD O FreeGatherPoint
+$MarketInit        DD O MarketInit
+$ExtendAttacks     DD O ExtendAttacks
+$VillCounterFix    DD O VillagerCounterFix
+$Repulse           DD O Repulse
+$PickRelic         DD O PickRelic
+$PickRelic2        DD O PickRelic2
+$PickRelic3        DD O PickRelic3
+$PickRelic4        DD O PickRelic4
+$IFV               DD O IFV
+$IFV2              DD O IFV2
+$RandomUnit        DD O RandomUnit
 
-$IconHeal          DD Offset IconHeal
-$IconDepositRes    DD Offset IconDepositResource
-$IconBuild         DD Offset IconBuild
-$IconGround        DD Offset IconGround
-$IconTrain         DD Offset IconTrain
-$IconUnload        DD Offset IconUnload
-$IconTeleport      DD Offset IconTeleport
-$IconDrop          DD Offset IconDrop
-$IconUnpack        DD Offset IconUnpack
-$IconPack          DD Offset IconPack
+$IconHeal          DD O IconHeal
+$IconDepositRes    DD O IconDepositResource
+$IconBuild         DD O IconBuild
+$IconGround        DD O IconGround
+$IconTrain         DD O IconTrain
+$IconUnload        DD O IconUnload
+$IconTeleport      DD O IconTeleport
+$IconDrop          DD O IconDrop
+$IconUnpack        DD O IconUnpack
+$IconPack          DD O IconPack
+$IconGround2       DD O IconGround2
+$IconPack2         DD O IconPack2
+$IconHeal2         DD O IconHeal2
+$IconUnload2       DD O IconUnload2
 
-$MoreGarrisonTypes DD Offset MoreGarrisonTypes
+$MoreGarrisonTypes DD O MoreGarrisonTypes
 
-$NewButtons2_Position DD Offset NewButtons2_Position
+$NewButtons2_Position DD O NewButtons2_Position
+$NewButtons2_Position2 DD O NewButtons2_Position2
 
 
 ; Addresses for jmp or call
-PatchModdingAddresses DD Offset NewButtons_0, Offset NewButtons_1, Offset NewButtons_2, Offset NewButtons_3, Offset NewButtons_4
-		DD Offset NewButtons_5, Offset NewButtons_6, Offset NewButtons_7, Offset NewButtons_8
-		DD Offset NewButtons_Back, Offset NewButtons_Back2, Offset NewButtons_9, Offset NewButtons_10, Offset NewButtons_11
-		DD Offset NewButtons_12, Offset NewButtons_13, Offset NewButtons_14
-		DD Offset NewButtons2_Back
-		DD Offset NewButtons2_Market_1, Offset NewButtons2_Market_2, Offset NewButtons2_Market_3
-		DD Offset NewButtons2_Market_4, Offset NewButtons2_Market_5, Offset NewButtons2_Market_6
-		DD Offset AllHeal_Monk, Offset AllHeal_1, Offset AllHeal_2, Offset AllHeal_3
-		DD Offset FreeDrop_1, Offset FreeDrop_2, Offset FreeDrop_Back, Offset FreeDrop_Other
-		DD Offset ExplosionUnit_1, Offset ExplosionUnit_2
-		DD Offset SelfDestructUnit_1, Offset SelfDestructUnit_2
-		DD Offset SelfHealUnit_1, Offset SelfHealUnit_2
-		DD Offset AttackGround_1, Offset AttackGround_2, Offset AttackGround_3, Offset AttackGround2_1
-		DD Offset CustomBuilder_1, Offset CustomBuilder2_1, Offset CustomBuilder3_1
-		DD Offset DepositResource_1, Offset DepositResource_2
-		DD Offset HeroMode_0, Offset HeroMode_1, Offset HeroMode_2, Offset HeroMode_3
-		DD Offset HeroMode2_0, Offset HeroMode2_1
-		DD Offset AdvancedTrainButton_1, Offset AdvancedTrainButton_2
-		DD Offset FreeGatherPoint_0, Offset FreeGatherPoint_1, Offset FreeGatherPoint_2
-		DD Offset FreeGatherPoint_3, Offset FreeGatherPoint_4, Offset FreeGatherPoint_5
-		DD Offset MarketInit_1, Offset MarketInit_2
-		DD Offset ExtendAttacks_1
-		DD Offset VillagerCounterFix_1, Offset VillagerCounterFix_2, Offset VillagerCounterFix_3
-		DD Offset MoreGarrisonTypes_0, Offset MoreGarrisonTypes_1, Offset MoreGarrisonTypes_2
-		DD Offset Repulse_2
-		DD Offset PickRelic_1, Offset PickRelic2_1, Offset PickRelic3_1
+PatchModdingAddresses DD O NewButtons_0, O NewButtons_1, O NewButtons_2, O NewButtons_3, O NewButtons_4
+		DD O NewButtons_5, O NewButtons_6, O NewButtons_7, O NewButtons_8
+		DD O NewButtons_Back, O NewButtons_Back2, O NewButtons_9, O NewButtons_10, O NewButtons_11
+		DD O NewButtons_12, O NewButtons_13, O NewButtons_14, O NewButtonsB_Create
+		DD O NewButtons2_Back
+		DD O NewButtons2_Market_1, O NewButtons2_Market_2, O NewButtons2_Market_3
+		DD O NewButtons2_Market_4, O NewButtons2_Market_5, O NewButtons2_Market_6
+		DD O NewButtonsGr_0, O NewButtonsGr_1, O NewButtonsGr_2
+		DD O AllHeal_Monk, O AllHeal_1, O AllHeal_2, O AllHeal_3
+		DD O FreeDrop_1, O FreeDrop_2, O FreeDrop_Back, O FreeDrop_Other
+		DD O ExplosionUnit_1, O ExplosionUnit_2
+		DD O SelfDestructUnit_1, O SelfDestructUnit_2
+		DD O SelfHealUnit_1, O SelfHealUnit_2
+		DD O AttackGround_1, O AttackGround_2, O AttackGround_3, O AttackGround2_1
+		DD O CustomBuilder_1, O CustomBuilder2_1, O CustomBuilder3_1
+		DD O DepositResource_1, O DepositResource_2
+		DD O HeroMode_0, O HeroMode_1, O HeroMode_2, O HeroMode_3
+		DD O HeroMode2_0, O HeroMode2_1
+		DD O AdvancedTrainButton_1, O AdvancedTrainButton_2
+		DD O FreeGatherPoint_0, O FreeGatherPoint_1, O FreeGatherPoint_2
+		DD O FreeGatherPoint_3, O FreeGatherPoint_4, O FreeGatherPoint_5
+		DD O MarketInit_1, O MarketInit_2
+		DD O ExtendAttacks_1
+		DD O VillagerCounterFix_1, O VillagerCounterFix_2, O VillagerCounterFix_3
+		DD O MoreGarrisonTypes_0, O MoreGarrisonTypes_1, O MoreGarrisonTypes_2
+		DD O Repulse_2
+		DD O PickRelic_1, O PickRelic2_1, O PickRelic3_1
+		DD O IFV_1, O IFV2_1
+		DD O RandomUnit_Villager, O RandomUnit_Other, O RandomUnit_1
 		DD 0H
 
-PatchModdingDirectAddresses DD 0H
+PatchModdingDirectAddresses DD NewButtons_Table_, O NewButtons_Table, 3
+		DD NewButtons_Table2_, O NewButtons_Table2, 3
+ 		DD 0H
 
-PatchModdingDirectAddressArrays DD 0H
+PatchModdingDirectAddressArrays DD O NewButtons_Table
+		DD O NewButtons_Table2
+		DD 0H
 
 .Data?
 
@@ -208,6 +231,13 @@ MoreGarrison2	DB 00H, 04H, 07H, 04H, 01H, 04H, 00H, 04H, 04H, 05H
 MoreGarrison2N	DD 60
 MoreGarrison3	DB 8CH ; Allowing Type 80 to garrison into Type 80
 MoreGarrison3N	DD 1
+MoreGarrison4	DB 00H, 01H, 00H, 01H, 00H, 01H, 00H, 01H, 01H, 00H ; Button Activated
+				DB 00H, 01H, 00H, 00H, 01H, 01H, 01H, 01H, 00H, 00H
+				DB 00H, 00H, 00H, 00H, 01H, 01H, 01H, 01H, 01H, 00H
+				DB 01H, 01H, 01H, 01H, 01H, 00H, 00H, 01H, 01H, 01H
+				DB 01H, 01H, 01H, 00H, 00H, 00H, 00H, 00H, 01H, 01H
+				DB 00H, 00H, 01H, 00H, 00H, 00H, 00H, 00H, 00H, 00H
+MoreGarrison4N	DD 60
 
 ;MarketInit      DB 04H, 50H
 ;MarketInitN		DD 2
@@ -341,6 +371,7 @@ NewButtons: ; EBX = Player Addr. ECX = Unit Addr. EDI = IconLib Addr.
 	Jne NewButtons_Opponent
 
 	Push 0
+	Push 3
 	Push 14
 	Push Ebx
 	Call NewButtons_Sub
@@ -365,52 +396,56 @@ NewButtons_Sub:
 
 	Mov Eax, DWord Ptr Ds:[Ecx + 08H]
 	Push Eax
-	Mov Al, Byte Ptr Ds:[Eax + 14CH] ; Eax = Tower Mode
-	Cmp Al, 0
-	Je NewButtons_Other ; faster
-	Cmp Al, 1
-	Je NewButtons_Deposit
-	Cmp Al, 2
-	Je NewButtons_Transform
-	Cmp Al, 3
-	Je NewButtons_Train
-	Cmp Al, 4
-	Je NewButtons_Heal
-	Cmp Al, 5
-	Je NewButtons_Build
-	Cmp Al, 6 ; Pack 15#
-	Je NewButtons_Pack
-	Cmp Al, 7 ; Unpack 15#
-	Je NewButtons_Unpack
-	Cmp Al, 8
-	Je NewButtons_Ground
-	Cmp Al, 9 ; Pack 14#
-	Je NewButtons_Pack_
-	Cmp Al, 10 ; Pack 14#
-	Je NewButtons_Unpack_
-	Cmp Al, 11
-	Je NewButtons_SingleBuild
-	;Cmp Al, 12
-	;Je NewButtons_SingleTrain
-	Cmp Al, 13
-	Je NewButtons_Unload
-	Cmp Al, 14
-	Je NewButtons_Teleport
-	Cmp Al, 15
-	Je NewButtons_Drop
-	Cmp Al, 16 ; Market Page
-	Je NewButtons_Market
-	Cmp Al, 17
-	Je NewButtons_Convert
+	Movzx Eax, Byte Ptr Ds:[Eax + 14CH] ; Eax = Tower Mode
+	And Al, 1FH
+	Cmp Eax, 17
+	Ja NewButtons_Other
+
+NewButtons_Table_:
+	Jmp DWord Ptr Ds:[Eax * 4 + 11111111H]
+NewButtons_Table:
+DD O NewButtons_Other, O NewButtons_Deposit, O NewButtons_Transform, O NewButtons_Train, O NewButtons_Heal
+DD O NewButtons_Build, O NewButtons_Pack, O NewButtons_Unpack, O NewButtons_Ground, O NewButtons_Pack_
+DD O NewButtons_Unpack_, O NewButtons_SingleBuild, O NewButtons_Other, O NewButtons_Unload, O NewButtons_Teleport
+DD O NewButtons_Drop, O NewButtons_Market, O NewButtons_Convert, 0H
 
 NewButtons_Other:
 	Pop Eax
 NewButtons_Done:
+	Mov Ecx, Ss:[Esp]
+	Test Ecx, Ecx
+	Je NewButtonsB_Other
+	Mov Eax, DWord Ptr Ds:[Ecx + 08H]
+	Movzx Eax, Byte Ptr Ds:[Eax + 14CH]
+	Shr Eax, 5
+
+NewButtons_Table2_: ; Vice Skill
+	Jmp DWord Ptr Ds:[Eax * 4 + 11111111H]
+NewButtons_Table2:
+DD O NewButtonsB_Other, O NewButtonsB_Ground, O NewButtonsB_Pack, O NewButtonsB_Heal, O NewButtonsB_Unload
+DD O NewButtonsB_Other, O NewButtonsB_Other, O NewButtonsB_Other, 0H
+
+NewButtonsB_Ground:
+	SimpleButtonArgs 1020H, [Ebp + 4], 60, 23, 4923, IconGround2 ; Attack Ground
+	Jmp NewButtonsB_Create
+NewButtonsB_Pack:
+	SimpleButtonArgs 1020H, [Ebp + 4], 0CH, 6EH, 0A05FH, IconPack2 ; Attack Ground
+	Jmp NewButtonsB_Create
+NewButtonsB_Heal:
+	SimpleButtonArgs 1020H, [Ebp + 4], 0FH, 1CH, 133CH, IconHeal2 ; Attack Ground
+	Jmp NewButtonsB_Create
+NewButtonsB_Unload:
+	SimpleButtonArgs 1020H, [Ebp + 4], 11H, 7H, 132BH, IconUnload2 ; Attack Ground
+
+NewButtonsB_Create:
+	FakeCall SUB_DRAWBUTTON
+NewButtonsB_Other:
 	Pop Ecx
 	Pop Edx
 	Pop Eax
 	Pop Ebp
-	Retn 0CH
+	Retn 10H
+
 
 NewButtons_Deposit:
 	Pop Eax
@@ -471,7 +506,7 @@ NewButtons_4:
 	Jmp NewButtons_Done
 
 NewButtons_Train:
-	Cmp DWord Ptr Ss:[Ebp + 4H], 0
+	Cmp DWord Ptr Ss:[Ebp + 8H], 0
 	Jne NewButtons_Other
 	Pop Eax
 	SimpleButtonArgs 1020H, [Ebp], 56, 0AAH, 1336H, IconTrain
@@ -489,7 +524,7 @@ NewButtons_SingleBuild:
 	Cmp Byte Ptr Ds:[Ebx + 5AH], 0
 	Jne NewButtons_6
 	Mov Ebx, 1 ; Disable the button
-	Mov DWord Ptr Ss:[Esp + 2CH], 1
+	Mov DWord Ptr Ss:[Esp + 30H], 1
 NewButtons_6:
 	FakeCall SUB_DRAWBUTTON
 	Pop Edx
@@ -552,7 +587,7 @@ NewButtons_13:
 	Jmp NewButtons_Done
 
 NewButtons_Market:
-	Cmp DWord Ptr Ss:[Ebp + 4H], 0
+	Cmp DWord Ptr Ss:[Ebp + 8H], 0
 	Je NewButtons_Train
 
 	Pop Eax
@@ -603,6 +638,8 @@ NewButtons2_Market_6_:
 NewButtons2: ; EBX = Player Addr, EDI = Unit Addr.
 	Push Ecx
 	Push 1
+NewButtons2_Position2:
+	Push 13
 NewButtons2_Position:
 	Push 14
 	Push Ebx
@@ -610,9 +647,29 @@ NewButtons2_Position:
 	Call NewButtons_Sub
 	Pop Ecx
 
-	Cmp Word Ptr Ds:[Edi + 1C6H], 0
+	Cmp Byte Ptr Ds:[Edi + 14CH], 0
 NewButtons2_Back:
 	FakeJmp 00528359H
+
+
+; Disable Delete Button when units have vice-ability
+NewButtonsGr:
+	Cmp Byte Ptr Ss:[Esp + 20H], 1
+	Je NewButtonsGr_1
+	Test Ecx, Ecx
+	Je NewButtonsGr_0
+	Push Ecx
+	Mov Ecx, [Ecx + 8H]
+	Test Byte Ptr Ds:[Ecx + 14CH], 0E0H
+	Pop Ecx
+	Jne NewButtonsGr_1
+NewButtonsGr_0:
+	FakeJmp 00525C83H ;00525CE5H
+NewButtonsGr_1:
+	FakeJmp 00525CC2H ;00525D00H
+NewButtonsGr_2:
+	FakeJmp 00525D35H
+
 
 
 ; Initialize Displayed Market Prices
@@ -746,13 +803,17 @@ FreeDrop_Transform__:
 
 
 ; Attack Ground
-; Allow Units with Attack Mode = 6 or Tower Mode = 8 to attack ground
+; Allow Units with Attack Mode = 6 or Tower Mode = 8 or Tower Mode & 0E0H = 20h to attack ground
 AttackGround:
 	Cmp Ax, 24H
 	Je AttackGround_1
 	Cmp Word Ptr Ds:[Ecx + 99H], 6
 	Je AttackGround_1
-	Cmp Word Ptr Ds:[Ecx + 14CH], 8
+	Mov Al, Byte Ptr Ds:[Ecx + 14CH]
+	Cmp Al, 8
+	Je AttackGround_1
+	And Al, 0E0H
+	Cmp Al, 20H
 	Jne AttackGround_3
 AttackGround_2:
 	FakeJmp 0046794CH
@@ -1094,32 +1155,6 @@ VillagerCounterFix_3:
 ; 6th bit: Veichles (Siege Weapon, Scorpion and Trebuchets)
 ; 7th bit: Ships (Trade, Fishing, Transport, Warship and Boarding Boats)
 MoreGarrisonTypes: ; Eax = Unit Class, Dl = Garrision Type
-	;Cmp Ax, 13
-	;Je MoreGarrisonTypes_Veichle
-	;Cmp Ax, 54
-	;Je MoreGarrisonTypes_Veichle
-	;Cmp Ax, 51
-	;Je MoreGarrisonTypes_Veichle
-	;Cmp Ax, 55
-	;Je MoreGarrisonTypes_Veichle
-	;Cmp Ax, 2
-	;Je MoreGarrisonTypes_Ship
-	;Cmp Ax, 20
-	;Je MoreGarrisonTypes_Ship
-	;Cmp Ax, 21
-	;Je MoreGarrisonTypes_Ship
-	;Cmp Ax, 22
-	;Je MoreGarrisonTypes_Ship
-	;Cmp Ax, 53
-	;Je MoreGarrisonTypes_Ship
-	;Cmp Ax, 9
-	;Je MoreGarrisonTypes_Animal
-	;Cmp Ax, 10
-	;Je MoreGarrisonTypes_Animal
-	;Cmp Ax, 29
-	;Je MoreGarrisonTypes_Animal
-	;Cmp Ax, 58
-	;Je MoreGarrisonTypes_Animal
 	Mov Bl, Byte Ptr Ds:[Eax + 434EB4H]
 	Cmp Bl, 05H
 	Jge MoreGarrisonTypes_
@@ -1132,6 +1167,8 @@ MoreGarrisonTypes_:
 	Je MoreGarrisonTypes_Veichle
 	Cmp Bl, 07H
 	Je MoreGarrisonTypes_Ship
+	Cmp Bl, 08H
+	Je MoreGarrisonTypes_Custom
 	Test Dl, 80H ; Custom Garrision
 	Je MoreGarrisonTypes_2
 	Jmp MoreGarrisonTypes_1
@@ -1153,6 +1190,11 @@ MoreGarrisonTypes_Veichle:
 
 MoreGarrisonTypes_Ship:
 	Test Dl, 40H
+	Je MoreGarrisonTypes_2
+	Jmp MoreGarrisonTypes_1
+
+MoreGarrisonTypes_Custom:
+	Test Dl, 80H
 	Je MoreGarrisonTypes_2
 	Jmp MoreGarrisonTypes_1
 
@@ -1283,5 +1325,187 @@ PickRelic3_1:
 	FakeJmp 004B18FEH
 
 
+IFV: ;004C5D24h , EDI = Source Unit, ESI = Room Unit
+	Mov Ecx, DWord Ptr Ds:[Esi + 24H]
+	Cmp DWord Ptr Ds:[Ecx + 4H], 1
+	Jne IFV_
 
-__PatchModdingEnd:
+	Push Edi
+	Mov Edi, [Edi + 8H]
+
+	Push 0
+	Push DWord Ptr Ds:[Edi + 10H]
+	Push DWord Ptr Ds:[Edi + 16H]
+	Push 160
+	Mov Ecx, Esi
+	Call GetAbility
+	Pop Edi
+	Test Eax, Eax
+	Je IFV_
+
+	Movsx Eax, Word Ptr Ds:[Eax + 14H]
+	Mov Ecx, DWord Ptr Ds:[Esi + 0CH]
+	Mov Ecx, DWord Ptr Ds:[Ecx + 74H]
+	Mov Ecx, DWord Ptr Ds:[Ecx + Eax * 4]
+	Push Ecx
+	Mov Ecx, Esi
+IFV_1:
+	FakeCall SUB_TRANSFORM
+
+IFV_:
+	Pop Edi
+	Pop Esi
+	Retn 4
+
+
+IFV2: ;004D27F5h
+	Cmp DWord Ptr Ds:[Ecx + 4], 0
+	Jg IFV2_
+	Mov Esi, [Esp]
+
+	Push 1
+	Push 0
+	Push 0
+	Push 161
+	Mov Ecx, Esi
+	Call GetAbility
+
+	Test Eax, Eax
+	Je IFV2_
+	Cmp Byte Ptr Ds:[Esi + 48H], 02H ; Unit must be living
+	Jne IFV2_
+
+	Push Eax
+	Movsx Eax, Word Ptr Ds:[Eax + 0AH]
+	Mov Ecx, DWord Ptr Ds:[Esi + 0CH]
+	Mov Ecx, DWord Ptr Ds:[Ecx + 74H]
+	Mov Ecx, DWord Ptr Ds:[Ecx + Eax * 4]
+	Push Ecx
+	Mov Ecx, Esi
+IFV2_1:
+	FakeCall SUB_TRANSFORM ; ECX = Source Unit
+	Pop Eax
+	Cmp Byte Ptr Ds:[Eax + 04H], 1 ; Unknown 1
+	Jne IFV2_
+
+	Mov Ecx, DWord Ptr Ds:[Plc]
+	Mov Ecx, DWord Ptr Ds:[Ecx + 424H]
+	Mov Ecx, DWord Ptr Ds:[Ecx + 4CH]
+	Mov Edx, DWord Ptr Ds:[Ecx]
+	Push Edx
+	Mov Ecx, Esi
+	Mov Eax, [Esi]
+	Call DWord Ptr Ds:[Eax + 4CH] ; Change Owner to GAIA
+
+IFV2_:
+	Pop Esi
+	Retn 4
+
+
+; Get Certain Ability Addr.
+; ECX = Source Unit
+; arg1 = type
+; arg2 = class (minor)
+; arg3 = id (major)
+; arg4 = mode (1 ignores arg 2 and 3)
+GetAbility:
+	Push Ebx
+	Push Esi
+	Push Edi
+	Push Edx
+	Push Ebp
+
+	Mov Esi, Ecx
+	Xor Ecx, Ecx
+
+	Mov Edi, DWord Ptr Ds:[Esi + 08H]
+	Mov Ebp, DWord Ptr Ds:[Edi + 0FCH]
+	Xor Eax, Eax
+	Test Ebp, Ebp
+	Je GetAbility_
+	Mov Edi, DWord Ptr Ds:[Ebp + 04H]
+	Xor Esi, Esi
+
+GetAbility_Loop:
+	Mov Edx, DWord Ptr Ds:[Edi]
+
+	Mov Bx, Word Ptr Ss:[Esp + 18H] ; arg1
+	Cmp Word Ptr Ds:[Edx + 06H], Bx
+	Jne GetAbility_Loop_
+	Xor Cl, Cl ; priority
+
+	Cmp DWord Ptr Ss:[Esp + 24H], 1 ; arg4
+	Je GetAbility_Loop_1st
+
+	Mov Ebx, DWord Ptr Ss:[Esp + 20H] ; arg3
+	Je GetAbility_Loop_1st
+	Cmp Word Ptr Ds:[Edx + 0AH], Bx
+	Jne GetAbility_Loop_2nd
+GetAbility_Loop_1st:
+	Mov Cl, 3
+	Jmp GetAbility_Loop_Do
+GetAbility_Loop_2nd:
+	Cmp Word Ptr Ds:[Edx + 0AH], -1
+	Jne GetAbility_Loop_
+	Mov Ebx, DWord Ptr Ss:[Esp + 1CH] ; arg2
+	Cmp Word Ptr Ds:[Edx + 08H], Bx
+	Jne GetAbility_Loop_3rd
+	Mov Cl, 2
+	Jmp GetAbility_Loop_Do
+GetAbility_Loop_3rd:
+	Cmp Word Ptr Ds:[Edx + 08H], -1
+	Jne GetAbility_Loop_
+	Mov Cl, 1
+
+GetAbility_Loop_Do:
+	Cmp Cl, Ch
+	Jle GetAbility_Loop_
+	Mov Esi, Edx
+	Mov Ch, Cl
+
+GetAbility_Loop_:
+	Add Edi, 4
+	Inc Eax
+	Cmp Eax, [Ebp + 8H]
+	Jl GetAbility_Loop
+	Mov Eax, Esi
+GetAbility_:
+	Pop Ebp
+	Pop Edx
+	Pop Edi
+	Pop Esi
+	Pop Ebx
+
+	Retn 10H
+
+
+
+RandomUnit: ; 004B12ABh
+	Cmp Esi, 53H
+	Je RandomUnit_Villager
+	Mov Edx, [Edi + 08H]
+	Mov Edx, [Edx + 0CH]
+	Mov Edx, [Edx + 74H]
+	Mov Ecx, [Esi * 4 + Edx]
+	Movsx Ecx, Word Ptr Ds:[Ecx + 58H] ; Unknown 1
+	Cmp Ecx, 0
+	Jl RandomUnit_Other
+	Push Ecx
+RandomUnit_1:
+	FakeCall SUB_RANDOM
+	Cdq
+	Mov Ecx, 64H
+	IDiv Ecx
+	Cmp Edx, 32H
+	Pop Ecx
+	Jl RandomUnit_Other
+	Mov Esi, Ecx
+RandomUnit_Other:
+	FakeJmp 004B12C7H
+
+RandomUnit_Villager:
+	FakeJmp 004B12B0H
+
+
+
+__PatchModdingEnd:

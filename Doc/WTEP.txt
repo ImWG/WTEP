@@ -1,8 +1,8 @@
 =============================================================
 
-          WAIFor's Trigger Effects and Modding Patch
+     WAIFor's Trigger & Extension Patch For UserPatch 1.4
                       For UserPatch 1.4
-                    Beta Version 1.00.8.0000
+                     Version 1.00.8.0006
 
                       By WAIFor, 2016
 
@@ -78,6 +78,36 @@ modifying ini contents.
   
 - New effects by setting different "number"s:
 
+    [Change Diplomacy]
+   #1 - Let the source player get or lose revealed field of destination player. Ally
+        makes player obtains, the other loses.
+   #2 - Let the source player get or lose line of sight of destination player. If you
+        lose LoS of yourself, you'll see buildings of yours standing in black area.
+    3 - Let the source CLIENT control destination player. After that, source client
+        will see destination's interface, scene, and do their's orders. Client N is
+        once game started, the client controlling player N.
+
+    [Send Chat]
+    1 - Use cheat by Dest Player.
+
+    [Tribute]
+    1 - Directly set destination player's resource quantity.
+    2 - Tribute from source to dest, but multiplied with 0.001.
+    3 - Directly set destination player's resource quantity multiplied with 0.001.
+    4 - Multiply with quantity permillages, from source to dest in confirmed resource.
+    5 - If positive, set destination's quantity confirmed resource (0-Food, 1-Wood,
+        2-Stone, etc.) as source's list confirmed resource. Else, effect will plus
+        rather than set (-1-Food, -2-Wood, -3-Stone, etc.).
+    6 - Multiply destination's quantity confirmed resource with source's list
+        confirmed resource. Negative quantity makes multiply and plus.
+    7 - Tribute to Destination Player randomly. For example, if Quanaity is 5, the
+        actual tribute would be between 0 and 4.
+    8 - Set quantity of resource of Destination Player randomly.
+    9 - Set civilization of dest player as the quantity stands. 0 is gaia, 1 is 
+        British, 2 is French, etc. This would only change civ name and sounds of 
+        units, does not affect tech tree. But, this effect would change tech tree
+        after loading saved games!
+
     [Create Object]
     Now, there is a zone selector, choosed zone would replace target point in play 
     time, creating units in every cell without restriction.
@@ -140,35 +170,11 @@ modifying ini contents.
         24 - Interaction Mode.
         98 - Tower Mode. For modding skill function.
         99 - Attribute Piece. For modding skill function.
-        
+
     [Move Sight]
     2 - Move sight to source unit. You have to set a target point to make the effect
         available.
     3 - Cut sight to source unit.
-    
-    [Tribute]
-    1 - Directly set destination player's resource quantity.
-    2 - Tribute from source to dest, but multiplied with 0.001.
-    3 - Directly set destination player's resource quantity multiplied with 0.001.
-    4 - Multiply with quantity permillages, from source to dest in confirmed resource.
-    5 - If positive, set destination's quantity confirmed resource (0-Food, 1-Wood,
-        2-Stone, etc.) as source's list confirmed resource. Else, effect will plus
-        rather than set (-1-Food, -2-Wood, -3-Stone, etc.).
-    6 - Multiply destination's quantity confirmed resource with source's list
-        confirmed resource. Negative quantity makes multiply and plus.
-    9 - Set civilization of dest player as the quantity stands. 0 is gaia, 1 is 
-        British, 2 is French, etc. This would only change civ name and sounds of 
-        units, does not affect tech tree. But, this effect would change tech tree
-        after loading saved games!
-
-    [Change Diplomacy]
-   #1 - Let the source player get or lose revealed field of destination player. Ally
-        makes player obtains, the other loses.
-   #2 - Let the source player get or lose line of sight of destination player. If you
-        lose LoS of yourself, you'll see buildings of yours standing in black area.
-    3 - Let the source CLIENT control destination player. After that, source client
-        will see destination's interface, scene, and do their's orders. Client N is
-        once game started, the client controlling player N.
 
     [Damage Unit]
     1 - Set source units' current HP.
@@ -179,7 +185,7 @@ modifying ini contents.
     5 - Set source units' current HP by their current HP's permillage.
     6 - Add source units' max HP, without changing current HP. This effect would isolate
         units.
-    NOTE: effect "Change Object HP" would trim overflowed HPs.
+    NOTE: effect "Change Object HP" (with Number = 2) would trim overflowed HPs.
 
     [Change Object Attack]
   10+ - Set attributes of protounits by quantity. Those are metric integral attributes.
@@ -200,15 +206,21 @@ modifying ini contents.
   10+ - Set attributes of protounits by quantity. Those are metric float attributes.
         Star "*"  means this attribute can be stored in saved files without isolation.
         10*- Speed
-        11 - Range
-        12 - Work Rate
+        11*- Range
+        12*- Work Rate
         13 - Decay Time
         14*- LoS
         15*- Stored 1
         16*- Stored 2
         17*- Stored 3
         18*- Minimum Projectile Count
-        19*- Damage Radius
+        19 - Damage Radius
+        20*- Radius 1
+        21*- Radius 2
+        22 - Editor Radius 1
+        23 - Editor Radius 2
+        24 - Selection Radius 1
+        25 - Selection Radius 2
         
     * These effects are unstable, they probably cause crashes, especially in returning 
       to the map editor.
@@ -280,6 +292,7 @@ modifying ini contents.
     0 - Only class 18 (Priest) can heal others by right-click on friend units. But units
         with heal button can use it for healing others.
     1 - Any units of class 18, or have skill 4, can heal friends by right-click.
+      * This function is not very useful.
 
     [ExplosionUnit=]
     0 - Only units with id #440 (Petard), #527 (Explosive Boat), #528 (Heavy Explosive Boat)
@@ -314,6 +327,7 @@ modifying ini contents.
     [HeroModeForConversion=]
     0 - Hero Mode=0 is non-hero, else hero.
     1 - Hero Mode=1 is hero, 2 is non-hero but unable to convert, else non-hero.
+      * This function is not so stable.
 
     [CustomBuilder=]
     0 - When Command Id=9, units have #13 - Fishing Boat's build page.
@@ -359,14 +373,41 @@ modifying ini contents.
         5th - Animals (9, 10, 29, 58)
         6th - Vehicles (13, 54, 51, 55)
         7th - Boats (2, 20, 21, 22, 53)
-        Those units can garrision into buildings by alt+right click.
+        8th - Custom
+        Those units can garrision into buildings via Garrision Button, or by alt+right-click.
         But, at present, animals has no ability to garrision.
+        Custom classes could be set in section [CustomGarrisiontypes]. The keys range from "1"
+        to "10". Here's an example:
+        [CustomGarrisionTypes]
+        1=0 ; Archer
+        2=6 ; Infantry
 
     [MonkRelicMemory=]
     0 - None.
     1 - While Monks picking Relics, the changed units - Monk With Relic would record
         monk's unit ids, so that they would restore after deposit, instead of becoming
         normal monks.
+
+    [FunctionGarrison=]
+    0 - None.
+    1 - Activate "Functional Garrison". If one unit is vacant, it could change itself into
+        specified unit when engaged. Besides, one unit can transform after the last passenger
+        leaves.
+        Ability 160 would set enter transform arguments. There can be multi abilities in
+        one unit. "Resource In" determines the transform unit id, and both "Unit Id" and 
+        "Class" filter what passenger units can be.
+        Priorities:
+        1st - Unit Id = passenger id
+        2nd - Unit Id = -1, Class = passenger class
+        3rd - Both Unit Id and Class equals to -1.
+        Meanwhile, Ability 161 sets leave arguments. "Unit Id" stands for the transform
+        unit id. "Unknown 1" is special - if set to 1, units would convert to GAIA's.
+
+    [RandomTrain=]
+    0 - None.
+    1 - Enable "Random Train". When one unit was trained, there would be half of chance
+        to be another unit, just like Villager of male or female. The alternative unit
+        id is determined by "Unknown 1", negative value means no random unit.
 
 
 - Some modding icons could be set in section button:
@@ -418,7 +459,7 @@ modifying ini contents.
   into the exe file. After that, you can play by run game directly!
 
 
-- Please do backup before install.
+- PLEASE DO BACKUP BEFORE INSTALL!
 
 
 

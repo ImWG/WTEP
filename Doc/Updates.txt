@@ -94,3 +94,16 @@ v1.00.8.0002:
 - Custom cheats.
 - "Send Chat" can send cheats from the specified player.
 - Changed symbols in source code.
+
+v1.00.8.0005:
+- Functional Garrison.
+- Random Tribute effects.
+- Random Train.
+- Vice Skills.
+
+v1.00.8.0006:
+- Functional Garrison can convert to GAIA now.
+- Custom Garrision type.
+
+v1.00.8.0007:
+- Fixed Funtional Unit's crashing death.

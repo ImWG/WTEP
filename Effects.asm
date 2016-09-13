@@ -32,50 +32,51 @@ ExpandNumberLength@	DD 004EADF9H ; Allow more figures to type in in "Number".
 .Const
 
 ; Interfaces
-$__PatchEffectsStart DD Offset __PatchEffectsStart
-$__PatchEffectsEnd DD Offset __PatchEffectsEnd
+$__PatchEffectsStart DD O __PatchEffectsStart
+$__PatchEffectsEnd DD O __PatchEffectsEnd
 
-$EnableInputs DD Offset EnableInputs
-$MoreResources DD Offset MoreResources
-$CustomColorInfo DD Offset CustomColorInfo
-$TaskObject DD Offset TaskObject
-$KillObject DD Offset KillObject
-$MoveSight DD Offset MoveSight
-$Tribute DD Offset Tribute
-$ShowInfo DD Offset ShowInfo
-$DamageUnit DD Offset DamageUnit
-$CreateUnitArray DD Offset CreateUnitArray
-$ChangeAttack DD Offset ChangeAttack
-$ChangeDiplomacy DD Offset ChangeDiplomacy
-$ChangeSpeed DD Offset ChangeSpeed
-$SendChat DD Offset SendChat
+$EnableInputs DD O EnableInputs
+$MoreResources DD O MoreResources
+$CustomColorInfo DD O CustomColorInfo
+$TaskObject DD O TaskObject
+$KillObject DD O KillObject
+$MoveSight DD O MoveSight
+$Tribute DD O Tribute
+$ShowInfo DD O ShowInfo
+$DamageUnit DD O DamageUnit
+$CreateUnitArray DD O CreateUnitArray
+$ChangeAttack DD O ChangeAttack
+$ChangeDiplomacy DD O ChangeDiplomacy
+$ChangeSpeed DD O ChangeSpeed
+$SendChat DD O SendChat
 
 
-PatchEffectsAddresses DD Offset CustomColorInfo_White, Offset CustomColorInfo_Normal
-	DD Offset EnableInputs_Back
-	DD Offset TaskObject_Other, Offset TaskObject_End
-	DD Offset TaskObject_Transform_1, Offset TaskObject_Immitate_End_1
-	DD Offset TaskObject_Teleport_1, Offset TaskObject_InstantGarrison_1, Offset TaskObject_InstantGarrison_2
-	DD Offset KillObject_Other, Offset KillObject_End, Offset KillObject_Isolate_1
-	DD Offset MoveSight_End, Offset MoveSight_Jle
-	DD Offset Tribute_Other, Offset Tribute_End
-	DD Offset MoreResources_1, Offset MoreResources_2, Offset MoreResources_3, Offset MoreResources_4
-	DD Offset MoreResources_5, Offset MoreResources_6, Offset MoreResources_Back
-	DD Offset ShowInfo_1
-	DD Offset DamageUnit_1, Offset DamageUnit_2, Offset DamageUnit_3
-	DD Offset CreateUnitArray_0, Offset CreateUnitArray_1, Offset CreateUnitArray_2, Offset CreateUnitArray_3
-	DD Offset ChangeAttack_1, Offset ChangeAttack_2, Offset ChangeAttack_3
-	DD Offset ChangeDiplomacy_1, Offset ChangeDiplomacy_2, Offset ChangeDiplomacy_3
-	DD Offset ChangeSpeed_2, Offset ChangeSpeed_1
-	DD Offset SendChat_0, Offset SendChat_1, Offset SendChat_2
+PatchEffectsAddresses DD O CustomColorInfo_White, O CustomColorInfo_Normal
+	DD O EnableInputs_Back
+	DD O TaskObject_Other, O TaskObject_End
+	DD O TaskObject_Transform_1, O TaskObject_Immitate_End_1
+	DD O TaskObject_Teleport_1, O TaskObject_InstantGarrison_1, O TaskObject_InstantGarrison_2
+	DD O KillObject_Other, O KillObject_End, O KillObject_Isolate_1
+	DD O MoveSight_End, O MoveSight_Jle
+	DD O Tribute_Other, O Tribute_End, O Tribute_Random
+	DD O MoreResources_1, O MoreResources_2, O MoreResources_3, O MoreResources_4
+	DD O MoreResources_5, O MoreResources_6, O MoreResources_Back
+	DD O ShowInfo_1
+	DD O DamageUnit_1, O DamageUnit_2, O DamageUnit_3
+	DD O CreateUnitArray_0, O CreateUnitArray_1, O CreateUnitArray_2, O CreateUnitArray_3
+	DD O ChangeAttack_1, O ChangeAttack_2, O ChangeAttack_3
+	DD O ChangeDiplomacy_1, O ChangeDiplomacy_2, O ChangeDiplomacy_3
+	DD O ChangeSpeed_2, O ChangeSpeed_1
+	DD O SendChat_0, O SendChat_1, O SendChat_2
 	DD 0H
 
-PatchEffectsDirectAddresses DD Offset KillObject_Table_, Offset KillObject_Table, 4
-	DD Offset ChangeAttack_Table_, Offset ChangeAttack_Table, 4
-	DD Offset ChangeSpeed_Table_, Offset ChangeSpeed_Table, 4
+PatchEffectsDirectAddresses DD O KillObject_Table_, O KillObject_Table, 4
+	DD O ChangeAttack_Table_, O ChangeAttack_Table, 4
+	DD O ChangeSpeed_Table_, O ChangeSpeed_Table, 4
+	DD O TaskObject_Table_, O TaskObject_Table, 3
 	DD 0H
 
-PatchEffectsDirectAddressArrays DD 0H ; Offset KillObject_Table
+PatchEffectsDirectAddressArrays DD O TaskObject_Table
 	DD 0H
 
 
@@ -223,24 +224,32 @@ CustomColorInfo_White:
 	FakeJmp 0051CF2FH
 
 CustomColorInfo_Other:
-	Cmp Byte Ptr Ds:[Esi], 03CH
+	Cmp Byte Ptr Ds:[Esi], '<'
 	Jne CustomColorInfo_Normal
-	Cmp Byte Ptr Ds:[Esi + 5], 03EH
+	Cmp Byte Ptr Ds:[Esi + 5], '>'
 	Jne CustomColorInfo_Normal
 	Lea Edx, [Esp + 20H]
 	Lea Eax, [Esp + 14H]
 	Mov Cl, Byte Ptr Ds:[Esi + 1]
-	Sub Cl, 041H
+	Sub Cl, 'A'
+	Cmp Cl, 0FH
+	Ja CustomColorInfo_Normal
 	Shl Cl, 4
 	Mov Ch, Byte Ptr Ds:[Esi + 2]
-	Sub Ch, 041H
+	Sub Ch, 'A'
+	Cmp Ch, 0FH
+	Ja CustomColorInfo_Normal
 	Add Cl, Ch
 	Mov Byte Ptr Ds:[Eax], Cl
 	Mov Cl, Byte Ptr Ds:[Esi + 3]
-	Sub Cl, 041H
+	Sub Cl, 'A'
+	Cmp Cl, 0FH
+	Ja CustomColorInfo_Normal
 	Shl Cl, 4
 	Mov Ch, Byte Ptr Ds:[Esi + 4]
-	Sub Ch, 041H
+	Sub Ch, 'A'
+	Cmp Ch, 0FH
+	Ja CustomColorInfo_Normal
 	Add Cl, Ch
 	Mov Byte Ptr Ds:[Edx], Cl
 	Add Esi, 6
@@ -251,60 +260,67 @@ CustomColorInfo_Normal:
 
 TaskObject:
 	Mov Edx, DWord Ptr Ds:[Edi + 64H]
-	Cmp Edx, 0H
-	Jle TaskObject_Other_
-	Cmp Edx, 1H
-	Je TaskObject_Teleport
-	Cmp Edx, 2H
-	Je TaskObject_InstantGarrison
-	Cmp Edx, 6H
-	Je TaskObject_ToId
-	Cmp Edx, 7H
-	Je TaskObject_Transform
-	Cmp Edx, 8H
-	Je TaskObject_Voice
-	Cmp Edx, 9H
-	Je TaskObject_Immitate
+	Cmp Edx, 10
+	Jae TaskObject_Other_
+TaskObject_Table_:
+	Jmp DWord Ptr Ds:[Edx * 4 + 11111111H]
+TaskObject_Table:
+	DD O TaskObject_Other_, O TaskObject_Teleport, O TaskObject_InstantGarrison, O TaskObject_Other_, O TaskObject_Other_
+	DD O TaskObject_Other_, O TaskObject_ToId, O TaskObject_Transform, O TaskObject_Voice, O TaskObject_Immitate
+	DD 0
+
 TaskObject_Other_:
 	Fild DWord Ptr Ds:[Edi + 48H]
 	Push 0H
-
 TaskObject_Other:
 	FakeJmp 00437984H
 
 TaskObject_Immitate:
+	Push Esi
+	Push Edi
+	Push Ebx
 
-	Push Ecx
-	Mov Ecx, DWord Ptr Ds:[Ecx + 8H]
-	Mov Edx, DWord Ptr Ds:[Esp + 28H]
-	Mov Edx, DWord Ptr Ds:[Edx + 8H]
-	Mov Edx, DWord Ptr Ds:[Edx + 18H] ;standing
-	Mov DWord Ptr Ds:[Ecx + 18H], Edx
-	Mov Edx, DWord Ptr Ds:[Esp + 28H]
-	Mov Edx, DWord Ptr Ds:[Edx + 8H]
-	Mov Edx, DWord Ptr Ds:[Edx + 20H] ;dying
-	Mov DWord Ptr Ds:[Ecx + 20H], Edx
-	Cmp Byte Ptr Ds:[Ecx + 4H], 46H ;is source eyecandy
-	Jl TaskObject_Immitate_End
-	Mov Edx, DWord Ptr Ds:[Esp + 28H]
-	Mov Edx, DWord Ptr Ds:[Edx + 8H]
-	Cmp Byte Ptr Ds:[Edx + 4H], 46H
-	Jl TaskObject_Immitate_EyeCandy ; is target eyecandy
-	Mov Edx, DWord Ptr Ds:[Edx + 0CCH] ;walking
-	Mov DWord Ptr Ds:[Ecx + 0CCH], Edx
-	Mov Edx, DWord Ptr Ds:[Esp + 28H]
-	Mov Edx, DWord Ptr Ds:[Edx + 8H]
-	Mov Edx, DWord Ptr Ds:[Edx + 120H] ;attacking
-	Mov DWord Ptr Ds:[Ecx + 120H], Edx
+	Mov Esi, DWord Ptr Ds:[Ecx + 8H]
+	Mov Edi, DWord Ptr Ss:[Esp + 30H] ;+3*4
+	Mov Edi, DWord Ptr Ds:[Edi + 8H]
+	Mov Bl, Byte Ptr Ds:[Esi + 4H]
+	Mov Bh, Byte Ptr Ds:[Edi + 4H]
+
+	Cmp Bl, 3CH ;is source < Type60
+	Jb TaskObject_Immitate_End
+
+	Mov Edx, DWord Ptr Ds:[Edi + 18H] ;standing
+	Mov DWord Ptr Ds:[Esi + 18H], Edx
+	Mov Edx, DWord Ptr Ds:[Edi + 1CH] ;standing 2
+	Mov DWord Ptr Ds:[Esi + 1CH], Edx
+
+	Mov Edx, DWord Ptr Ds:[Edi + 20H] ;dying
+	Mov DWord Ptr Ds:[Esi + 20H], Edx
+	Mov Edx, DWord Ptr Ds:[Edi + 24H] ;dying 2
+	Mov DWord Ptr Ds:[Esi + 24H], Edx
+
+	Cmp Bh, 3CH
+	Jb TaskObject_Immitate_EyeCandy ; is target eyecandy
+
+	Mov Edx, DWord Ptr Ds:[Edi + 0CCH] ;walking
+	Mov DWord Ptr Ds:[Esi + 0CCH], Edx
+	Mov Edx, DWord Ptr Ds:[Edi + 0D0H] ;running
+	Mov DWord Ptr Ds:[Esi + 0D0H], Edx
+	Mov Edx, DWord Ptr Ds:[Edi + 120H] ;attacking
+	Mov DWord Ptr Ds:[Esi + 120H], Edx
 	Jmp TaskObject_Immitate_End
 
 TaskObject_Immitate_EyeCandy:
-	Mov Edx, DWord Ptr Ds:[Edx + 18H]
-	Mov DWord Ptr Ds:[Ecx + 0CCH], Edx
-	Mov DWord Ptr Ds:[Ecx + 120H], Edx
+	Mov Edx, DWord Ptr Ds:[Edi + 18H]
+	Mov DWord Ptr Ds:[Esi + 0CCH], Edx
+	Mov DWord Ptr Ds:[Esi + 120H], Edx
+	Mov Edx, DWord Ptr Ds:[Edi + 1CH]
+	Mov DWord Ptr Ds:[Esi + 0D0H], Edx
 
 TaskObject_Immitate_End: ; Update Vision
-	Pop Ecx
+	Pop Ebx
+	Pop Edi
+	Pop Esi
 	Mov Edx, DWord Ptr Ds:[Ecx + 8H]
 	Push Edx
 TaskObject_Immitate_End_1:
@@ -618,6 +634,10 @@ Tribute:
 	Je Tribute_Convert
 	Cmp Edx, 6H
 	Je Tribute_Product2
+	Cmp Edx, 7H
+	Je Tribute_Random
+	Cmp Edx, 8H
+	Je Tribute_Random
 
 	Fild DWord Ptr Ds:[Edi + 10H]
 	Cmp Edx, 2H
@@ -692,6 +712,25 @@ Tribute_Product2:
 Tribute_Product2_:
 	Fmul DWord Ptr Ds:[Edx + Eax * 4]
 Tribute_Product2__:
+	Fstp DWord Ptr Ds:[Edx + Eax * 4]
+	Jmp Tribute_End
+
+Tribute_Random:
+	FakeCall SUB_RANDOM
+	Cdq
+	Mov Ecx, 64H
+	IDiv Ecx
+	Sub Esp, 4H
+	Mov [Esp], Edx
+	Fild DWord Ptr Ds:[Esp]
+	Fimul DWord Ptr Ds:[Edi + 10H]
+	Fdiv DWord Ptr Ds:[Float100]
+	Add Esp, 4H
+	Cmp DWord Ptr Ss:[Edi + 64H], 7
+	Je Tribute_Other_
+	Mov Edx, DWord Ptr Ss:[Esp + 20H]
+	Mov Edx, DWord Ptr Ds:[Edx + 0A8H]
+	Mov Eax, DWord Ptr Ds:[Edi + 14H]
 	Fstp DWord Ptr Ds:[Edx + Eax * 4]
 	Jmp Tribute_End
 
@@ -1013,7 +1052,7 @@ ChangeSpeed: ; 007DD43Eh
 	Mov Eax, [Edi + 64H]
 	Cmp Eax, 10
 	Jl ChangeSpeed_1
-	Cmp Eax, 20
+	Cmp Eax, 26
 	Jge ChangeSpeed_1
 	Sub Eax, 10
 
@@ -1042,9 +1081,13 @@ ChangeSpeed_1:
 
 ; Speed, Range, WorkRate, DecayRate, LoS(Causing Unrevealable Black Areas!)
 ; Stored1, Stored2, Stored3, ProjCount, BlastRadius
+; Radius1, Radius2, EditorRd1, EditorRd2, SelectRd1
+; SelectRd2
 ChangeSpeed_Table:
 	DW 0C8H, 138H, 108H, 088H, 02CH
 	DW 078H, 07CH, 080H, 198H, 13CH
+	DW 034H, 038H, 064H, 068H, 0BCH
+	DW 0C0H
 
 
 ; Send Chat

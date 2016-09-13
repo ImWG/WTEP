@@ -71,6 +71,8 @@ __OffsetStart	DD 00000000H
 
 .Code
 
+O Equ Offset
+
 
 IncreasePatchAddress Proc _From, _To
 	Mov Eax, __PatchStart@
@@ -372,14 +374,22 @@ WriteCall Proc _jmpFrom, _jmpTo
 WriteCall EndP
 
 
-WriteNumber Proc _jmpFrom, _Length, _Offset ; EAX = Number
+; Mode: 0-Base, 1-Patch
+WriteNumber Proc _jmpFrom, _Length, _Offset, _Mode ; EAX = Number
 	Mov Wbx, Eax
 	Mov Eax, _jmpFrom
-	Sub Eax, __OffsetStart
-	Add Eax, __PatchStart@
-	Add Eax, _Offset
-	.If cInstall != 0
-		Sub Eax, PatchDelta
+	.If _Mode == 0
+		Add Eax, _Offset
+		.If cInstall != 0
+			Sub Eax, BaseDelta
+		.EndIf
+	.Else
+		Sub Eax, __OffsetStart
+		Add Eax, __PatchStart@
+		Add Eax, _Offset
+		.If cInstall != 0
+			Sub Eax, PatchDelta
+		.EndIf
 	.EndIf
 	Mov Wax, Eax
 
@@ -402,7 +412,7 @@ WriteNumber EndP
 SetIcon Proc, _iniIcon, _Target, _Offset
 	Invoke GetINI, Offset iniSection3, _iniIcon, -1
 	.If Eax != -1
-		Invoke WriteNumber, _Target, 1, _Offset
+		Invoke WriteNumber, _Target, 1, _Offset, 1
 	.EndIf
 	Ret
 SetIcon EndP
@@ -410,7 +420,7 @@ SetIcon EndP
 SetCheatUnit Proc, _iniIcon, _Target, _Offset
 	Invoke GetINI, Offset iniSection4, _iniIcon, -1
 	.If Eax != -1
-		Invoke WriteNumber, _Target, 2, _Offset
+		Invoke WriteNumber, _Target, 2, _Offset, 1
 	.EndIf
 	Ret
 SetCheatUnit EndP
@@ -451,6 +461,20 @@ SetCheat Proc, _iniCheat, _Target
 	.EndIf
 	Ret
 SetCheat EndP
+
+SetGarrisionType Proc, _iniKey
+	Invoke GetINI, Offset iniSection5, _iniKey, -1
+	.If Eax != -1
+		Mov Esi, Eax
+		Mov Eax, 8
+		Invoke WriteNumber, MoreGarrison2@, 1, Esi, 0
+		Xor Eax, Eax
+		Invoke WriteNumber, MoreGarrison4@, 1, Esi, 0
+	.EndIf
+	Ret
+SetGarrisionType EndP
+
+
 
 
 
@@ -641,14 +665,17 @@ PatchIsReady:
 			Invoke	WritePatch, SecondPageA@, Offset SecondPageA, SecondPageAN
 			Invoke	WritePatch, SecondPage2@, Offset SecondPage2, SecondPage2N
 
+			Mov Eax, 12
+			Invoke WriteNumber, $NewButtons2_Position2, 1, 1, 1 ; Adjust positions of skill buttons
 			Mov Eax, 13
-			Invoke WriteNumber, $NewButtons2_Position, 1, 1 ; Adjust positions of skill buttons
+			Invoke WriteNumber, $NewButtons2_Position, 1, 1, 1 ; Adjust positions of skill buttons
 		.EndIf
 
 		Invoke GetINI, Offset iniSection1, Offset iniKeyNewSkills, 0
 		.If Eax == 1
 			Invoke	WriteJmp, NewButtons@, $NewButtons
 			Invoke	WriteJmp, NewButtons2@, $NewButtons2
+			Invoke	WriteJmp, NewButtonsGr@, $NewButtonsGr
 			Invoke	WriteJmp, FreeDrop@, $FreeDrop
 			Invoke	WritePatch, FreeDrop2@, Offset FreeDrop2, FreeDrop2N
 
@@ -729,6 +756,19 @@ PatchIsReady:
 			Invoke WriteJmp, MoreGarrison@, $MoreGarrisonTypes
 			Invoke WritePatch, MoreGarrison2@, Offset MoreGarrison2, MoreGarrison2N
 			Invoke WritePatch, MoreGarrison3@, Offset MoreGarrison3, MoreGarrison3N
+			Invoke WritePatch, MoreGarrison4@, Offset MoreGarrison4, MoreGarrison4N
+
+			Invoke SetGarrisionType, O iniKey1
+			Invoke SetGarrisionType, O iniKey2
+			Invoke SetGarrisionType, O iniKey3
+			Invoke SetGarrisionType, O iniKey4
+			Invoke SetGarrisionType, O iniKey5
+			Invoke SetGarrisionType, O iniKey6
+			Invoke SetGarrisionType, O iniKey7
+			Invoke SetGarrisionType, O iniKey8
+			Invoke SetGarrisionType, O iniKey9
+			Invoke SetGarrisionType, O iniKey10
+
 		.EndIf
 
 		;Invoke WriteJmp, Repulse@, $Repulse
@@ -738,6 +778,17 @@ PatchIsReady:
 			Invoke WriteJmp, PickRelic2@, $PickRelic2
 			Invoke WriteJmp, PickRelic3@, $PickRelic3
 			Invoke WriteJmp, PickRelic4@, $PickRelic4
+		.EndIf
+
+		Invoke GetINI, Offset iniSection1, O iniKeyIFV, 0
+		.If Eax == 1
+			Invoke WriteJmp, IFV@, $IFV
+			Invoke WriteJmp, IFV2@, $IFV2
+		.EndIf
+
+		Invoke GetINI, Offset iniSection1, Offset iniKeyRandomUnit, 0
+		.If Eax == 1
+			Invoke WriteJmp, RandomUnit@, $RandomUnit
 		.EndIf
 
 		Invoke	SetIcon, Offset iniIconHeal, $IconHeal, 1
@@ -750,6 +801,11 @@ PatchIsReady:
 		Invoke	SetIcon, Offset iniIconUnpack, $IconUnpack, 1
 		Invoke	SetIcon, Offset iniIconPack, $IconPack, 1
 		Invoke	SetIcon, Offset iniIconDepositRes, $IconDepositRes, 1
+
+		Invoke	SetIcon, Offset iniIconHeal, $IconHeal2, 1
+		Invoke	SetIcon, Offset iniIconGround, $IconGround2, 1
+		Invoke	SetIcon, Offset iniIconUnload, $IconUnload2, 1
+		Invoke	SetIcon, Offset iniIconPack, $IconPack2, 1
 
 
 		Invoke WriteDirectAddresses, Offset PatchModdingDirectAddresses
@@ -823,4 +879,5 @@ Exit:
 	Invoke ExitProcess, NULL
 
 End Main
+
 
