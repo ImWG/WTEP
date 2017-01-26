@@ -2,9 +2,9 @@
 
      WAIFor's Trigger & Extension Patch For UserPatch 1.4
                       For UserPatch 1.4
-                     Version 1.00.8.0006
+                     Version 1.01.00.0000
 
-                      By WAIFor, 2016
+                     By WAIFor, 2016-2017
 
 =============================================================
 
@@ -46,10 +46,17 @@ modifying ini contents.
     worry about moving projectiles shot by others unwillingly, because they're of
     negative ids!
 
+    [CasualTerrain=]
+    Activation of this item would make terrain editing more casually - creating 
+    waters without generating shores, or on ridged base. Beaches would not be
+    replaced while painting neighborhood.
+    Besides, it could affect generations of random map. So it is recommended that
+    you activate this in the launcher instead of changing EXE.
+    
 
 - New effects:
 
-  - All Effects have new "Number" imput boxes now. Some certain effects have extra
+  - All Effects have new "Number" input boxes now. Some certain effects have extra
     inputs, like Kill Object, also has "quantity" box now.
 
   - In "Display Instructions", you can set 65536 types of color set for text. To do 
@@ -67,13 +74,30 @@ modifying ini contents.
   - You can type negative symbol "-" instantly in Quantity now.
 
   - In "Accumulate Attribute" and "Tribute", we can select extra resource categories
-    directly, like Pop Cap, Population Limit and Build Rate.
+    directly, like Pop Cap, Population Limit and Build Rate. You can set lang DLLs of
+    those resources in [NewResourceLanguages]:
+    PopLimit - Population limitation
+    BuildRate - Build rate
+    MarketRate - Market trading rate
+    CurrentAge - Current rate
+    MonkHealRate - Monk's healing rate
+    BerserkerHealRate - Berserker's self-healing rate
+    FaithRecharge - Monk's faith recharging rate
+    RelicProduction - Relic's production rate
+    MonkHealRange - Monk's healing range (Called "Archbishop" in default)
+    FoodProduction - Food Gather Production
+    WoodProduction - Wood Gather Production
+    GoldProduction - Gold Gather Production
+    StoneProduction - Stone Gather Production
+    TradeProduction - Trading Production
 
   - In trigger editor, on choosing buildings, units without language DLL ids would
     shown as blank items, making user hard to distinguish'em. Now, those problems is
     solved, they will use interior names.
 
   - Player's civilization could set as GAIA (called "Random").
+
+  - Rotating any buildings, not only Houses.
 
   
 - New effects by setting different "number"s:
@@ -92,21 +116,22 @@ modifying ini contents.
 
     [Tribute]
     1 - Directly set destination player's resource quantity.
-    2 - Tribute from source to dest, but multiplied with 0.001.
-    3 - Directly set destination player's resource quantity multiplied with 0.001.
-    4 - Multiply with quantity permillages, from source to dest in confirmed resource.
-    5 - If positive, set destination's quantity confirmed resource (0-Food, 1-Wood,
+    2 - Multiply with quantity, from source to dest in confirmed resource.
+    3 - If positive, set destination's quantity confirmed resource (0-Food, 1-Wood,
         2-Stone, etc.) as source's list confirmed resource. Else, effect will plus
         rather than set (-1-Food, -2-Wood, -3-Stone, etc.).
-    6 - Multiply destination's quantity confirmed resource with source's list
+    4 - Multiply destination's quantity confirmed resource with source's list
         confirmed resource. Negative quantity makes multiply and plus.
-    7 - Tribute to Destination Player randomly. For example, if Quanaity is 5, the
+    5 - Tribute to Destination Player randomly. For example, if Quanaity is 5, the
         actual tribute would be between 0 and 4.
-    8 - Set quantity of resource of Destination Player randomly.
+    6 - Set quantity of resource of Destination Player randomly.
     9 - Set civilization of dest player as the quantity stands. 0 is gaia, 1 is 
         British, 2 is French, etc. This would only change civ name and sounds of 
         units, does not affect tech tree. But, this effect would change tech tree
         after loading saved games!
+   10 - Tribute from source to dest, but multiplied with 0.001.
+   11 - Directly set destination player's resource quantity multiplied with 0.001.
+   12 - Multiply with quantity permillages, from source to dest in confirmed resource.
 
     [Create Object]
     Now, there is a zone selector, choosed zone would replace target point in play 
@@ -178,13 +203,11 @@ modifying ini contents.
 
     [Damage Unit]
     1 - Set source units' current HP.
-    2 - Damage source units by their max HP's permillage. 100 is damage their 10% of
-        maximum hitpoints.
+    2 - Damage source units by their max HP's permillage. e.g. 100 is damage their
+        10% of maximum hitpoints.
     3 - Set source units' current HP by their max HP's permillage.
     4 - Damage source units by their lost HP's permillage.
     5 - Set source units' current HP by their current HP's permillage.
-    6 - Add source units' max HP, without changing current HP. This effect would isolate
-        units.
     NOTE: effect "Change Object HP" (with Number = 2) would trim overflowed HPs.
 
     [Change Object Attack]
@@ -281,12 +304,14 @@ modifying ini contents.
             Piece BITS determines what trade can do:
             0-Sell Wood, 1-Sell Food, 2-Sell Stone, 3-Buy Wood, 4-Buy Food, 5-Buy Stone.
             A building with this skill doesn't show skill button, but trade buttons.
+       17 - Convert. Currently this is not available.
+       18 - Scout. Explore the destination area.
+       19 - Get out. Get all passengers out.
 
     [AllClassBuildFoundations=]
     0 - Only units of class 4 can put foundations (except #125 - the Fish Trap), class 21
         could put foundations of #125.
     1 - Allow all classes of units put foundations.
-
 
     [AllClassHeal=]
     0 - Only class 18 (Priest) can heal others by right-click on friend units. But units
@@ -305,6 +330,7 @@ modifying ini contents.
     0 - Only units with id #440, #527, #528 or #706 would die hen they attacked.
     1 - Except units with ids above, if a unit's Attack Mode=5, the unit would die when attacked.
     2 - Only units with Attack Mode=5 would die when attacked.
+      * NOTE: In newer AGEs, "Attack Mode" is named "Attack Reaction".
 
     [SelfHealUnit=]
     0 - Besides heroes, only units with id #692 (Berserker), #694 (Elite Berserker) would
@@ -345,21 +371,21 @@ modifying ini contents.
     1 - In train page, one unit of Type 80 would be set as foundation button, if conditions
         below satisfied:
         - The unit is not class 51 (Packed Siege Unit).
-        - The unit is class 51, but HP is not greater than 0.
+        - The unit's Train Time is less than 0.
 
     [ExtendedAttacks=]
     0 - None
-    1 - Special Armor Types:
-        10000 - By target's maximum HP
-        10001 - By target's current HP
-        10002 - By target's lost HP
-        10003 - By source's maximum HP
-        10004 - By source's current HP
-        10005 - By source's lost HP
+    1 - Special Armor Types: (NOTE: they are negative classes)
+        -100 - By target's maximum HP
+        -101 - By target's current HP
+        -102 - By target's lost HP
+        -103 - By source's maximum HP
+        -104 - By source's current HP
+        -105 - By source's lost HP
         Values would be subtracted by 1000 (Default Armor), then the permillage multipled
         with certain HPs as damage. Target's corresponding Armor value would reduce 
-        permillage of source. For instance, units with Atk. 10000:1100 damage units with
-        their max 10% HP, while units with Armor 10000:1020 would sustain 8%.
+        permillage of source. For instance, units with Atk. -100:1100 damage units with
+        their max 10% HP, while units with Armor -100:1020 would sustain 8%.
 
     [FixVillagerCounter=]
     0 - Class-4 units under attack by wild animals, if their Villager Mode is 1, they would
@@ -381,12 +407,19 @@ modifying ini contents.
         [CustomGarrisionTypes]
         1=0 ; Archer
         2=6 ; Infantry
+    2 - Like 1, but another function added. In ability "Garrison Class #3" (required to 
+        garrison in buildings), you can set an override class for garrison, by setting
+        "Resource In" as a positive figure. For example, a cavalry can garrison like a archer
+        when his garrison ability "Resource In" equals 0.
 
     [MonkRelicMemory=]
     0 - None.
     1 - While Monks picking Relics, the changed units - Monk With Relic would record
         monk's unit ids, so that they would restore after deposit, instead of becoming
         normal monks.
+        The "Monk With Relic" unit would inherit original's name, icon, sounds. And it
+        would take running graphic as new standing(still) and walking ones, dying as 
+        new dying.
 
     [FunctionGarrison=]
     0 - None.
@@ -408,10 +441,43 @@ modifying ini contents.
     1 - Enable "Random Train". When one unit was trained, there would be half of chance
         to be another unit, just like Villager of male or female. The alternative unit
         id is determined by "Unknown 1", negative value means no random unit.
+      * NOTE: In newer AGEs, "Unknown 1" is named "Portrait".
+
+    [FreeFoundationTerrain=]
+    This is used to "vacate" foundation terrains for modding.
+    0 - Buildings with "Foundation Terrain" as #27 (Foundation), would convert grass
+        terrains into #27, or snow terrains into #36 (Snow Fd.).
+    1 - Buildings with #27 convert grass terrains into #27, or snow terrains into
+        #33 (Snow Dirt.). #36 was vacated.
+    2 - Buildings with #27 convert grass terrains into #11 (Dirt 2), or snow terrains
+        into #33. #27 and #36 were vacated.
+    3 - Similar with 2, but for buildings with #11.
+    4 - Similar with 2, but for buildings with #127.
+      * Grass terrains includes #0 (Grass 1), #3 (Dirt 3), #7 (Farm 1), #8 (Farm 2),
+        #9 (Grass 3), #12 (Grass 2), #29 (Farm Cnst 1), #31 (Farm Cnst 3). Snow terrains
+        includes #32 (Snow), #34 (Snow Grass).
+
+    [VisbilityInEditor=]
+    0 - A unit with attr "Fog Visbility" be 3 would be invisible all the time.
+    1 - Such units would be invisible EXCEPT in Map Editor.
+
+    [VillagerThirdPage=]
+    0 - Only two pages in villager building page.
+    1 - The third page is attached. It lay in the next page of military buildings page.
+        Buildings with Train Location between 21~35 would present here, regardless of
+        Command ID. 
+
+    [ForcedTypeInEditor=]
+    0 - Except some hardcoded ids, a unit with Type less than 70 would be listed in 
+        "Other" in map editor. 70 type makes unit in "Unit" or "Heroes". 80 type in
+        "Building".
+    1 - Based on normal rules, Units can be listed by attribute "Hide in Editor". 2, 3,
+        4 and 5 stand for Unit, Building, Heroes and Other.
 
 
-- Some modding icons could be set in section button:
+- Some modding buttons could be set in section [buttons]:
 
+    [Icons]
     IconSkillHeal - Skill of heal
     IconSkillBuild - Skill of building page
     IconSkillAttackGround - Skill of attack ground
@@ -421,7 +487,29 @@ modifying ini contents.
     IconSkillParadrop - Skill of paradrop
     IconSkillUnpack - Skill of unpack
     IconSkillPack - Skill of pack
+    IconSkillGetOut - Skill of scout
+    IconSkillScout - Skill of get out
     IconDepositResource - Deposit resource
+    IconGarrison - Garrison button. In offical version, the icon is a cursor in fact. If
+        you set this value as a non-negative figure, the icon would be the certain frame
+        in resource #50721.
+
+    [Description]
+    DescSkillHeal - Skill of heal
+    DescSkillBuild - Skill of building page
+    DescSkillAttackGround - Skill of attack ground
+    DescSkillTrain - Skill of train page
+    DescSkillUnload - Skill of unload
+    DescSkillTeleport - Skill of teleport
+    DescSkillParadrop - Skill of paradrop
+    DescSkillUnpack - Skill of unpack
+    DescSkillPack - Skill of pack
+    DescSkillGetOut - Skill of scout
+    DescSkillScout - Skill of get out
+    DescDepositResource - Deposit resource
+
+    [Position] (From 0 to 14)
+    PosDepositResource - Deposit resource
 
 
 

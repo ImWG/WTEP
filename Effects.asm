@@ -28,8 +28,11 @@ GaiaForPlayer@		DD 007CE1C0H ; Allow set gaia civilization for players (shown as
 GaiaForPlayer2@		DD 007CE1DCH
 BuildingNameFix@	DD 004E1033H ; Fix buildings without language name shown as blank choices in trigger editor.
 ExpandNumberLength@	DD 004EADF9H ; Allow more figures to type in in "Number".
+CasualTerrain@		DD 00461A8AH ; Allow free terrain draw
+CasualTerrain2@		DD 00461444H
+CasualTerrain3@		DD 0045F984H
+HouseRotate@		DD 004CA4DCH ; Allow All Building's Rotation (Not only House #70)
 
-.Const
 
 ; Interfaces
 $__PatchEffectsStart DD O __PatchEffectsStart
@@ -50,6 +53,8 @@ $ChangeDiplomacy DD O ChangeDiplomacy
 $ChangeSpeed DD O ChangeSpeed
 $SendChat DD O SendChat
 
+$MoreResources_Table DD O MoreResources_Table
+
 
 PatchEffectsAddresses DD O CustomColorInfo_White, O CustomColorInfo_Normal
 	DD O EnableInputs_Back
@@ -59,8 +64,7 @@ PatchEffectsAddresses DD O CustomColorInfo_White, O CustomColorInfo_Normal
 	DD O KillObject_Other, O KillObject_End, O KillObject_Isolate_1
 	DD O MoveSight_End, O MoveSight_Jle
 	DD O Tribute_Other, O Tribute_End, O Tribute_Random
-	DD O MoreResources_1, O MoreResources_2, O MoreResources_3, O MoreResources_4
-	DD O MoreResources_5, O MoreResources_6, O MoreResources_Back
+	DD O MoreResources_1, O MoreResources_Back
 	DD O ShowInfo_1
 	DD O DamageUnit_1, O DamageUnit_2, O DamageUnit_3
 	DD O CreateUnitArray_0, O CreateUnitArray_1, O CreateUnitArray_2, O CreateUnitArray_3
@@ -74,9 +78,12 @@ PatchEffectsDirectAddresses DD O KillObject_Table_, O KillObject_Table, 4
 	DD O ChangeAttack_Table_, O ChangeAttack_Table, 4
 	DD O ChangeSpeed_Table_, O ChangeSpeed_Table, 4
 	DD O TaskObject_Table_, O TaskObject_Table, 3
+	DD O Tribute_Table_, O Tribute_Table, 3
+	DD O DamageUnit_Table_, O DamageUnit_Table, 3
+	DD O MoreResources_Table_, O MoreResources_Table, 1
 	DD 0H
 
-PatchEffectsDirectAddressArrays DD O TaskObject_Table
+PatchEffectsDirectAddressArrays DD O TaskObject_Table, O Tribute_Table, O DamageUnit_Table
 	DD 0H
 
 
@@ -102,6 +109,16 @@ BuildingNameFixN	DD 01H
 
 ExpandNumberLength	DB 05H
 ExpandNumberLengthN	DD 1
+
+CasualTerrain		DB 0EBH, 0AH
+CasualTerrainN		DD 02H
+CasualTerrain2		DB 0EBH, 2BH
+CasualTerrain2N		DD 02H
+CasualTerrain3		DB 0EBH
+CasualTerrain3N		DD 01H
+
+HouseRotate			DB 00H
+HouseRotateN		DD 01H
 
 
 .Code
@@ -177,42 +194,48 @@ EnableInputs_Back:
 
 
 MoreResources:
+	Push Ebx
+	Push Esi
+	Push Edi
+MoreResources_Table_:
+	Mov Esi, 11111111H
+	Lea Ebx, [Esi + 2H]
+MoreResources_Loop:
+
 	Mov Ecx, DWord Ptr Ss:[Ebp] ; Pop Limitation
-	Push 4
-	Push 9747
+	Movsx Edi, Word Ptr Ds:[Esi]
+	Cmp Edi, 0
+	Jl MoreResources_LoopEnd
+	Push Edi
+	Movsx Edi, Word Ptr Ds:[Ebx]
+	Push Edi
 MoreResources_1:
 	FakeCall 00550870H
-	Mov Ecx, DWord Ptr Ss:[Ebp] ; Building Rate
-	Push 195
-	Push 7054
-MoreResources_2:
-	FakeCall 00550870H
-	Mov Ecx, DWord Ptr Ss:[Ebp] ; Market Rate
-	Push 78
-	Push 7015
-MoreResources_3:
-	FakeCall 00550870H
-	Mov Ecx, DWord Ptr Ss:[Ebp] ; Current Age
-	Push 6
-	Push 10336
-MoreResources_4:
-	FakeCall 00550870H
-	Mov Ecx, DWord Ptr Ss:[Ebp] ; Monk Heal Rate
-	Push 89
-	Push 4124
-MoreResources_5:
-	FakeCall 00550870H
-	Mov Ecx, DWord Ptr Ss:[Ebp] ; berserker Heal
-	Push 96
-	Push 7431
-MoreResources_6:
-	FakeCall 00550870H
+
+	Add Esi, 4H
+	Add Ebx, 4H
+	Jmp MoreResources_Loop
+
+MoreResources_LoopEnd:
+	Pop Edi
+	Pop Esi
+	Pop Ebx
 
 	Mov Ecx, DWord Ptr Ss:[Ebp]
 	Push 0
 MoreResources_Back:
 	FakeJmp 004EE729H
 
+; Pop Limitation, Building Rate, Market Rate, Current Age, Monk Heal Rate
+; Food Prod., Wood Prod., Gold Prod., Stone Prod., Trade Prod.
+; berserker Heal, Faith Recharging, Relic Prod., Heal Range
+; (Unused)Gathered Gold, Stone, Food, Wood, Map Reveal%
+MoreResources_Table:
+	DW 4, 9747, 195, 8054, 78, 8015, 6, 10336, 89, 4124
+	DW 190, 9906, 189, 9907, 47, 9909, 79, 9908, 10, 42040
+	DW 96, 8431, 35, 8220, 191, 9929, 90, 5620
+	;DW 188, 9909, 187, 9908, 185, 9906, 186, 9907, 22, 9919
+	DW - 1, -1
 
 
 CustomColorInfo:
@@ -523,18 +546,6 @@ KillObject_AttrPiece:
 	Call KillObject_LoopAttr2
 	Jmp KillObject_End
 
-; Originally I used this for loading saved file causes restore problems. I referred UserPatch's Effect, but it doesn't work.
-; I think it is because AOC doesn't save those attributes.
-; Use "Call KillObject_GetProtoUnit" replace "Mov Ebx, DWord Ptr Ds:[Ecx + 08H]".
-;KillObject_GetProtoUnit:
-;	Mov Ebx, DWord Ptr Ds:[Ecx + 0CH]
-;	Mov Ebx, DWord Ptr Ds:[Ebx + 74H]
-;	Mov Ecx, DWord Ptr Ds:[Ecx + 8H]
-;	Mov Cx, Word Ptr Ds:[Ecx + 10H]
-;	And Ecx, 0FFFFH
-;	Mov Ebx, DWord Ptr Ds:[Ebx + Ecx * 4]
-;	Retn
-
 KillObject_Undead:
 	Mov DWord Ptr Ds:[Ecx + 30H], 7F800000H
 	Call KillObject_CommonLoop
@@ -583,7 +594,6 @@ KillObject_Angle:
 	Jl KillObject_Angle
 	Jmp KillObject_End
 
-
 ; Id, Class, Icon, LangId, MinimapMode
 ; Visibility, DeathUnit, Walkable, TerrRt, Projectile
 ; Projectile2, TrainLocation, TrainButton, CommandID, IntereationMode
@@ -622,33 +632,30 @@ MoveSight_End:
 
 Tribute:
 	Mov Edx, DWord Ptr Ss:[Edi + 64H]
-	Cmp Edx, 9H
-	Je Tribute_Civil
-	Cmp Edx, 1H
-	Je Tribute_Instant
-	Cmp Edx, 3H
-	Je Tribute_Instant_1000Div
-	Cmp Edx, 4H
-	Je Tribute_Product_1000Div
-	Cmp Edx, 5H
-	Je Tribute_Convert
-	Cmp Edx, 6H
-	Je Tribute_Product2
-	Cmp Edx, 7H
-	Je Tribute_Random
-	Cmp Edx, 8H
-	Je Tribute_Random
+	Cmp Edx, 13
+	Jae Tribute_Default
+Tribute_Table_:
+	Jmp DWord Ptr Ds:[Edx * 4 + 11111111H]
+Tribute_Table:
+	DD O Tribute_Default, O Tribute_Instant, O Tribute_Product, O Tribute_Convert, O Tribute_Product2
+	DD O Tribute_Random, O Tribute_Random, O Tribute_Default, O Tribute_Default, O Tribute_Civil
+	DD O Tribute_1000Div, O Tribute_Instant_1000Div, O Tribute_Product_1000Div, 0
 
+Tribute_1000Div:
 	Fild DWord Ptr Ds:[Edi + 10H]
-	Cmp Edx, 2H
-	Jne Tribute_Other_
-	Fmul DWord Ptr Ds:[Float0001] ; X = X / 100
-Tribute_Other_:
+	Fmul DWord Ptr Ds:[Float0001] ; X = X / 1000
+	Jmp Tribute_
+Tribute_Default:
+	Fild DWord Ptr Ds:[Edi + 10H]
+Tribute_:
 	Mov Edx, DWord Ptr Ss:[Esp + 20H]
-
 Tribute_Other:
 	FakeJmp 004377C7H
 
+Tribute_Instant_1000Div:
+	Fild DWord Ptr Ds:[Edi + 10H]
+	Fmul DWord Ptr Ds:[Float0001]
+	Jmp Tribute_Instant_
 Tribute_Instant:
 	Fild DWord Ptr Ds:[Edi + 10H]
 Tribute_Instant_:
@@ -658,20 +665,17 @@ Tribute_Instant_:
 	Fstp DWord Ptr Ds:[Edx + Eax * 4]
 	Jmp Tribute_End
 
-Tribute_Instant_1000Div:
-	Fild DWord Ptr Ds:[Edi + 10H]
-	Fmul DWord Ptr Ds:[Float0001]
-	Jmp Tribute_Instant_
-
 Tribute_Product_1000Div:
 	Fild DWord Ptr Ds:[Edi + 10H]
 	Fmul DWord Ptr Ds:[Float0001]
-
+	Jmp Tribute_Product_
+Tribute_Product:
+	Fild DWord Ptr Ds:[Edi + 10H]
+Tribute_Product_:
 	Mov Eax, DWord Ptr Ds:[Edi + 14H]
 	Mov Edx, DWord Ptr Ss:[Esp + 18H]
 	Mov Edx, DWord Ptr Ds:[Edx + 0A8H]
 	Fmul DWord Ptr Ds:[Edx + Eax * 4]
-
 	Mov Edx, DWord Ptr Ss:[Esp + 20H]
 	Mov Edx, DWord Ptr Ds:[Edx + 0A8H]
 	Fstp DWord Ptr Ds:[Edx + Eax * 4]
@@ -699,7 +703,6 @@ Tribute_Product2:
 	Mov Edx, DWord Ptr Ss:[Esp + 18H]
 	Mov Edx, DWord Ptr Ds:[Edx + 0A8H]
 	Fld DWord Ptr Ds:[Edx + Eax * 4]
-
 	Mov Edx, DWord Ptr Ss:[Esp + 20H]
 	Mov Edx, DWord Ptr Ds:[Edx + 0A8H]
 	Mov Eax, DWord Ptr Ds:[Edi + 10H]
@@ -726,8 +729,8 @@ Tribute_Random:
 	Fimul DWord Ptr Ds:[Edi + 10H]
 	Fdiv DWord Ptr Ds:[Float100]
 	Add Esp, 4H
-	Cmp DWord Ptr Ss:[Edi + 64H], 7
-	Je Tribute_Other_
+	Cmp DWord Ptr Ss:[Edi + 64H], 5
+	Je Tribute_
 	Mov Edx, DWord Ptr Ss:[Esp + 20H]
 	Mov Edx, DWord Ptr Ds:[Edx + 0A8H]
 	Mov Eax, DWord Ptr Ds:[Edi + 14H]
@@ -778,19 +781,21 @@ ShowInfo_1:
 
 DamageUnit: ; ST(0) = Quantity
 	Mov Eax, DWord Ptr Ds:[Esi]
-	Mov Dl, Byte Ptr Ds:[Edi + 64H]
-	Cmp Dl, 1 ; Set HP instantly
-	Je DamageUnit_1
-	Cmp Dl, 2 ; Damage HP by permillage
-	Je DamageUnit_Perm
-	Cmp Dl, 3 ; Set HP by permillage
-	Je DamageUnit_Perm
-	Cmp Dl, 4 ; Damage HP by current lost HP's permillage
-	Je DamageUnit_LostPerm
-	Cmp Dl, 5 ; Set HP by current HP's permillage
-	Je DamageUnit_CurrentPerm
-	Cmp Dl, 6 ; Add Max HP
-	Je DamageUnit_AddEmptyHP
+	Mov Edx, DWord Ptr Ds:[Edi + 64H]
+	Cmp Edx, 7
+	Jae DamageUnit_
+DamageUnit_Table_:
+	Jmp DWord Ptr Ds:[Edx * 4 + 11111111H]
+
+; Set HP instantly
+; Damage HP by permillage
+; Set HP by permillage
+; Damage HP by current lost HP's permillage
+; Set HP by current HP's permillage
+; Add Max HP
+DamageUnit_Table:
+	DD O DamageUnit_, O DamageUnit_1, DamageUnit_Perm, DamageUnit_Perm, DamageUnit_LostPerm
+	DD O DamageUnit_CurrentPerm, 0 ; DamageUnit_AddEmptyHP
 
 DamageUnit_:
 	Fsubr DWord Ptr Ds:[Eax + 30H]
