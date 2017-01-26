@@ -8,9 +8,6 @@ Include	kernel32.inc
 IncludeLib	user32.lib
 IncludeLib	kernel32.lib
 
-;Include	effects.asm
-;Include	modding.asm
-
 .Const
 
 MyPatchSizeX  	DD 00030000H
@@ -47,6 +44,8 @@ Wcx	DD ?
 Wdx	DD ?
 Wsi DD ?
 
+Wst	DB 256 Dup(?) ; String Buffer
+
 
 .Data
 
@@ -68,6 +67,8 @@ __OffsetStart	DD 00000000H
 
 
 .Code
+
+O Equ Offset
 
 
 IncreasePatchAddress Proc _From, _To
@@ -237,6 +238,45 @@ WriteDirectAddressArrays Proc _jmpFroms
 WriteDirectAddressArrays EndP
 
 
+WriteDirectAddressReverse Proc _jmpFrom, _jmpTo ; From Original to Patch
+	Mov Eax, _jmpFrom
+	Mov Wax, Eax
+
+	Mov Eax, _jmpTo
+	Add Eax, __PatchStart@
+	Sub Eax, __OffsetStart
+	Mov Wbx, Eax
+
+	.If cInstall == 0
+		Invoke	WriteProcessMemory, stProcInfo.hProcess, Wax, Offset Wbx, 4, 0
+		test	eax,eax
+		setnz	cl
+		Movzx Eax, Cl
+	.Else
+		Mov Eax, Wax
+		Sub Eax, BaseDelta
+		Mov Wax, Eax
+		Invoke SetFilePointer, fHandle, Wax, 0H, FILE_BEGIN
+		Invoke WriteFile, fHandle, Offset Wbx, 4, Addr Wcx, NULL
+	.EndIf
+
+	Ret
+WriteDirectAddressReverse EndP
+
+WriteAddressReverse Proc _jmpFrom, _jmpTo, _offset ; From Original to Patch
+
+	Mov Eax, _jmpTo
+	Sub Eax, _jmpFrom
+	Sub Eax, _offset
+
+	Invoke WriteDirectAddressReverse, _jmpFrom, Eax
+
+	Ret
+WriteAddressReverse EndP
+
+
+
+
 WriteAddress Proc _jmpFrom
 	Mov Eax, _jmpFrom
 	Sub Eax, __OffsetStart
@@ -347,20 +387,45 @@ WriteJmp Proc _jmpFrom, _jmpTo
 	Ret
 WriteJmp EndP
 
+; Multi to One
+WriteJmps Proc _jmpFroms, _jmpTo
+	Mov Eax, _jmpFroms
+	Mov Wsi, Eax
+
+	.Repeat
+		Mov Eax, Wsi
+		Mov Eax, [Eax] ; [Wsi] = Wsi !
+		Invoke WriteJmp, Eax, _jmpTo
+		Mov Eax, Wsi
+		Add Eax, 4
+		Mov Wsi, Eax
+		Mov Eax, [Eax]
+	.Until Eax == 0
+	Ret
+WriteJmps EndP
+
 WriteCall Proc _jmpFrom, _jmpTo
 	Invoke _WriteJmp, _jmpFrom, _jmpTo, Offset _Call
 	Ret
 WriteCall EndP
 
 
-WriteNumber Proc _jmpFrom, _Length, _Offset ; EAX = Number
+; Mode: 0-Base, 1-Patch
+WriteNumber Proc _jmpFrom, _Length, _Offset, _Mode ; EAX = Number
 	Mov Wbx, Eax
 	Mov Eax, _jmpFrom
-	Sub Eax, __OffsetStart
-	Add Eax, __PatchStart@
-	Add Eax, _Offset
-	.If cInstall != 0
-		Sub Eax, PatchDelta
+	.If _Mode == 0
+		Add Eax, _Offset
+		.If cInstall != 0
+			Sub Eax, BaseDelta
+		.EndIf
+	.Else
+		Sub Eax, __OffsetStart
+		Add Eax, __PatchStart@
+		Add Eax, _Offset
+		.If cInstall != 0
+			Sub Eax, PatchDelta
+		.EndIf
 	.EndIf
 	Mov Wax, Eax
 
@@ -383,10 +448,83 @@ WriteNumber EndP
 SetIcon Proc, _iniIcon, _Target, _Offset
 	Invoke GetINI, Offset iniSection3, _iniIcon, -1
 	.If Eax != -1
-		Invoke WriteNumber, _Target, 1, _Offset
+		Invoke WriteNumber, _Target, 1, _Offset, 1
 	.EndIf
 	Ret
 SetIcon EndP
+
+SetLang Proc, _iniIcon, _Target, _Offset
+	Invoke GetINI, Offset iniSection3, _iniIcon, -1
+	.If Eax != -1
+		Invoke WriteNumber, _Target, 2, _Offset, 1
+	.EndIf
+	Ret
+SetLang EndP
+
+SetResource Proc, _iniIcon, _Target, _Offset
+	Invoke GetINI, Offset iniSection6, _iniIcon, -1
+	.If Eax != -1
+		Invoke WriteNumber, _Target, 2, _Offset, 1
+	.EndIf
+	Ret
+SetResource EndP
+
+SetCheatUnit Proc, _iniIcon, _Target, _Offset
+	Invoke GetINI, Offset iniSection4, _iniIcon, -1
+	.If Eax != -1
+		Invoke WriteNumber, _Target, 2, _Offset, 1
+	.EndIf
+	Ret
+SetCheatUnit EndP
+
+WriteString Proc _jmpFrom, _StringAddr, _Length, _Offset
+	Mov Eax, _StringAddr
+	Mov Wbx, Eax
+	Mov Eax, _jmpFrom
+	Sub Eax, __OffsetStart
+	Add Eax, __PatchStart@
+	Add Eax, _Offset
+	.If cInstall != 0
+		Sub Eax, PatchDelta
+	.EndIf
+	Mov Wax, Eax
+
+	.If cInstall == 0
+		Invoke	WriteProcessMemory, stProcInfo.hProcess, Wax, Wbx, _Length, 0
+		Test Eax, Eax
+		setnz	cl
+		Movzx Eax, Cl
+
+	.Else
+		;Mov Wbx, Eax
+		Invoke SetFilePointer, fHandle, Wax, 0H, FILE_BEGIN
+		Invoke WriteFile, fHandle, Wbx, _Length, Addr Wcx, NULL
+
+	.EndIf
+
+	ret
+WriteString EndP
+
+SetCheat Proc, _iniCheat, _Target
+	Invoke GetINIString, Offset iniSection4, _iniCheat, Offset noCheat, Offset Wst
+	Mov Esi, Offset Wst
+	.If Byte Ptr Ds:[Esi] != 0
+		Invoke WriteString, _Target, Esi, 31, 0
+	.EndIf
+	Ret
+SetCheat EndP
+
+SetGarrisionType Proc, _iniKey
+	Invoke GetINI, Offset iniSection5, _iniKey, -1
+	.If Eax != -1
+		Mov Esi, Eax
+		Mov Eax, 8
+		Invoke WriteNumber, MoreGarrison2@, 1, Esi, 0
+		Xor Eax, Eax
+		Invoke WriteNumber, MoreGarrison4@, 1, Esi, 0
+	.EndIf
+	Ret
+SetGarrisionType EndP
 
 
 
@@ -488,28 +626,29 @@ PatchIsReady:
 	Invoke GetINI, Offset iniSection0, Offset iniKeyTriggers, 0
 
 	.If Eax == 1
-		Mov Eax, _PatchEffectsStart
+		Mov Eax, $__PatchEffectsStart
 		Mov __OffsetStart, Eax
 
 		; Triggers related
-		Invoke	WritePatchCode, __PatchStart@, _PatchEffectsStart, _PatchEffectsEnd
+		Invoke	WritePatchCode, __PatchStart@, $__PatchEffectsStart, $__PatchEffectsEnd
 		Invoke WriteAddresses, Addr PatchEffectsAddresses
 
 		Invoke GetINI, Offset iniSection2, Offset iniKeyNewEffects, 0
 		.If Eax == 1
 			Invoke  WritePatch, ExpandNumberLength@, Offset ExpandNumberLength, ExpandNumberLengthN
-			Invoke	WriteJmp, EnableInputs@, _EnableInputs
-			Invoke	WriteJmp, CustomColorInfo@, _CustomColorInfo
+			Invoke	WriteJmp, EnableInputs@, $EnableInputs
+			Invoke	WriteJmp, CustomColorInfo@, $CustomColorInfo
 
-			Invoke	WriteJmp, TaskObject@, _TaskObject
-			Invoke	WriteJmp, KillObject@, _KillObject
-			Invoke	WriteJmp, MoveSight@, _MoveSight
-			Invoke	WriteJmp, Tribute@, _Tribute
-			Invoke  WriteJmp, DamageUnit@, _DamageUnit
-			Invoke  WriteJmp, ChangeAttack@, _ChangeAttack
-			Invoke  WriteJmp, CreateUnitArray@, _CreateUnitArray
-			Invoke  WriteJmp, ChangeDiplomacy@, _ChangeDiplomacy
-			Invoke  WriteJmp, ChangeSpeed@, _ChangeSpeed
+			Invoke	WriteJmp, TaskObject@, $TaskObject
+			Invoke	WriteJmp, KillObject@, $KillObject
+			Invoke	WriteJmp, MoveSight@, $MoveSight
+			Invoke	WriteJmp, Tribute@, $Tribute
+			Invoke  WriteJmp, DamageUnit@, $DamageUnit
+			Invoke  WriteJmp, ChangeAttack@, $ChangeAttack
+			Invoke  WriteJmp, CreateUnitArray@, $CreateUnitArray
+			Invoke  WriteJmp, ChangeDiplomacy@, $ChangeDiplomacy
+			Invoke  WriteJmp, ChangeSpeed@, $ChangeSpeed
+			Invoke  WriteJmp, SendChat@, $SendChat
 
 		.EndIf
 
@@ -517,10 +656,27 @@ PatchIsReady:
 		Invoke GetINI, Offset iniSection2, Offset iniKeyImprovedEd, 0
 		.If Eax == 1
 			Invoke	WritePatch, MoreTributeRes@, Offset MoreTributeRes, MoreTributeResN
-			Invoke	WriteJmp, MoreResources@, _MoreResources
+			Invoke	WriteJmp, MoreResources@, $MoreResources
 			Invoke	WritePatch, NonNumInQuantity@, Offset NonNumInQuantity, NonNumInQuantityN
 			Invoke	WritePatch, GaiaForPlayer@, Offset GaiaForPlayer, GaiaForPlayerN
+			Invoke	WritePatch, GaiaForPlayer2@, Offset GaiaForPlayer2, GaiaForPlayer2N
 			Invoke	WritePatch, BuildingNameFix@, Offset BuildingNameFix, BuildingNameFixN
+			Invoke	WritePatch, HouseRotate@, Offset HouseRotate, HouseRotateN
+
+			Invoke	SetResource, O iniRDscPopLimit, $MoreResources_Table, 2
+			Invoke	SetResource, O iniRDscBuildRat, $MoreResources_Table, 6
+			Invoke	SetResource, O iniRDscMarketRt, $MoreResources_Table, 10
+			Invoke	SetResource, O iniRDscCurrAge, $MoreResources_Table, 14
+			Invoke	SetResource, O iniRDscMonkHeal, $MoreResources_Table, 18
+			Invoke	SetResource, O iniRDscFoodPrd, $MoreResources_Table, 22
+			Invoke	SetResource, O iniRDscWoodPrd, $MoreResources_Table, 26
+			Invoke	SetResource, O iniRDscGoldPrd, $MoreResources_Table, 30
+			Invoke	SetResource, O iniRDscStonePrd, $MoreResources_Table, 34
+			Invoke	SetResource, O iniRDscTradePrd, $MoreResources_Table, 38
+			Invoke	SetResource, O iniRDscBerserk, $MoreResources_Table, 42
+			Invoke	SetResource, O iniRDscFaithRc, $MoreResources_Table, 46
+			Invoke	SetResource, O iniRDscRelicPrd, $MoreResources_Table, 50
+			Invoke	SetResource, O iniRDscHealRang, $MoreResources_Table, 54
 
 		.EndIf
 
@@ -531,8 +687,15 @@ PatchIsReady:
 
 		.EndIf
 
+		Invoke GetINI, Offset iniSection2, Offset iniKeyCasualTerr, 0
+		.If Eax == 1
+			Invoke	WritePatch, CasualTerrain@, Offset CasualTerrain, CasualTerrainN
+			Invoke	WritePatch, CasualTerrain2@, Offset CasualTerrain2, CasualTerrain2N
+			Invoke	WritePatch, CasualTerrain3@, Offset CasualTerrain3, CasualTerrain3N
 
-		;Invoke	WriteJmp, ShowInfo@, _ShowInfo
+		.EndIf
+
+		;Invoke	WriteJmp, ShowInfo@, $ShowInfo
 
 		Invoke WriteDirectAddresses, Offset PatchEffectsDirectAddresses
 		Invoke WriteDirectAddressArrays, Offset PatchEffectsDirectAddressArrays
@@ -543,33 +706,33 @@ PatchIsReady:
 	Invoke GetINI, Offset iniSection0, Offset iniKeyModding, 0
 
 	.If Eax == 1
-		Mov Eax, _PatchModdingStart
+		Mov Eax, $__PatchModdingStart
 		Mov __OffsetStart, Eax
 
-		Invoke IncreasePatchAddress, _PatchEffectsStart, _PatchEffectsEnd
-		Invoke	WritePatchCode, __PatchStart@, _PatchModdingStart, _PatchModdingEnd
+		Invoke IncreasePatchAddress, $__PatchEffectsStart, $__PatchEffectsEnd
+		Invoke	WritePatchCode, __PatchStart@, $__PatchModdingStart, $__PatchModdingEnd
 		Invoke WriteAddresses, Addr PatchModdingAddresses
 
 
 		Invoke GetINI, Offset iniSection1, Offset iniKeyExplUnit, 0
 		.If Eax == 1
-			Invoke	WriteJmp, ExplosionUnit1@, _ExplosionUnit1
+			Invoke	WriteJmp, ExplosionUnit1@, $ExplosionUnit1
 		.ElseIf Eax == 2
-			Invoke	WriteJmp, ExplosionUnit2@, _ExplosionUnit2
+			Invoke	WriteJmp, ExplosionUnit2@, $ExplosionUnit2
 		.EndIf
 
 		Invoke GetINI, Offset iniSection1, Offset iniKeySelfDestruct, 0
 		.If Eax == 1
-			Invoke	WriteJmp, SelfDestructUnit1@, _SelfDestructUnit1
+			Invoke	WriteJmp, SelfDestructUnit1@, $SelfDestructUnit1
 		.ElseIf Eax == 2
-			Invoke	WriteJmp, SelfDestructUnit2@, _SelfDestructUnit2
+			Invoke	WriteJmp, SelfDestructUnit2@, $SelfDestructUnit2
 		.EndIf
 
 		Invoke GetINI, Offset iniSection1, Offset iniKeySelfHeal, 0
 		.If Eax == 1
-			Invoke	WriteJmp, SelfHealUnit1@, _SelfHealUnit1
+			Invoke	WriteJmp, SelfHealUnit1@, $SelfHealUnit1
 		.ElseIf Eax == 2
-			Invoke	WriteJmp, SelfHealUnit2@, _SelfHealUnit2
+			Invoke	WriteJmp, SelfHealUnit2@, $SelfHealUnit2
 		.EndIf
 
 		Invoke GetINI, Offset iniSection1, Offset iniKey2ndPage, 0
@@ -577,22 +740,25 @@ PatchIsReady:
 			Invoke	WritePatch, SecondPageA@, Offset SecondPageA, SecondPageAN
 			Invoke	WritePatch, SecondPage2@, Offset SecondPage2, SecondPage2N
 
+			Mov Eax, 12
+			Invoke WriteNumber, $NewButtons2_Position2, 1, 1, 1 ; Adjust positions of skill buttons
 			Mov Eax, 13
-			Invoke WriteNumber, _NewButtons2_Position, 1, 1 ; Adjust positions of skill buttons
+			Invoke WriteNumber, $NewButtons2_Position, 1, 1, 1 ; Adjust positions of skill buttons
 		.EndIf
 
 		Invoke GetINI, Offset iniSection1, Offset iniKeyNewSkills, 0
 		.If Eax == 1
-			Invoke	WriteJmp, NewButtons@, _NewButtons
-			Invoke	WriteJmp, NewButtons2@, _NewButtons2
-			Invoke	WriteJmp, FreeDrop@, _FreeDrop
+			Invoke	WriteJmp, NewButtons@, $NewButtons
+			Invoke	WriteJmp, NewButtons2@, $NewButtons2
+			Invoke	WriteJmp, NewButtonsGr@, $NewButtonsGr
+			Invoke	WriteJmp, FreeDrop@, $FreeDrop
 			Invoke	WritePatch, FreeDrop2@, Offset FreeDrop2, FreeDrop2N
 
 			Invoke	WritePatch, AllUnload@, Offset AllUnload, AllUnloadN
-			Invoke	WriteJmp, FreeGather@, _FreeGather
+			Invoke	WriteJmp, FreeGather@, $FreeGather
 
 			;Invoke	WritePatch, MarketInit@, Offset MarketInit, MarketInitN
-			Invoke	WriteJmp, MarketInit@, _MarketInit
+			Invoke	WriteJmp, MarketInit@, $MarketInit
 
 		.EndIf
 
@@ -603,29 +769,29 @@ PatchIsReady:
 
 		Invoke GetINI, Offset iniSection1, Offset iniKeyAllHeal, 0
 		.If Eax == 1
-			Invoke	WriteJmp, AllHeal@, _AllHeal
+			Invoke	WriteJmp, AllHeal@, $AllHeal
 		.EndIf
 
 		Invoke GetINI, Offset iniSection1, Offset iniKeyAttackGnd, 0
 		.If Eax == 1
-			Invoke	WriteJmp, AttackGround@, _AttackGround
-			Invoke	WriteJmp, AttackGround2@, _AttackGround2
+			Invoke	WriteJmp, AttackGround@, $AttackGround
+			Invoke	WriteJmp, AttackGround2@, $AttackGround2
 		.EndIf
 
 		Invoke GetINI, Offset iniSection1, Offset iniKeyBuilder, 0
 		.If Eax == 1
-			Invoke	WriteJmp, CustomBuilder@, _CustomBuilder
+			Invoke	WriteJmp, CustomBuilder@, $CustomBuilder
 		.EndIf
 
 		Invoke GetINI, Offset iniSection1, Offset iniKeyBuilder2, 0
 		.If Eax == 1
-			Invoke	WriteJmp, CustomBuilder2@, _CustomBuilder2
-			Invoke	WriteJmp, CustomBuilder3@, _CustomBuilder3
+			Invoke	WriteJmp, CustomBuilder2@, $CustomBuilder2
+			Invoke	WriteJmp, CustomBuilder3@, $CustomBuilder3
 		.EndIf
 
 		Invoke GetINI, Offset iniSection1, Offset iniKeyDepositButton, 0
 		.If Eax == 1
-			Invoke	WriteJmp, DepositRes@, _DepositResource
+			Invoke	WriteJmp, DepositRes@, $DepositResource
 			Invoke WritePatch, DepositRes2@, Offset DepositRes2, DepositRes2N
 		.EndIf
 
@@ -633,8 +799,8 @@ PatchIsReady:
 
 		Invoke GetINI, Offset iniSection1, Offset iniKeyHeroMode, 0
 		.If Eax == 1
-			Invoke	WriteJmp, HeroMode@, _HeroMode
-			Invoke	WriteJmp, HeroMode2@, _HeroMode2
+			Invoke	WriteJmp, HeroMode@, $HeroMode
+			Invoke	WriteJmp, HeroMode2@, $HeroMode2
 			Invoke WritePatch, HeroMode3@, Offset HeroMode3, HeroMode3N
 			Invoke WritePatch, HeroMode4@, Offset HeroMode4, HeroMode4N
 			Invoke WritePatch, HeroMode5@, Offset HeroMode5, HeroMode5N
@@ -647,44 +813,201 @@ PatchIsReady:
 
 		Invoke GetINI, Offset iniSection1, Offset iniKeyAdvTrain, 0
 		.If Eax == 1
-			Invoke	WriteJmp, AdvTrainButton@, _AdvTrainButton
+			Invoke	WriteJmp, AdvTrainButton@, $AdvTrainButton
 		.EndIf
 
 		Invoke GetINI, Offset iniSection1, Offset iniKeyXAtks, 0
 		.If Eax == 1
-			Invoke WriteJmp, ExtendAttacks@, _ExtendAttacks
+			Invoke WriteJmp, ExtendAttacks@, $ExtendAttacks
 		.EndIf
 
 		Invoke GetINI, Offset iniSection1, Offset iniKeyVillCntr, 0
 		.If Eax == 1
-			Invoke WriteJmp, VillCounterFix@, _VillCounterFix
+			Invoke WriteJmp, VillCounterFix@, $VillCounterFix
 		.EndIf
 
 		Invoke GetINI, Offset iniSection1, Offset iniKeyXGarrison, 0
-		.If Eax == 1
-			Invoke WriteJmp, MoreGarrison@, _MoreGarrisonTypes
+		.If Eax == 1 || Eax == 2
+			.If Eax == 1
+				Invoke WriteJmp, MoreGarrison@, $MoreGarrisonTypes
+			.Else
+				Invoke WriteJmp, MoreGarrisonB@, $MoreGarrisonTypesB
+			.EndIf
+
 			Invoke WritePatch, MoreGarrison2@, Offset MoreGarrison2, MoreGarrison2N
 			Invoke WritePatch, MoreGarrison3@, Offset MoreGarrison3, MoreGarrison3N
+			Invoke WritePatch, MoreGarrison4@, Offset MoreGarrison4, MoreGarrison4N
+
+			Invoke SetGarrisionType, O iniKey1
+			Invoke SetGarrisionType, O iniKey2
+			Invoke SetGarrisionType, O iniKey3
+			Invoke SetGarrisionType, O iniKey4
+			Invoke SetGarrisionType, O iniKey5
+			Invoke SetGarrisionType, O iniKey6
+			Invoke SetGarrisionType, O iniKey7
+			Invoke SetGarrisionType, O iniKey8
+			Invoke SetGarrisionType, O iniKey9
+			Invoke SetGarrisionType, O iniKey10
+
 		.EndIf
 
-		;Invoke WriteJmp, Repulse@, _Repulse
+		;Invoke WriteJmp, Repulse@, $Repulse
+		Invoke GetINI, Offset iniSection1, Offset iniKeyRelicMem, 0
+		.If Eax == 1
+			Invoke WriteJmps, Offset PickRelic@, $PickRelic
+			Invoke WriteJmp, PickRelic2@, $PickRelic2
+			Invoke WriteJmp, PickRelic3@, $PickRelic3
+			Invoke WriteJmp, PickRelic4@, $PickRelic4
+		.EndIf
 
-		Invoke	SetIcon, Offset iniIconHeal, _IconHeal, 1
-		Invoke	SetIcon, Offset iniIconBuild, _IconBuild, 1
-		Invoke	SetIcon, Offset iniIconGround, _IconGround, 1
-		Invoke	SetIcon, Offset iniIconTrain, _IconTrain, 1
-		Invoke	SetIcon, Offset iniIconUnload, _IconUnload, 1
-		Invoke	SetIcon, Offset iniIconTeleport, _IconTeleport, 1
-		Invoke	SetIcon, Offset iniIconDrop, _IconDrop, 1
-		Invoke	SetIcon, Offset iniIconUnpack, _IconUnpack, 1
-		Invoke	SetIcon, Offset iniIconPack, _IconPack, 1
+		Invoke GetINI, Offset iniSection1, O iniKeyIFV, 0
+		.If Eax == 1
+			Invoke WriteJmp, IFV@, $IFV
+			Invoke WriteJmp, IFV2@, $IFV2
+		.EndIf
 
-		Invoke	SetIcon, Offset iniIconDepositRes, _IconDepositRes, 1
+		Invoke GetINI, Offset iniSection1, Offset iniKeyRandomUnit, 0
+		.If Eax == 1
+			Invoke WriteJmp, RandomUnit@, $RandomUnit
+		.EndIf
 
-		
+		Invoke GetINI, Offset iniSection1, Offset iniKeyTerrFndn, 0
+		.If Eax == 1
+			Invoke WritePatch, TerrFndnA@, O TerrFndnA, TerrFndnAN
+		.ElseIf Eax == 2
+			Invoke WriteJmp, TerrFndn@, $TerrFndn
+		.ElseIf Eax == 3
+			Invoke WriteJmp, TerrFndn@, $TerrFndn
+			Invoke WritePatch, TerrFndnC@, O TerrFndnC, TerrFndnCN
+		.ElseIf Eax == 4
+			Invoke WriteJmp, TerrFndn@, $TerrFndn
+			Invoke WritePatch, TerrFndnC@, O TerrFndnD, TerrFndnCN
+		.EndIf
+
+		Invoke GetINI, Offset iniSection1, Offset iniKeyVisInEd, 0
+		.If Eax == 1
+			Invoke WriteJmp, VisInEditor@, $VisInEditor
+		.EndIf
+
+		Invoke GetINI, Offset iniSection1, Offset iniKeyVillThird, 0
+		.If Eax == 1
+			Invoke WriteJmp, VillThirdPage1@, $VillThirdPage1
+			Invoke WriteDirectAddressReverse, VillThirdPage2@, $VillThirdPage2
+			Invoke WriteJmp, VillThirdPage3@, $VillThirdPage3
+			Invoke WriteJmp, VillThirdPage4@, $VillThirdPage4
+			Invoke WriteAddressReverse, VillThirdPage5@, $VillThirdPage5, 4
+			Invoke WritePatch, VillThirdPage6@, O VillThirdPage6, VillThirdPage6N
+			Invoke WritePatch, VillThirdPage7@, O VillThirdPage7, VillThirdPage7N
+			Invoke WritePatch, VillThirdPage8@, O VillThirdPage8, VillThirdPage8N
+			Invoke WritePatch, VillThirdPage9@, O VillThirdPage9, VillThirdPage9N
+			Invoke WritePatch, VillThirdPage10@, O VillThirdPage10, VillThirdPage10N
+		.EndIf
+
+		Invoke GetINI, Offset iniSection1, Offset iniKeyTypeInEd, 0
+		.If Eax == 1
+			Invoke WriteJmp, TypeInEditor1@, $TypeInEditor1
+			Invoke WriteJmp, TypeInEditor2@, $TypeInEditor2
+			Invoke WriteJmp, TypeInEditor3@, $TypeInEditor3
+			Invoke WriteJmp, TypeInEditor4@, $TypeInEditor4
+			Invoke WriteJmp, TypeInEditor5@, $TypeInEditor5
+			Invoke WriteJmp, TypeInEditor6@, $TypeInEditor6
+			Invoke WriteJmp, TypeInEditor7@, $TypeInEditor7
+			Invoke WriteJmp, TypeInEditor8@, $TypeInEditor8
+			Invoke WriteJmp, TypeInEditor9@, $TypeInEditor9
+		.EndIf
+
+
+		Invoke	SetIcon, O iniIconHeal, $IconHeal, 1
+		Invoke	SetIcon, O iniIconBuild, $IconBuild, 1
+		Invoke	SetIcon, O iniIconGround, $IconGround, 1
+		Invoke	SetIcon, O iniIconTrain, $IconTrain, 1
+		Invoke	SetIcon, O iniIconUnload, $IconUnload, 1
+		Invoke	SetIcon, O iniIconTeleport, $IconTeleport, 1
+		Invoke	SetIcon, O iniIconDrop, $IconDrop, 1
+		Invoke	SetIcon, O iniIconUnpack, $IconUnpack, 1
+		Invoke	SetIcon, O iniIconPack, $IconPack, 1
+		Invoke	SetIcon, O iniIconDepositRes, $IconDepositRes, 1
+		Invoke	SetLang, O iniIconGetOut, $IconGetOut, 1
+		Invoke	SetLang, O iniIconScout, $IconScout, 1
+
+		Invoke	SetIcon, O iniIconHeal, $IconHeal2, 1
+		Invoke	SetIcon, O iniIconGround, $IconGround2, 1
+		Invoke	SetIcon, O iniIconUnload, $IconUnload2, 1
+		Invoke	SetIcon, O iniIconPack, $IconPack2, 1
+
+		Invoke	SetLang, O iniDscHeal, $DscHeal, 1
+		Invoke	SetLang, O iniDscBuild, $DscBuild, 1
+		Invoke	SetLang, O iniDscGround, $DscGround, 1
+		Invoke	SetLang, O iniDscTrain, $DscTrain, 1
+		Invoke	SetLang, O iniDscUnload, $DscUnload, 1
+		Invoke	SetLang, O iniDscTeleport, $DscTeleport, 1
+		Invoke	SetLang, O iniDscDrop, $DscDrop, 1
+		Invoke	SetLang, O iniDscUnpack, $DscUnpack, 1
+		Invoke	SetLang, O iniDscPack, $DscPack, 1
+		Invoke	SetLang, O iniDscDepositRes, $DscDepositRes, 1
+		Invoke	SetLang, O iniDscGetOut, $DscGetOut, 1
+		Invoke	SetLang, O iniDscScout, $DscScout, 1
+
+		Invoke	SetLang, O iniDscHeal, $DscHeal2, 1
+		Invoke	SetLang, O iniDscGround, $DscGround2, 1
+		Invoke	SetLang, O iniDscUnload, $DscUnload2, 1
+		Invoke	SetLang, O iniDscPack, $DscPack2, 1
+
+		Invoke	SetIcon, O iniPosDepositRes, $PosDepositRes, 1
+
+		Invoke GetINI, Offset iniSection3, Offset iniIconGarrison, -1
+		.If Eax <= 80000000H
+			Invoke WriteNumber, IconGarrison2@, 1, 0, 0
+			Invoke WritePatch, IconGarrison@, O IconGarrison, IconGarrisonN
+		.EndIf
+
+
+		Invoke WriteDirectAddresses, Offset PatchModdingDirectAddresses
+		Invoke WriteDirectAddressArrays, Offset PatchModdingDirectAddressArrays
 
 	.EndIf
 
+
+	; Cheats Patch
+	Invoke GetINI, Offset iniSection0, Offset iniKeyCheats, 0
+	.If Eax == 1
+		Mov Eax, $__PatchCheatsStart
+		Mov __OffsetStart, Eax
+
+		Invoke IncreasePatchAddress, $__PatchModdingStart, $__PatchModdingEnd
+		Invoke	WritePatchCode, __PatchStart@, $__PatchCheatsStart, $__PatchCheatsEnd
+		Invoke WriteAddresses, Addr PatchCheatsAddresses
+		Invoke WriteDirectAddresses, Offset PatchCheatsDirectAddresses
+		Invoke WriteDirectAddressArrays, Offset PatchCheatsDirectAddressArrays
+
+		Invoke WriteJmp, CheatCheck@, $CheatCheck
+		Invoke WriteJmp, CheatEffect@, $CheatEffect
+
+		; Spawn Cheats
+		Invoke SetCheat, Offset iniCheatSpawn1, $Cheat_1
+		Invoke SetCheatUnit, Offset iniCheatUnit1, $CheatEffect1_Unit, 1
+		Invoke SetCheat, Offset iniCheatSpawn2, $Cheat_2
+		Invoke SetCheatUnit, Offset iniCheatUnit2, $CheatEffect2_Unit, 1
+		Invoke SetCheat, Offset iniCheatSpawn3, $Cheat_3
+		Invoke SetCheatUnit, Offset iniCheatUnit3, $CheatEffect3_Unit, 1
+		Invoke SetCheat, Offset iniCheatSpawn4, $Cheat_4
+		Invoke SetCheatUnit, Offset iniCheatUnit4, $CheatEffect4_Unit, 1
+		Invoke SetCheat, Offset iniCheatSpawn5, $Cheat_5
+		Invoke SetCheatUnit, Offset iniCheatUnit5, $CheatEffect5_Unit, 1
+
+		; Research Cheats
+		Invoke SetCheat, Offset iniCheatTech1, $Cheat_6
+		Invoke SetCheatUnit, Offset iniCheatRsrh1, $CheatEffect6_Unit, 1
+		Invoke SetCheat, Offset iniCheatTech2, $Cheat_7
+		Invoke SetCheatUnit, Offset iniCheatRsrh2, $CheatEffect7_Unit, 1
+		Invoke SetCheat, Offset iniCheatTech3, $Cheat_8
+		Invoke SetCheatUnit, Offset iniCheatRsrh3, $CheatEffect8_Unit, 1
+		Invoke SetCheat, Offset iniCheatTech4, $Cheat_9
+		Invoke SetCheatUnit, Offset iniCheatRsrh4, $CheatEffect9_Unit, 1
+		Invoke SetCheat, Offset iniCheatTech5, $Cheat_10
+		Invoke SetCheatUnit, Offset iniCheatRsrh5, $CheatEffect10_Unit, 1
+
+	.EndIf
 
 
 ;Post-write
@@ -710,4 +1033,5 @@ Exit:
 	Invoke ExitProcess, NULL
 
 End Main
+
 

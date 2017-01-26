@@ -81,3 +81,67 @@ v1.00.7.0005:
 - Some more protounit attribute modify effects.
 - Move player LoS and field vision effects into "Change Diplomacy".
 - Fixed train button mistakes of trebuchets.
+
+v1.00.7.0006:
+- Fixed the bug of no last civilization displayed in editor.
+- Added Intereation Mode and Command ID attributes in Kill Object.
+
+v1.00.8.0000:
+- Added Monk-Relic Memory function.
+- Fixed mistakes in Custom Color Info.
+
+v1.00.8.0002:
+- Custom cheats.
+- "Send Chat" can send cheats from the specified player.
+- Changed symbols in source code.
+
+v1.00.8.0005:
+- Functional Garrison.
+- Random Tribute effects.
+- Random Train.
+- Vice Skills.
+
+v1.00.8.0006:
+- Functional Garrison can convert to GAIA now.
+- Custom Garrision type.
+
+v1.00.8.0008:
+- Fixed Funtional Unit's crashing death.
+- Added Free Foundation Terrain function.
+
+v1.00.9.0000:
+- Adjusted lists of sub Tribute effects.
+- Removed "Add Max Hp" effect.
+- Fixed something about new skills.
+- Fixed one bug, which brought units with infinite HP killed by
+  units with damage by target's current HP.
+
+v1.00.9.0001:
+- Changing descrptions and positions for new buttons is available.
+
+v1.00.9.0002:
+- Fixed one bug: When an unit without abilities got garrisoned,
+  it would crash the game.
+
+v1.00.10.0001:
+- Added "Casual Terrain" mode for terrain editor.
+- Added "Visibility In Editor" function.
+
+v1.00.11.0000:
+- Improved Monk Relic Memory.
+
+v1.00.12.0000:
+- Override garrison type.
+- New skills: scout and get out.
+- Rotating all houses in editor.
+
+v1.01.00.0000:
+- Better algorithm in code address converting.
+- Third page for villager's building. (Thanks to Daniel Pereira)
+- Changing Garrision button is available.
+- (!)The conditions in Advanced Train Button changed. From "HP is not 
+  greater than 0" to "Train Time is LESS THAN 0".
+- Forced Type In Editor.
+- (!)Change Extend Attack classes from 10000~10005 to -100~-105.
+- Fixed Extend Attack bugs.
+- Custom extra resource names.
