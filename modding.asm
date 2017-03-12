@@ -8,7 +8,6 @@ SecondPage2@	DD 0052830CH
 NewButtons@  	DD 00525A04H
 NewButtons2@  	DD 00528351H
 NewButtonsGr@  	DD 00525C7CH ;00525CE0H
-;AllBuildFnd@	DD 005571BBH
 AllBuildFnd@	DD 005571B5H
 AllHeal@		DD 00434AC6H
 FreeDrop@		DD 004692AAH
@@ -104,9 +103,13 @@ TypeInEditor7@ DD 004E0C55H
 TypeInEditor8@ DD 004E11DEH
 TypeInEditor9@ DD 004E5047H
 
-IconGarrison@	DD 00525D10H
-IconGarrison2@	DD 00525D26H
+NewHealUnit@    DD 004C16C2H
 
+IconGarrison@   DD 00525D10H
+IconGarrison2@  DD 00525D26H
+
+MonkHealGraph@  DD 004B4ED0H
+MonkHealGraphId@ DD 004B4EDFH
 
 
 ; Interfaces
@@ -163,6 +166,8 @@ $TypeInEditor6	   DD O TypeInEditor6
 $TypeInEditor7	   DD O TypeInEditor7
 $TypeInEditor8	   DD O TypeInEditor8
 $TypeInEditor9	   DD O TypeInEditor9
+$NewHealUnit       DD O NewHealUnit
+$AllBuildFnd       DD O AllBuildFnd
 
 ; Icons
 $IconHeal          DD O IconHeal
@@ -217,10 +222,10 @@ PatchModdingAddresses DD O NewButtons_0, O NewButtons_1, O NewButtons_2, O NewBu
 		DD O NewButtonsGr_0, O NewButtonsGr_1, O NewButtonsGr_2
 		DD O AllHeal_Monk, O AllHeal_1, O AllHeal_2, O AllHeal_3
 		DD O FreeDrop_1, O FreeDrop_2, O FreeDrop_Back, O FreeDrop_Other
-		DD O ExplosionUnit_1, O ExplosionUnit_2
-		DD O SelfDestructUnit_1, O SelfDestructUnit_2
-		DD O SelfHealUnit_1, O SelfHealUnit_2
-		DD O AttackGround_1, O AttackGround_2, O AttackGround_3, O AttackGround2_1
+		DD O ExplosionUnit_1
+		DD O SelfDestructUnit_1
+		DD O SelfHealUnit_1
+		DD O AttackGround_1, O AttackGround_2, O AttackGround2_1
 		DD O CustomBuilder_1, O CustomBuilder2_1, O CustomBuilder3_1
 		DD O DepositResource_1, O DepositResource_2
 		DD O HeroMode_0, O HeroMode_1, O HeroMode_2, O HeroMode_3
@@ -230,7 +235,7 @@ PatchModdingAddresses DD O NewButtons_0, O NewButtons_1, O NewButtons_2, O NewBu
 		DD O FreeGatherPoint_3, O FreeGatherPoint_4, O FreeGatherPoint_5
 		DD O MarketInit_1, O MarketInit_2
 		DD O ExtendAttacks_1
-		DD O VillagerCounterFix_1, O VillagerCounterFix_2, O VillagerCounterFix_3
+		DD O VillagerCounterFix_1
 		DD O MoreGarrisonTypes_0, O MoreGarrisonTypes_1, O MoreGarrisonTypes_2
 		DD O Repulse_2
 		DD O PickRelic_1, O PickRelic2_1, O PickRelic3_1
@@ -252,6 +257,16 @@ PatchModdingAddresses DD O NewButtons_0, O NewButtons_1, O NewButtons_2, O NewBu
 		DD O TypeInEditor7_1, O TypeInEditor7_2, O TypeInEditor7_3
 		DD O TypeInEditor8_1, O TypeInEditor8_2, O TypeInEditor8_3
 		DD O TypeInEditor9_1
+
+		DD O NewHealUnit_1, O NewHealUnit_2
+		DD O AllBuildFnd_1
+
+		DD 0H
+
+PatchModdingAddresses2 DD O ExplosionUnit_01, O AllBuildFnd_01
+		DD O SelfDestructUnit_01, O SelfHealUnit_01
+		DD O VillagerCounterFix_01, O VillagerCounterFix_02
+		DD O AttackGround_01
 		DD 0H
 
 PatchModdingDirectAddresses DD NewButtons_Table_, O NewButtons_Table, 3
@@ -271,10 +286,6 @@ SecondPageA		DB 00H
 SecondPageAN	DD 1
 SecondPage2		DB 66H, 90H
 SecondPage2N	DD 2
-;AllBuildFnd		DB 0EBH, 04H
-;AllBuildFndN	DD 2
-AllBuildFnd		DB 083H, 03CH, 0E4H, 000H, 0EBH, 000H, 00FH, 084H ; Allowing all classes of units to build foundations
-AllBuildFndN	DD 8
 FreeDrop2		DD 00000000H
 FreeDrop2N		DD 4
 AllUnload		DB 14H, 0FH, 84H
@@ -349,6 +360,11 @@ VillThirdPage10N DD 1
 IconGarrison	DB 20H, 10H
 IconGarrisonN	DD 2
 
+MonkHealGraph   DB 66H, 83H, 7AH, 10H, 7DH, 90H, 75H, 16H, 8BH, 51H, 0CH, 8BH, 52H, 74H, 0B8H, 00H
+				DB 00H, 00H, 00H, 8BH, 14H, 82H, 8BH, 52H, 18H, 8BH, 01H, 90H
+MonkHealGraphN  DD 1CH
+
+
 
 .Code
 
@@ -422,6 +438,18 @@ __PatchModdingStart:
 	DB 'WAIFor modding', 0
 
 
+
+; Allowing all classes of units to build foundations
+AllBuildFnd:
+	Cmp Word Ptr Ss:[Esp + 28H], 4
+AllBuildFnd_01:
+	FakeJe 005571C1H
+	Mov Dl, Cl
+	Cmp Word Ptr Ds:[Eax + 16H], Dx
+AllBuildFnd_1:
+	FakeJmp 005571BBH
+
+
 ; Make units with 4th bit of unit attributes checked explode when die.
 ExplosionUnit1: ; 004C1695H - Remain offical petards and explosion boats
 	Cmp Ax, 1B8H
@@ -431,12 +459,10 @@ ExplosionUnit2: ; 004C167CH - Not remain
 	Mov Eax, DWord Ptr Ds:[Esi + 8H]
 	Mov Al, Byte Ptr Ds:[Eax + 0A4H]
 	Test Al, 08H
-	Je ExplosionUnit_2
+ExplosionUnit_01:
+	FakeJe 004C16B6H
 ExplosionUnit_1:
 	FakeJmp 004C169BH
-
-ExplosionUnit_2:
-	FakeJmp 004C16B6H
 
 
 ; Make units with "Attack Mode"=5 die when attack.
@@ -447,12 +473,10 @@ SelfDestructUnit1: ; 004C2CE6H - Remain offical petards and explosion boats
 SelfDestructUnit2: ; 004C2CD0H - Not remain
 	Mov Al, Byte Ptr Ds:[Edi + 99H]
 	Cmp Al, 5H
-	Jne SelfDestructUnit_2
+SelfDestructUnit_01:
+	FakeJne 004C2D1FH
 SelfDestructUnit_1:
 	FakeJmp 004C2CECH
-
-SelfDestructUnit_2:
-	FakeJmp 004C2D1FH
 
 
 ; Make units 3rd bit of unit attributes checked self-healing like berserkers.
@@ -463,12 +487,10 @@ SelfHealUnit1: ; 004C179BH - Remain offical berserkers
 SelfHealUnit2: ; 004C1791H - Not remain
 	Mov Al, Byte Ptr Ds:[Edx + 0A4H]
 	Test Al, 04H
-	Jz SelfHealUnit_2
+SelfHealUnit_01:
+	FakeJe 004C188BH
 SelfHealUnit_1:
 	FakeJmp 004C17A5H
-
-SelfHealUnit_2:
-	FakeJmp 004C188BH
 
 
 SecondPage:
@@ -830,11 +852,18 @@ AllHeal_1_:
 	Mov Eax, DWord Ptr Ds:[Ebx + 0CH]
 	Cmp Eax, DWord Ptr Ss:[Ebp + 0CH]
 	Jne AllHeal_2_
-	Cmp Byte Ptr Ds:[Ecx + 14CH], 4 ; is with heal skill?
+	Mov Al, Byte Ptr Ds:[Ecx + 14CH]
+	Mov Ah, Al
+	And Al, 1FH
+	Cmp Al, 4 ; is with heal skill?
+	Je AllHeal_3_
+	And Ah, 0E0H
+	Cmp Al, 3 ; is with vice heal skill?
 	Je AllHeal_3_
 
 AllHeal_2_:
 	Pop Ebx
+	Movsx Eax, Word Ptr Ds:[Ecx + 16H]
 AllHeal_2: ; Other
 	FakeJmp 00434CDFH
 
@@ -948,13 +977,12 @@ AttackGround:
 	Je AttackGround_1
 	And Al, 0E0H
 	Cmp Al, 20H
-	Jne AttackGround_3
+AttackGround_01:
+	FakeJne 00467938H
 AttackGround_2:
 	FakeJmp 0046794CH
 AttackGround_1:
 	FakeJmp 00467945H
-AttackGround_3:
-	FakeJmp 00467938H
 
 ; Make Units with Attack Mode = 6 have attack ground buttons instead of petrol, guard and follow
 AttackGround2: ;00526120h
@@ -1292,15 +1320,16 @@ ExtendAttacks_1:
 ; Fixed bugs of Villager's attacked by animals: change into female villager
 VillagerCounterFix: ;005cf005h
 	Cmp Byte Ptr Ds:[Eax + 110H], 1
-	Je VillagerCounterFix_2
+VillagerCounterFix_01:
+	FakeJe 005CF00EH
 	Cmp Byte Ptr Ds:[Eax + 110H], 2
-	Je VillagerCounterFix_3
+VillagerCounterFix_02:
+	FakeJe 005CF020H
 VillagerCounterFix_1:
 	FakeJmp 005CF038H
-VillagerCounterFix_2:
-	FakeJmp 005CF00EH
-VillagerCounterFix_3:
-	FakeJmp 005CF020H
+
+
+
 
 
 ; More Garrison Types
@@ -1458,14 +1487,36 @@ PickRelic_1:
 	Mov Eax, DWord Ptr Ds:[Edi + 118H] ; Attack Sound
 	Mov DWord Ptr Ds:[Esi + 118H], Eax
 
-	Mov Eax, DWord Ptr Ds:[Edi + 0D0H] ; Running - for Relic Image
+	Push 1
+	Sub Esp, 8H
+	Push 132 ; Pickup Ability
+	Mov Ecx, Edi
+	Call GetAbility
+
 	Test Eax, Eax
-	Je PickRelic_SkipImage
-	Mov DWord Ptr Ds:[Esi + 18H], Eax ; Standing
-	Mov DWord Ptr Ds:[Esi + 0CCH], Eax ; Walking
-	Mov Eax, DWord Ptr Ds:[Edi + 20H] ; Dying
-	Mov DWord Ptr Ds:[Esi + 20H], Eax
-PickRelic_SkipImage:
+	.If !Zero?
+		Mov Ebx, Eax ; Ability addr.
+
+		; NOTE: Tool Graphic was used when monks go for relic
+		Mov Eax, DWord Ptr Ds:[Ebx + 38H] ; Standing=Proceeding
+		Test Eax, Eax
+		.If !Zero?
+			Mov DWord Ptr Ds:[Esi + 18H], Eax
+		.EndIf
+
+		Mov Eax, DWord Ptr Ds:[Ebx + 40H] ; Walking=Carrying
+		Test Eax, Eax
+		.If !Zero?
+			Mov DWord Ptr Ds:[Esi + 0CCH], Eax
+		.EndIf
+
+		Mov Eax, DWord Ptr Ds:[Ebx + 3CH] ; Dying=Action
+		Test Eax, Eax
+		.If !Zero?
+			Mov DWord Ptr Ds:[Esi + 20H], Eax
+		.EndIf
+
+	.EndIf
 
 	Mov Ax, Word Ptr Ds:[Edi + 10H]
 	Mov Word Ptr Ds:[Esi + 162H], Ax ; Stored original id in displayed attack
@@ -2115,6 +2166,178 @@ TypeInEditor9_Table:
 	DD 004E5116H ; Building
 	DD 004E5132H ; Hero
 	DD 004E5145H ; Other
+
+
+NewHealUnit:
+	Mov Ecx, Edx
+	Push 1
+	Sub Esp, 8H
+	Push 150
+	Call GetAbility
+	Test Eax, Eax
+	Jne NewHealUnit_
+	Mov Al, Byte Ptr Ds:[Edx + 1B5H] ; Other
+NewHealUnit_1:
+	FakeJmp 004C16C8H
+NewHealUnit_2: ; Other
+	FakeJmp 004C1791H
+
+NewHealUnit_:
+	Mov Edi, Eax
+
+	Fld DWord Ptr Ds:[Esi + 30H]
+	Fcomp DWord Ptr Ds:[635BC8H]
+	Fstsw Ax
+	Test Ah, 01H
+	Jne NewHealUnit_2 ; Taken if HP <= 1
+
+	Cmp Byte Ptr Ds:[Edi + 4], 0
+	JNE NewHealUnit_Fast
+	Mov Eax, DWord Ptr Ds:[Esi + 0CH]
+	Mov Ecx, DWord Ptr Ds:[Eax + 8CH]
+	Fld DWord Ptr Ds:[Ecx + 0A8H]
+	Fadd DWord Ptr Ds:[Esi + 18CH]
+	Fst DWord Ptr Ds:[Esi + 18CH]
+	Fcomp DWord Ptr Ds:[6355CCH]
+	Fstsw Ax
+	Test Ah, 01H
+	Jne NewHealUnit_Skip ; Taken if Paused ( Res < 2.0)
+
+NewHealUnit_Fast:
+	Fld DWord Ptr Ds:[Edi + 1CH] ; Work Rate Mul.
+	Ftst
+	Fstsw Ax
+	Movsx Ecx, Word Ptr Ds:[Edi + 16H]
+	Cmp Ecx, 0
+	Jl NewHealUnit_NoRes
+	Mov Ebp, DWord Ptr Ds:[Esi + 0CH]
+	Mov Ebp, DWord Ptr Ds:[Ebp + 0A8H]
+	Mov Ecx, DWord Ptr Ds:[Ecx * 4 + Ebp]
+	Fmul DWord Ptr Ds:[Ecx + 1CH] ; Resource
+
+NewHealUnit_NoRes:
+	Lea Ebp, [Esp - 4]
+	Fstp DWord Ptr Ss:[Ebp + 14H]
+	Test Ah, 01H
+	Jne NewHealUnit_Decrease
+
+NewHealUnit_Increase:
+	Movsx Ecx, Word Ptr Ds:[Edx + 2AH]
+	Mov DWord Ptr Ss:[Ebp + 10H], Ecx
+	Fild DWord Ptr Ss:[Ebp + 10H]
+	Fcomp DWord Ptr Ds:[Esi + 30H]
+	Fstsw Ax
+	Test Ah, 41H
+	Jne NewHealUnit_Skip
+
+	Fld DWord Ptr Ds:[Esi + 30H]
+	Fcomp DWord Ptr Ds:[Edi + 24H]
+	Fstsw Ax
+	Test Ah, 01H
+	Je NewHealUnit_Skip ; Taken If Hp >= Max Recover Hp
+
+NewHealUnit_Increase_:
+	Fld DWord Ptr Ds:[Esi + 18CH]
+	Fsub DWord Ptr Ds:[6355CCH]
+	Fstp DWord Ptr Ds:[Esi + 18CH]
+	Fld DWord Ptr Ds:[Esi + 30H]
+	Fadd DWord Ptr Ss:[Ebp + 14H]
+	Fst DWord Ptr Ds:[Esi + 30H]
+	Movsx Eax, Word Ptr Ds:[Edx + 2AH]
+	Mov DWord Ptr Ss:[Ebp + 10H], Eax
+	Fild DWord Ptr Ss:[Ebp + 10H]
+	Fxch St(1)
+	Fcompp
+	Fstsw Ax
+	Test Ah, 01H
+	Je NewHealUnit_Full ; Taken if ST>=ST(1)P
+
+	Fld DWord Ptr Ds:[Esi + 30H]
+	Fcomp DWord Ptr Ds:[Edi + 24H]
+	Fstsw Ax
+	Test Ah, 01H
+	Je NewHealUnit_Maximum ; Taken If Hp >= Max Recover Hp
+
+	Fld DWord Ptr Ds:[Esi + 18CH]
+	Fcomp DWord Ptr Ds:[6355CCH] ; FLOAT 2.000000
+	Fstsw Ax
+	Test Ah, 01H
+	Je NewHealUnit_Increase_ ; Taken if ST>=[6355CC]
+
+	Pop Edi
+	Pop Esi
+	Mov Al, Bl
+	Pop Ebp
+	Pop Ebx
+	Pop Ecx
+	Retn
+
+NewHealUnit_Full:
+	Movsx Ecx, Word Ptr Ds:[Edx + 2AH]
+	Mov DWord Ptr Ss:[Esp + 10H], Ecx
+	Pop Edi
+	Fild DWord Ptr Ss:[Esp + 0CH]
+	Mov Al, Bl
+	Fstp DWord Ptr Ds:[Esi + 30H]
+	Pop Esi
+	Pop Ebp
+	Pop Ebx
+	Pop Ecx
+	Retn
+
+NewHealUnit_Maximum:
+	Fld DWord Ptr Ds:[Edi + 24H]
+	Pop Edi
+	Mov Al, Bl
+	Fstp DWord Ptr Ds:[Esi + 30H]
+	Pop Esi
+	Pop Ebp
+	Pop Ebx
+	Pop Ecx
+	Retn
+
+NewHealUnit_Skip:
+	Pop Edi
+	Pop Esi
+	Mov Al, Bl
+	Pop Ebp
+	Pop Ebx
+	Pop Ecx
+	Retn
+
+NewHealUnit_Decrease:
+	Fld DWord Ptr Ds:[Esi + 30H]
+	Fcomp DWord Ptr Ds:[Edi + 24H]
+	Fstsw Ax
+	Test Ah, 41H
+	Jne NewHealUnit_Skip ; Taken If Hp <= Min Decrease Hp
+
+NewHealUnit_Decrease_:
+	Fld DWord Ptr Ds:[Esi + 18CH]
+	Fsub DWord Ptr Ds:[6355CCH]
+	Fstp DWord Ptr Ds:[Esi + 18CH]
+	Fld DWord Ptr Ds:[Esi + 30H]
+	Fadd DWord Ptr Ss:[Ebp + 14H]
+	Fst DWord Ptr Ds:[Esi + 30H]
+
+	Fcomp DWord Ptr Ds:[Edi + 24H]
+	Fstsw Ax
+	Test Ah, 01H
+	Jne NewHealUnit_Maximum ; Taken If Hp < Min Decrease Hp
+
+	Fld DWord Ptr Ds:[Esi + 18CH]
+	Fcomp DWord Ptr Ds:[6355CCH] ; FLOAT 2.000000
+	Fstsw Ax
+	Test Ah, 01H
+	Je NewHealUnit_Decrease_ ; Taken if ST>=[6355CC]
+
+	Pop Edi
+	Pop Esi
+	Mov Al, Bl
+	Pop Ebp
+	Pop Ebx
+	Pop Ecx
+	Retn
 
 
 

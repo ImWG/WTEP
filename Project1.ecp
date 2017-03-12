@@ -27,6 +27,7 @@ Begin ECProject = WTEP
   Module=Effects.asm
   Module=main.asm
   Module=modding.asm
+  Module=unitattrs.asm
   Include=Kernel32.inc
   Include=User32.inc
   Library=Kernel32.lib

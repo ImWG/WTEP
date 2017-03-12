@@ -19,6 +19,58 @@ FakeCall Macro _Address
 	DD _Address
 EndM
 
+
+FakeJb Macro _Address
+	DB 0FH, 82H
+	DD _Address
+EndM
+
+FakeJae Macro _Address
+	DB 0FH, 83H
+	DD _Address
+EndM
+
+FakeJe Macro _Address
+	DB 0FH, 84H
+	DD _Address
+EndM
+
+FakeJne Macro _Address
+	DB 0FH, 85H
+	DD _Address
+EndM
+
+FakeJbe Macro _Address
+	DB 0FH, 86H
+	DD _Address
+EndM
+
+FakeJa Macro _Address
+	DB 0FH, 87H
+	DD _Address
+EndM
+
+FakeJl Macro _Address
+	DB 0FH, 8CH
+	DD _Address
+EndM
+
+FakeJge Macro _Address
+	DB 0FH, 8DH
+	DD _Address
+EndM
+
+FakeJle Macro _Address
+	DB 0FH, 8EH
+	DD _Address
+EndM
+
+FakeJg Macro _Address
+	DB 0FH, 8FH
+	DD _Address
+EndM
+
+
 SUB_REFRESH_GRAPHIC Equ 005CDC10H
 
 SUB_TRANSFORM Equ 004C1A50H
@@ -49,7 +101,7 @@ PageJmp7 Equ 0051D968H
 
 ; Constatnt
 Plc Equ 007912A0H
-Float1 Equ 00635BC8H
+Float1 Equ 00635BC8H ; Hero Healing Rate
 Float100 Equ 006355D8H
 Float05 Equ 00635978H
 Float0 Equ 006355C8H
