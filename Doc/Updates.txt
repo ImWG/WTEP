@@ -145,3 +145,25 @@ v1.01.00.0000:
 - (!)Change Extend Attack classes from 10000~10005 to -100~-105.
 - Fixed Extend Attack bugs.
 - Custom extra resource names.
+
+v1.
+- Improved coding algorithms. Jumping codes were simplified now.
+- Fixed one bug in "AllBuildFoundations". This brought packing or
+  unpacking crash when both trebuchets and other units selected.
+- Added Regeneration ability. You can make customized self healing now.
+- Fixed one bug in "AllClassHeal". It caused boarding boats not able
+  to convert enemy units.
+- (!)Rework on new trigger effects:
+  - All protounit modifications moved in "Kill Object". "Change Unit
+    Attack" and "Change Unit Speed" restored.
+  - "Create Unit" can only create array while number=3 now. On number=4,
+    it creates a unit located by food and wood.
+  - "Tribute" can divide a resource by another now. You can make infinite
+    resource by divide 0. Change civilization sub-effect is removed.
+- (!)Extra resources in scenaro editor is no longer bundled with
+  "ImprovedEditor" item. You need to set "MoreResources" as 1 to enable
+  it.
+- Added monk's healing graphics un-hardcoding function.
+- (!)Monks' picking up relics updated. We no longer use running graphic
+  as graphics of the relic monk. Instead, we use graphics mentioned
+  in pickup ability.

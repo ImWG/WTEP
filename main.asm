@@ -311,6 +311,42 @@ WriteAddress Proc _jmpFrom
 	ret
 WriteAddress EndP
 
+; Conditional Jumps
+WriteAddress2 Proc _jmpFrom
+	Mov Eax, _jmpFrom
+	Sub Eax, __OffsetStart
+	Add Eax, __PatchStart@
+	Add Eax, 2
+	.If cInstall != 0
+		Sub Eax, PatchDelta
+		Mov Wax, Eax ; source address
+		Add Eax, PatchDelta
+	.Else
+		Mov Wax, Eax
+	.EndIf
+	Add Eax, 3
+	Not Eax ; eax = -eax - 1
+	Mov Ecx, _jmpFrom
+	Add Eax, [Ecx + 2]
+	Mov Wbx, Eax ; target address
+
+	.If cInstall == 0
+		Invoke	WriteProcessMemory, stProcInfo.hProcess, Wax, Offset Wbx, 4, 0
+		test	eax,eax
+		setnz	cl
+		Movzx Eax, Cl
+
+	.Else
+		Mov Wbx, Eax
+		Invoke SetFilePointer, fHandle, Wax, 0H, FILE_BEGIN
+		Invoke WriteFile, fHandle, Offset Wbx, 4, Addr Wcx, NULL
+
+	.EndIf
+
+	ret
+WriteAddress2 EndP
+
+
 WriteAddresses Proc _jmpFroms
 	Mov Eax, _jmpFroms
 	Mov Wsi, Eax
@@ -327,6 +363,23 @@ WriteAddresses Proc _jmpFroms
 
 	Ret
 WriteAddresses EndP
+
+WriteAddresses2 Proc _jmpFroms
+	Mov Eax, _jmpFroms
+	Mov Wsi, Eax
+
+	.Repeat
+		Mov Eax, Wsi
+		Mov Eax, [Eax] ; [Wsi] = Wsi !
+		Invoke WriteAddress2, Eax
+		Mov Eax, Wsi
+		Add Eax, 4
+		Mov Wsi, Eax
+		Mov Eax, [Eax]
+	.Until Eax == 0
+
+	Ret
+WriteAddresses2 EndP
 
 
 
@@ -632,6 +685,7 @@ PatchIsReady:
 		; Triggers related
 		Invoke	WritePatchCode, __PatchStart@, $__PatchEffectsStart, $__PatchEffectsEnd
 		Invoke WriteAddresses, Addr PatchEffectsAddresses
+		Invoke WriteAddresses2, Addr PatchEffectsAddresses2
 
 		Invoke GetINI, Offset iniSection2, Offset iniKeyNewEffects, 0
 		.If Eax == 1
@@ -644,10 +698,9 @@ PatchIsReady:
 			Invoke	WriteJmp, MoveSight@, $MoveSight
 			Invoke	WriteJmp, Tribute@, $Tribute
 			Invoke  WriteJmp, DamageUnit@, $DamageUnit
-			Invoke  WriteJmp, ChangeAttack@, $ChangeAttack
-			Invoke  WriteJmp, CreateUnitArray@, $CreateUnitArray
+			Invoke  WriteJmp, DamageUnit2@, $DamageUnit2
+			Invoke  WriteJmp, CreateUnit@, $CreateUnit
 			Invoke  WriteJmp, ChangeDiplomacy@, $ChangeDiplomacy
-			Invoke  WriteJmp, ChangeSpeed@, $ChangeSpeed
 			Invoke  WriteJmp, SendChat@, $SendChat
 
 		.EndIf
@@ -655,14 +708,18 @@ PatchIsReady:
 
 		Invoke GetINI, Offset iniSection2, Offset iniKeyImprovedEd, 0
 		.If Eax == 1
-			Invoke	WritePatch, MoreTributeRes@, Offset MoreTributeRes, MoreTributeResN
-			Invoke	WriteJmp, MoreResources@, $MoreResources
 			Invoke	WritePatch, NonNumInQuantity@, Offset NonNumInQuantity, NonNumInQuantityN
 			Invoke	WritePatch, GaiaForPlayer@, Offset GaiaForPlayer, GaiaForPlayerN
 			Invoke	WritePatch, GaiaForPlayer2@, Offset GaiaForPlayer2, GaiaForPlayer2N
 			Invoke	WritePatch, BuildingNameFix@, Offset BuildingNameFix, BuildingNameFixN
 			Invoke	WritePatch, HouseRotate@, Offset HouseRotate, HouseRotateN
 
+		.EndIf
+
+		Invoke GetINI, Offset iniSection2, Offset iniKeyMoreRes, 0
+		.If Eax == 1
+			Invoke	WriteJmp, MoreResources@, $MoreResources
+			Invoke	WritePatch, MoreTributeRes@, Offset MoreTributeRes, MoreTributeResN
 			Invoke	SetResource, O iniRDscPopLimit, $MoreResources_Table, 2
 			Invoke	SetResource, O iniRDscBuildRat, $MoreResources_Table, 6
 			Invoke	SetResource, O iniRDscMarketRt, $MoreResources_Table, 10
@@ -677,7 +734,6 @@ PatchIsReady:
 			Invoke	SetResource, O iniRDscFaithRc, $MoreResources_Table, 46
 			Invoke	SetResource, O iniRDscRelicPrd, $MoreResources_Table, 50
 			Invoke	SetResource, O iniRDscHealRang, $MoreResources_Table, 54
-
 		.EndIf
 
 
@@ -712,6 +768,7 @@ PatchIsReady:
 		Invoke IncreasePatchAddress, $__PatchEffectsStart, $__PatchEffectsEnd
 		Invoke	WritePatchCode, __PatchStart@, $__PatchModdingStart, $__PatchModdingEnd
 		Invoke WriteAddresses, Addr PatchModdingAddresses
+		Invoke WriteAddresses2, Addr PatchModdingAddresses2
 
 
 		Invoke GetINI, Offset iniSection1, Offset iniKeyExplUnit, 0
@@ -764,7 +821,7 @@ PatchIsReady:
 
 		Invoke GetINI, Offset iniSection1, Offset iniKeyAllFnd, 0
 		.If Eax == 1
-			Invoke	WritePatch, AllBuildFnd@, Offset AllBuildFnd, AllBuildFndN
+			Invoke	WriteJmp, AllBuildFnd@, $AllBuildFnd
 		.EndIf
 
 		Invoke GetINI, Offset iniSection1, Offset iniKeyAllHeal, 0
@@ -914,6 +971,18 @@ PatchIsReady:
 			Invoke WriteJmp, TypeInEditor7@, $TypeInEditor7
 			Invoke WriteJmp, TypeInEditor8@, $TypeInEditor8
 			Invoke WriteJmp, TypeInEditor9@, $TypeInEditor9
+		.EndIf
+
+		Invoke GetINI, Offset iniSection1, Offset iniKeyNewHeal, 0
+		.If Eax == 1
+			Invoke WriteJmp, NewHealUnit@, $NewHealUnit
+		.EndIf
+
+		Invoke GetINI, Offset iniSection1, Offset iniKeyMonkHealGraph, 0
+		.If Eax == 1
+			Invoke WritePatch, MonkHealGraph@, O MonkHealGraph, MonkHealGraphN
+			Invoke GetINI, Offset iniSection1, Offset iniKeyMonkHealGraphId, 125 ; Default is Monk
+			Invoke WriteNumber, MonkHealGraphId@, 4, 0, 0
 		.EndIf
 
 

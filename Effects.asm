@@ -1,5 +1,6 @@
 ;EasyCodeName=Effects,1
 Include	defines.asm
+Include	unitattrs.asm
 
 .Const
 
@@ -8,16 +9,15 @@ CustomColorInfo@ 	DD 0051CF28H
 MoreResources@		DD 004EE724H ; Add more resources in list
 
 EnableInputs@ 		DD 007DD2DDH
-TaskObject@ 		DD 0043797FH
-KillObject@			DD 004379DDH
+TaskObject@ 		DD 0043796BH
+KillObject@			DD 004379CFH
 MoveSight@			DD 007D8B10H
 Tribute@			DD 004377C0H
 ShowInfo@			DD 00437C0FH
 DamageUnit@			DD 00437D40H
-CreateUnitArray@	DD 004378C3H
-ChangeAttack@ 		DD 007D8A94H
+DamageUnit2@ 		DD 00437D36H
+CreateUnit@			DD 007D8BB3H
 ChangeDiplomacy@	DD 00437605H
-ChangeSpeed@		DD 007DD43EH
 SendChat@			DD 0043764FH
 
 ; Isolated patches
@@ -47,10 +47,9 @@ $MoveSight DD O MoveSight
 $Tribute DD O Tribute
 $ShowInfo DD O ShowInfo
 $DamageUnit DD O DamageUnit
-$CreateUnitArray DD O CreateUnitArray
-$ChangeAttack DD O ChangeAttack
+$DamageUnit2 DD O DamageUnit2
+$CreateUnit DD O CreateUnit
 $ChangeDiplomacy DD O ChangeDiplomacy
-$ChangeSpeed DD O ChangeSpeed
 $SendChat DD O SendChat
 
 $MoreResources_Table DD O MoreResources_Table
@@ -58,25 +57,23 @@ $MoreResources_Table DD O MoreResources_Table
 
 PatchEffectsAddresses DD O CustomColorInfo_White, O CustomColorInfo_Normal
 	DD O EnableInputs_Back
-	DD O TaskObject_Other, O TaskObject_End
-	DD O TaskObject_Transform_1, O TaskObject_Immitate_End_1
-	DD O TaskObject_Teleport_1, O TaskObject_InstantGarrison_1, O TaskObject_InstantGarrison_2
-	DD O KillObject_Other, O KillObject_End, O KillObject_Isolate_1
-	DD O MoveSight_End, O MoveSight_Jle
+	DD O TaskObject_Teleport_1
+	DD O MoveSight_Jle
 	DD O Tribute_Other, O Tribute_End, O Tribute_Random
 	DD O MoreResources_1, O MoreResources_Back
 	DD O ShowInfo_1
-	DD O DamageUnit_1, O DamageUnit_2, O DamageUnit_3
-	DD O CreateUnitArray_0, O CreateUnitArray_1, O CreateUnitArray_2, O CreateUnitArray_3
-	DD O ChangeAttack_1, O ChangeAttack_2, O ChangeAttack_3
+	DD O DamageUnit_1, O DamageUnit_2
+	DD O CreateUnit_1, O CreateUnit_2, O CreateUnit_3
 	DD O ChangeDiplomacy_1, O ChangeDiplomacy_2, O ChangeDiplomacy_3
-	DD O ChangeSpeed_2, O ChangeSpeed_1
 	DD O SendChat_0, O SendChat_1, O SendChat_2
 	DD 0H
 
-PatchEffectsDirectAddresses DD O KillObject_Table_, O KillObject_Table, 4
-	DD O ChangeAttack_Table_, O ChangeAttack_Table, 4
-	DD O ChangeSpeed_Table_, O ChangeSpeed_Table, 4
+PatchEffectsAddresses2 DD O CreateUnit_01, O MoveSight_01, O TaskObject_01, 0H
+
+PatchEffectsDirectAddresses DD O KillObject_Table_, O KillObject_Table, 3
+	DD O KillObject_Table2_, O KillObject_Table2, 3
+	DD O KillObject_CallTable_, O KillObject_CallTable, 3
+	DD O KillObject_CallTable2_, O KillObject_CallTable2, 3
 	DD O TaskObject_Table_, O TaskObject_Table, 3
 	DD O Tribute_Table_, O Tribute_Table, 3
 	DD O DamageUnit_Table_, O DamageUnit_Table, 3
@@ -84,6 +81,7 @@ PatchEffectsDirectAddresses DD O KillObject_Table_, O KillObject_Table, 4
 	DD 0H
 
 PatchEffectsDirectAddressArrays DD O TaskObject_Table, O Tribute_Table, O DamageUnit_Table
+	DD O KillObject_CallTable, O KillObject_CallTable2
 	DD 0H
 
 
@@ -122,6 +120,8 @@ HouseRotateN		DD 01H
 
 
 .Code
+
+
 
 ; Patch Content
 __PatchEffectsStart:
@@ -282,87 +282,24 @@ CustomColorInfo_Normal:
 
 
 TaskObject:
-	Mov Edx, DWord Ptr Ds:[Edi + 64H]
-	Cmp Edx, 10
-	Jae TaskObject_Other_
+	Lea Ebp, [Esp + 94H]
+	Mov Ecx, DWord Ptr Ds:[Edi + 64H]
+	Dec Ecx
+	Cmp Ecx, 3
+TaskObject_01:
+	FakeJa 00437972H
+
 TaskObject_Table_:
-	Jmp DWord Ptr Ds:[Edx * 4 + 11111111H]
+	Jmp DWord Ptr Ds:[Ecx * 4 + 11111111H]
 TaskObject_Table:
-	DD O TaskObject_Other_, O TaskObject_Teleport, O TaskObject_InstantGarrison, O TaskObject_Other_, O TaskObject_Other_
-	DD O TaskObject_Other_, O TaskObject_ToId, O TaskObject_Transform, O TaskObject_Voice, O TaskObject_Immitate
-	DD 0
+	DD O TaskObject_Teleport, O TaskObject_Garrison, TaskObject_ByRes, 0 ;O TaskObject_Transform, 0
 
-TaskObject_Other_:
-	Fild DWord Ptr Ds:[Edi + 48H]
-	Push 0H
-TaskObject_Other:
-	FakeJmp 00437984H
-
-TaskObject_Immitate:
-	Push Esi
-	Push Edi
-	Push Ebx
-
-	Mov Esi, DWord Ptr Ds:[Ecx + 8H]
-	Mov Edi, DWord Ptr Ss:[Esp + 30H] ;+3*4
-	Mov Edi, DWord Ptr Ds:[Edi + 8H]
-	Mov Bl, Byte Ptr Ds:[Esi + 4H]
-	Mov Bh, Byte Ptr Ds:[Edi + 4H]
-
-	Cmp Bl, 3CH ;is source < Type60
-	Jb TaskObject_Immitate_End
-
-	Mov Edx, DWord Ptr Ds:[Edi + 18H] ;standing
-	Mov DWord Ptr Ds:[Esi + 18H], Edx
-	Mov Edx, DWord Ptr Ds:[Edi + 1CH] ;standing 2
-	Mov DWord Ptr Ds:[Esi + 1CH], Edx
-
-	Mov Edx, DWord Ptr Ds:[Edi + 20H] ;dying
-	Mov DWord Ptr Ds:[Esi + 20H], Edx
-	Mov Edx, DWord Ptr Ds:[Edi + 24H] ;dying 2
-	Mov DWord Ptr Ds:[Esi + 24H], Edx
-
-	Cmp Bh, 3CH
-	Jb TaskObject_Immitate_EyeCandy ; is target eyecandy
-
-	Mov Edx, DWord Ptr Ds:[Edi + 0CCH] ;walking
-	Mov DWord Ptr Ds:[Esi + 0CCH], Edx
-	Mov Edx, DWord Ptr Ds:[Edi + 0D0H] ;running
-	Mov DWord Ptr Ds:[Esi + 0D0H], Edx
-	Mov Edx, DWord Ptr Ds:[Edi + 120H] ;attacking
-	Mov DWord Ptr Ds:[Esi + 120H], Edx
-	Jmp TaskObject_Immitate_End
-
-TaskObject_Immitate_EyeCandy:
-	Mov Edx, DWord Ptr Ds:[Edi + 18H]
-	Mov DWord Ptr Ds:[Esi + 0CCH], Edx
-	Mov DWord Ptr Ds:[Esi + 120H], Edx
-	Mov Edx, DWord Ptr Ds:[Edi + 1CH]
-	Mov DWord Ptr Ds:[Esi + 0D0H], Edx
-
-TaskObject_Immitate_End: ; Update Vision
-	Pop Ebx
-	Pop Edi
-	Pop Esi
-	Mov Edx, DWord Ptr Ds:[Ecx + 8H]
-	Push Edx
-TaskObject_Immitate_End_1:
-	FakeCall SUB_REFRESH_GRAPHIC
-	Jmp TaskObject_End
-
-TaskObject_ToId:
-	Mov Edx, DWord Ptr Ds:[Esp + 24H]
-	Mov Edx, DWord Ptr Ds:[Edx + 4H]
-	Mov DWord Ptr Ds:[Ecx + 4H], Edx
-	Jmp TaskObject_End
-
-TaskObject_Teleport: ; ECX = Unit Addr.
-	Cmp Byte Ptr Ds:[Ecx + 4EH], 60
-	Jl TaskObject_Teleport_End
+TaskObject_Teleport:
+	Mov Esi, DWord Ptr Ss:[Esp + 10H]
+.Repeat
+	Mov Ecx, DWord Ptr Ss:[Ebp]
 	Mov Edx, DWord Ptr Ds:[Esp + 24H]
 	Cmp Edx, 0H
-	Push Edx
-	Push Eax
 	Push 0
 	Jle TaskObject_Teleport_Point
 	Fld DWord Ptr Ds:[Edx + 38H]
@@ -379,228 +316,57 @@ TaskObject_Teleport_:
 	Fstp DWord Ptr Ss:[Esp]
 TaskObject_Teleport_1:
 	FakeCall SUB_TELEPORT
-	Pop Eax
-	Pop Edx
-TaskObject_Teleport_End:
-	Jmp TaskObject_End
+	Add Ebp, 4H
+	Dec Esi
+.Until Zero?
+	Jmp TaskObject_Skip
 
-TaskObject_Transform:
-	Mov Edx, DWord Ptr Ds:[Esp + 24H]
-	Mov Edx, DWord Ptr Ds:[Edx + 8H]
-	Push Edx
-TaskObject_Transform_1:
-	FakeCall SUB_TRANSFORM
-	Jmp TaskObject_End
-
-TaskObject_InstantGarrison:
+TaskObject_Garrison:
+	Mov Esi, DWord Ptr Ss:[Esp + 10H]
+.Repeat
+	Mov Ecx, DWord Ptr Ss:[Ebp]
 	Mov Edx, DWord Ptr Ds:[Esp + 24H]
 	Push Ecx
+	Mov Eax, DWord Ptr Ds:[Edx]
 	Mov Ecx, Edx
-TaskObject_InstantGarrison_2:
-	FakeCall 004C5CB0H ;
-	Jmp TaskObject_End
+	Call DWord Ptr Ds:[Eax + 0E8H]
+	Add Ebp, 4H
+	Dec Esi
+.Until Zero?
+TaskObject_Skip:
+	Pop Edi
+	Pop Esi
+	Pop Ebp
+	Mov Al, 1
+	Pop Ebx
+	Add Esp, 2034H
+	Retn 4
 
-	Push Ecx
-	Push Edx
-	Push Ecx
-	Mov Ecx, Edx
-TaskObject_InstantGarrison_1:
-	FakeCall 004D27A0H
-	Add Esp, 8H
-	Jmp TaskObject_End
+TaskObject_ByRes:
+	Mov Esi, DWord Ptr Ss:[Esp + 10H]
+.Repeat
+	Mov Ecx, DWord Ptr Ss:[Ebp]
+	Push 0
+	Mov Edi, DWord Ptr Ds:[Ecx + 0CH]
+	Mov Ecx, Edi
+	Push 1
+	Call KillObject_GetResourceFloat
+	Sub Esp, 4H
+	Fstp DWord Ptr Ss:[Esp]
+	Mov Ecx, Edi
+	Push 0
+	Call KillObject_GetResourceFloat
+	Sub Esp, 4H
+	Fstp DWord Ptr Ss:[Esp]
+	Mov Ecx, DWord Ptr Ss:[Ebp]
+	Mov Eax, DWord Ptr Ds:[Ecx]
+	Push 0
+	Call DWord Ptr Ds:[Eax + 0A0H]
 
-TaskObject_Voice:
-	Mov Ecx, DWord Ptr Ds:[Ecx + 8H]
-	Cmp Byte Ptr Ds:[Ecx + 4H], 46H ;is source eyecandy
-	Jl TaskObject_End
-	Mov Edx, DWord Ptr Ds:[Esp + 24H]
-	Mov Edx, DWord Ptr Ds:[Edx + 8H]
-	Cmp Byte Ptr Ds:[Edx + 4H], 46H
-	Jl TaskObject_End
-	Mov Edx, DWord Ptr Ds:[Edx + 40H]
-	Mov DWord Ptr Ds:[Ecx + 40H], Edx
-	Mov Edx, DWord Ptr Ds:[Esp + 24H]
-	Mov Edx, DWord Ptr Ds:[Edx + 8H]
-	Mov Edx, DWord Ptr Ds:[Edx + 114H]
-	Mov DWord Ptr Ds:[Ecx + 114H], Edx
-	Mov Edx, DWord Ptr Ds:[Esp + 24H]
-	Mov Edx, DWord Ptr Ds:[Edx + 8H]
-	Mov Edx, DWord Ptr Ds:[Edx + 118H]
-	Mov DWord Ptr Ds:[Ecx + 118H], Edx
-
-TaskObject_End:
-	FakeJmp 0043799CH
-
-
-; In Kill Object, changed attributes are non-metric.
-KillObject:
-	Mov Eax, DWord Ptr Ds:[Edi + 10H] ;eax = Quantity
-	Mov Ebx, DWord Ptr Ds:[Edi + 64H] ;ebx = Number
-	Lea Edi, [Esp + 94H]
-	Mov Ecx, DWord Ptr Ds:[Edi]
-	Cmp Ebx, 0
-	Jle KillObject_Other
-	Cmp Ebx, 1
-	Je KillObject_Undead
-	Cmp Ebx, 2
-	Je KillObject_Isolate
-	Cmp Ebx, 3
-	Je KillObject_ToggleId
-	Cmp Ebx, 4
-	Je KillObject_Angle
-
-	; WAIFor's Unique Attribute!
-	Cmp Ebx, 99
-	Jg KillObject_Other
-	Je KillObject_AttrPiece
-	Cmp Ebx, 98
-	Je KillObject_TowerMode
-
-	; General Attributes
-	Cmp Ebx, 10
-	Jl KillObject_Other
-	Cmp Ebx, 25
-	Jge KillObject_Other
-	Sub Ebx, 10
-
-KillObject_Table_:
-	Movsx Ebx, Word Ptr Ds:[Ebx * 2 + 11111111H]
-	Test Ebx, 3000H
-	Je KillObject_Word
-	Test Ebx, 1000H
-	Jne KillObject_Byte
-	And Ebx, 0FFFH
-	Push Ebx
-	Call KillObject_LoopAttr3
-KillObject_End:
-	FakeJmp 004379F7H
-KillObject_Byte:
-	And Ebx, 0FFFH
-	Push Ebx
-	Call KillObject_LoopAttr1
-	Jmp KillObject_End
-KillObject_Word:
-	Push Ebx
-	Call KillObject_LoopAttr2
-	Jmp KillObject_End
-
-KillObject_Other:
-	FakeJmp 004379E6H
-
-KillObject_CommonLoop:
-	Inc Esi
-	Add Edi, 4H
-	Mov Ecx, DWord Ptr Ds:[Edi]
-	Cmp Esi, DWord Ptr Ss:[Esp + 14H]
-	Retn
-
-KillObject_LoopAttr1:
-	Push Edx
-	Mov Edx, [Esp + 08H]
-KillObject_LoopAttr1_:
-	Mov Ebx, DWord Ptr Ds:[Ecx + 08H]
-	Mov Byte Ptr Ds:[Ebx + Edx], Al
-	Inc Esi
-	Add Edi, 4H
-	Mov Ecx, DWord Ptr Ds:[Edi]
-	Cmp Esi, DWord Ptr Ss:[Esp + 1CH]
-	Jl KillObject_LoopAttr2_
-	Pop Edx
-	Retn 04H
-
-KillObject_LoopAttr2:
-	Push Edx
-	Mov Edx, [Esp + 08H]
-KillObject_LoopAttr2_:
-	Mov Ebx, DWord Ptr Ds:[Ecx + 08H]
-	Mov Word Ptr Ds:[Ebx + Edx], Ax
-	Inc Esi
-	Add Edi, 4H
-	Mov Ecx, DWord Ptr Ds:[Edi]
-	Cmp Esi, DWord Ptr Ss:[Esp + 1CH]
-	Jl KillObject_LoopAttr2_
-	Pop Edx
-	Retn 04H
-
-KillObject_LoopAttr3:
-	Push Edx
-	Mov Edx, [Esp + 08H]
-KillObject_LoopAttr3_:
-	Mov Ebx, DWord Ptr Ds:[Ecx + 08H]
-	Mov DWord Ptr Ds:[Ebx + Edx], Eax
-	Inc Esi
-	Add Edi, 4H
-	Mov Ecx, DWord Ptr Ds:[Edi]
-	Cmp Esi, DWord Ptr Ss:[Esp + 1CH]
-	Jl KillObject_LoopAttr3_
-	Pop Edx
-	Retn 04H
-
-KillObject_TowerMode:
-	Push 14CH
-	Call KillObject_LoopAttr1
-	Jmp KillObject_End
-
-KillObject_AttrPiece:
-	Push 0A6H
-	Call KillObject_LoopAttr2
-	Jmp KillObject_End
-
-KillObject_Undead:
-	Mov DWord Ptr Ds:[Ecx + 30H], 7F800000H
-	Call KillObject_CommonLoop
-	Jl KillObject_Undead
-	Jmp KillObject_End
-
-KillObject_Isolate:
-	Mov Ebx, DWord Ptr Ds:[Ecx + 8H]
-	Mov Bl, Byte Ptr Ds:[Ebx + 4H]
-	Cmp Bl, 46H
-	Jl KillObject_Isolate_
-KillObject_Isolate_1:
-	FakeCall SUB_UNIQUEUNIT
-KillObject_Isolate_:
-	Call KillObject_CommonLoop
-	Jl KillObject_Isolate
-	Jmp KillObject_End
-
-KillObject_ToggleId:
-	Cmp Eax, 0H
-	Jg KillObject_ToggleId_P
-	KillObject_ToggleId_N:
-		Mov Eax, DWord Ptr Ds:[Ecx + 4H]
-		Cmp Eax, 0H
-		Jl KillObject_ToggleId_N_Skip
-		Not Eax
-		Mov DWord Ptr Ds:[Ecx + 4H], Eax
-		KillObject_ToggleId_N_Skip:
-			Call KillObject_CommonLoop
-			Jl KillObject_ToggleId_N
-			Jmp KillObject_End
-	KillObject_ToggleId_P:
-		Mov Eax, DWord Ptr Ds:[Ecx + 4H]
-		Cmp Eax, 0H
-		Jge KillObject_ToggleId_P_Skip
-		Not Eax
-		Mov DWord Ptr Ds:[Ecx + 4H], Eax
-		KillObject_ToggleId_P_Skip:
-			Call KillObject_CommonLoop
-			Jl KillObject_ToggleId_P
-			Jmp KillObject_End
-
-KillObject_Angle:
-	Mov Ds:[Ecx + 35H], Al
-	Call KillObject_CommonLoop
-	Jl KillObject_Angle
-	Jmp KillObject_End
-
-; Id, Class, Icon, LangId, MinimapMode
-; Visibility, DeathUnit, Walkable, TerrRt, Projectile
-; Projectile2, TrainLocation, TrainButton, CommandID, IntereationMode
-KillObject_Table: ; 5 values per line
-	DW 0010H, 0016H, 0054H, 000CH, 1096H
-	DW 106DH, 0050H, 10A2H, 006EH, 0148H
-	DW 01ACH, 0184H, 1186H, 1097H, 1095H
+	Add Ebp, 4H
+	Dec Esi
+.Until Zero?
+	Jmp TaskObject_Skip
 
 
 MoveSight:
@@ -621,13 +387,11 @@ MoveSight_Point:
 	Mov Eax, DWord Ptr Ds:[Edi + 64H]
 	Fild DWord Ptr Ds:[Edi + 48H]
 	And Eax, 1H
-	Jg MoveSight_End
+MoveSight_01:
+	FakeJg 007D8B1EH
 
 MoveSight_Jle:
 	FakeJmp 00437A40H
-
-MoveSight_End:
-	FakeJmp 007D8B1EH
 
 
 Tribute:
@@ -637,9 +401,9 @@ Tribute:
 Tribute_Table_:
 	Jmp DWord Ptr Ds:[Edx * 4 + 11111111H]
 Tribute_Table:
-	DD O Tribute_Default, O Tribute_Instant, O Tribute_Product, O Tribute_Convert, O Tribute_Product2
-	DD O Tribute_Random, O Tribute_Random, O Tribute_Default, O Tribute_Default, O Tribute_Civil
-	DD O Tribute_1000Div, O Tribute_Instant_1000Div, O Tribute_Product_1000Div, 0
+	DD O Tribute_Default, O Tribute_Instant, O Tribute_Multiply, O Tribute_Convert, O Tribute_Product
+	DD O Tribute_Division, O Tribute_Default, O Tribute_Default, O Tribute_Random, O Tribute_Random
+	DD O Tribute_1000Div, O Tribute_Instant_1000Div, O Tribute_Multiply_1000Div, 0
 
 Tribute_1000Div:
 	Fild DWord Ptr Ds:[Edi + 10H]
@@ -665,13 +429,13 @@ Tribute_Instant_:
 	Fstp DWord Ptr Ds:[Edx + Eax * 4]
 	Jmp Tribute_End
 
-Tribute_Product_1000Div:
+Tribute_Multiply_1000Div:
 	Fild DWord Ptr Ds:[Edi + 10H]
 	Fmul DWord Ptr Ds:[Float0001]
-	Jmp Tribute_Product_
-Tribute_Product:
+	Jmp Tribute_Multiply_
+Tribute_Multiply:
 	Fild DWord Ptr Ds:[Edi + 10H]
-Tribute_Product_:
+Tribute_Multiply_:
 	Mov Eax, DWord Ptr Ds:[Edi + 14H]
 	Mov Edx, DWord Ptr Ss:[Esp + 18H]
 	Mov Edx, DWord Ptr Ds:[Edx + 0A8H]
@@ -698,7 +462,7 @@ Tribute_Convert_:
 	Fstp DWord Ptr Ds:[Edx + Eax * 4]
 	Jmp Tribute_End
 
-Tribute_Product2:
+Tribute_Product:
 	Mov Eax, DWord Ptr Ds:[Edi + 14H]
 	Mov Edx, DWord Ptr Ss:[Esp + 18H]
 	Mov Edx, DWord Ptr Ds:[Edx + 0A8H]
@@ -707,14 +471,34 @@ Tribute_Product2:
 	Mov Edx, DWord Ptr Ds:[Edx + 0A8H]
 	Mov Eax, DWord Ptr Ds:[Edi + 10H]
 	Cmp Eax, 0H
-	Jge Tribute_Product2_
+	Jge Tribute_Product_
 	Not Eax
 	Fmul DWord Ptr Ds:[Edx + Eax * 4]
 	Fadd DWord Ptr Ds:[Edx + Eax * 4]
-	Jmp Tribute_Product2__
-Tribute_Product2_:
+	Jmp Tribute_Product__
+Tribute_Product_:
 	Fmul DWord Ptr Ds:[Edx + Eax * 4]
-Tribute_Product2__:
+Tribute_Product__:
+	Fstp DWord Ptr Ds:[Edx + Eax * 4]
+	Jmp Tribute_End
+
+Tribute_Division:
+	Mov Eax, DWord Ptr Ds:[Edi + 14H]
+	Mov Edx, DWord Ptr Ss:[Esp + 18H]
+	Mov Edx, DWord Ptr Ds:[Edx + 0A8H]
+	Fld DWord Ptr Ds:[Edx + Eax * 4]
+	Mov Edx, DWord Ptr Ss:[Esp + 20H]
+	Mov Edx, DWord Ptr Ds:[Edx + 0A8H]
+	Mov Eax, DWord Ptr Ds:[Edi + 10H]
+	Cmp Eax, 0H
+	Jge Tribute_Division_
+	Not Eax
+	Fdivr DWord Ptr Ds:[Edx + Eax * 4]
+	Fadd DWord Ptr Ds:[Edx + Eax * 4]
+	Jmp Tribute_Division__
+Tribute_Division_:
+	Fdivr DWord Ptr Ds:[Edx + Eax * 4]
+Tribute_Division__:
 	Fstp DWord Ptr Ds:[Edx + Eax * 4]
 	Jmp Tribute_End
 
@@ -735,12 +519,6 @@ Tribute_Random:
 	Mov Edx, DWord Ptr Ds:[Edx + 0A8H]
 	Mov Eax, DWord Ptr Ds:[Edi + 14H]
 	Fstp DWord Ptr Ds:[Edx + Eax * 4]
-	Jmp Tribute_End
-
-Tribute_Civil:
-	Mov Edx, DWord Ptr Ss:[Esp + 20H]
-	Mov Eax, DWord Ptr Ss:[Edi + 10H]
-	Mov Byte Ptr Ds:[Edx + 15DH], Al
 	Jmp Tribute_End
 
 Tribute_End:
@@ -782,20 +560,21 @@ ShowInfo_1:
 DamageUnit: ; ST(0) = Quantity
 	Mov Eax, DWord Ptr Ds:[Esi]
 	Mov Edx, DWord Ptr Ds:[Edi + 64H]
-	Cmp Edx, 7
-	Jae DamageUnit_
+	Cmp Edx, 6
+	Ja DamageUnit_
 DamageUnit_Table_:
 	Jmp DWord Ptr Ds:[Edx * 4 + 11111111H]
 
-; Set HP instantly
-; Damage HP by permillage
-; Set HP by permillage
-; Damage HP by current lost HP's permillage
-; Set HP by current HP's permillage
-; Add Max HP
+; 1 - Set HP instantly
+; 2 - Damage HP by permillage
+; 3 - Set HP by permillage
+; 4 - Damage HP by current lost HP's permillage
+; 5 - Set HP by current HP's permillage
+; 6 - Save HP into Resource
+; 7 - Load HP from Resource
 DamageUnit_Table:
 	DD O DamageUnit_, O DamageUnit_1, DamageUnit_Perm, DamageUnit_Perm, DamageUnit_LostPerm
-	DD O DamageUnit_CurrentPerm, 0 ; DamageUnit_AddEmptyHP
+	DD O DamageUnit_CurrentPerm, 0 ;
 
 DamageUnit_:
 	Fsubr DWord Ptr Ds:[Eax + 30H]
@@ -827,33 +606,85 @@ DamageUnit_LostPerm:
 	Fmul
 	Jmp DamageUnit_
 
-DamageUnit_AddEmptyHP:
-	Push Ecx
-	Push Eax
-	Mov Ecx, Eax
+DamageUnit_ToRes:
+	Fldz
+DamageUnit_ToRes_:
+	Mov Eax, DWord Ptr Ds:[Esi]
+	Fadd DWord Ptr Ds:[Eax + 30H]
+	Mov Eax, DWord Ptr Ss:[Esp + 10H]
+	Inc Ebp
+	Add Esi, 4
+	Cmp Ebp, Eax
+	Jl DamageUnit_ToRes_
+
+	Fidiv DWord Ptr Ss:[Esp + 10H]
+
+	Mov Ebx, DWord Ptr Ss:[Esp + 18H]
+	Mov Ebx, DWord Ptr Ss:[Ebx + 0A8H]
+	Movsx Eax, Word Ptr Ds:[Edi + 10H]
+	Lea Eax, [Eax * 4 + Ebx]
+	Fadd DWord Ptr Ds:[Eax]
+	Fstp DWord Ptr Ds:[Eax]
+DamageUnit_Back:
+	Pop Edi
+	Pop Esi
+	Pop Ebp
+	Mov Al, 1
+	Pop Ebx
+	Add Esp, 2034H
+	Retn 4
+
+DamageUnit_FromRes:
+	Mov Ebx, DWord Ptr Ss:[Esp + 18H]
+	Mov Ebx, DWord Ptr Ss:[Ebx + 0A8H]
+	Movsx Eax, Word Ptr Ds:[Edi + 10H]
+	Lea Eax, [Eax * 4 + Ebx]
+	Fld DWord Ptr Ds:[Eax]
+	Mov Edx, DWord Ptr Ss:[Esp + 10H]
+DamageUnit_FromRes_:
+	Mov Eax, DWord Ptr Ds:[Esi]
+	Fst DWord Ptr Ds:[Eax + 30H]
+	Inc Ebp
+	Add Esi, 4
+	Cmp Ebp, Edx
+	Jl DamageUnit_FromRes_
+	Fincstp
+	Jmp DamageUnit_Back
+
+DamageUnit2: ; 00437D36H
+	Mov Esi, Esp
+	Add Esi, 94H
+	Mov Eax, DWord Ptr Ds:[Edi + 64H]
+	Cmp Eax, 7
+	Je DamageUnit_ToRes
+	Cmp Eax, 8
+	Je DamageUnit_FromRes
 DamageUnit_2:
-	FakeCall SUB_UNIQUEUNIT
-	Pop Eax
-	Mov Edx, [Eax + 8H]
-	Fiadd Word Ptr Ds:[Edx + 2AH]
-	Fistp Word Ptr Ds:[Edx + 2AH]
-	Pop Ecx
-	;Fdecstp
-DamageUnit_3:
-	FakeJmp 00437FCEH
+	FakeJmp 00437D3DH
 
 
-; "Create Unit" can set a square area, so game will create units fill the square.
-CreateUnitArray: ; @004378C3h
-	Jne CreateUnitArray_
-CreateUnitArray_1:
-	FakeJmp 00437FDAH
-CreateUnitArray_: ; ECX = Protounit addr. EAX = Player Addr
-	Cmp DWord Ptr Ds:[Edi + 4CH], 0
-	Jge CreateUnitArray__
-CreateUnitArray_0:
-	FakeJmp 004378C9H
-CreateUnitArray__:
+; Create Unit:
+; 3 - can set a square area, so game will create units fill the square.
+; 4 - located by resources (Food, Wood).
+; both ignore room.
+CreateUnit: ; 007D8BB3H
+	Mov Eax, DWord Ptr Ss:[Esp + 18H]
+	Cmp Esi, 3
+	Je CreateUnitArray
+	Cmp Esi, 4
+	Je CreateUnitResource
+	And Esi, Esi
+CreateUnit_01:
+	FakeJle 004378B8H ; Other
+CreateUnit_1:
+	FakeJmp 007D8BBFH ; Enable/disable
+
+CreateUnitArray:
+	Mov Ecx, DWord Ptr Ds:[Edi + 24H]
+	Mov Edx, DWord Ptr Ds:[Eax + 74H]
+	Mov Ecx, DWord Ptr Ds:[Ecx * 4 + Edx]
+	Cmp Ecx, Ebx
+	Je CreateUnitArray_Skip
 
 	Push Ebp
 	Mov Ebp, Edi
@@ -887,7 +718,7 @@ CreateUnitArray_Loop:
 	Fadd DWord Ptr Ds:[Float05]
 	Fstp DWord Ptr Ss:[Esp]
 	Push Edx
-CreateUnitArray_3:
+CreateUnit_2:
 	FakeCall SUB_DROPUNIT
 	Pop Edi
 	Pop Esi
@@ -895,7 +726,7 @@ CreateUnitArray_3:
 	Pop Edx
 	Inc Esi
 	Cmp Esi, DWord Ptr Ds:[Ebp + 54H]
-	Jl CreateUnitArray_Loop
+	Jle CreateUnitArray_Loop
 	Cmp Edi, DWord Ptr Ds:[Ebp + 58H]
 	Jge CreateUnitArray_LoopEnd
 	Mov Esi, DWord Ptr Ds:[Ebp + 4CH]
@@ -910,74 +741,42 @@ CreateUnitArray_LoopEnd:
 	Pop Ebx
 	Pop Eax
 	Pop Ebp
-CreateUnitArray_2:
-	FakeJmp 0043794EH
+CreateUnitArray_Skip:
+	Pop Edi
+	Pop Esi
+	Pop Ebp
+	Mov Al, 1
+	Pop Ebx
+	Add Esp, 2034H
+	Retn 4
 
+CreateUnitResource:
+	Mov Edi, DWord Ptr Ds:[Edi + 24H]
+	Mov Edx, DWord Ptr Ds:[Eax + 74H]
+	Mov Ecx, DWord Ptr Ds:[Edi * 4 + Edx]
+	Mov Esi, Eax ; esi = player addr.
+	Cmp Ecx, Ebx
+	Je CreateUnitArray_Skip
 
-; Change Protounit's Integer Metric Attributes
-ChangeAttack: ;007D8A94h
-	Cmp Edx, 0
-	Jne ChangeAttack_
-ChangeAttack_1:
-	FakeJmp 00437F2BH
-ChangeAttack_:
-	Cmp Edx, 1
-	Jne ChangeAttack__
-ChangeAttack_2:
-	FakeJmp 007D8A9DH
-ChangeAttack__:
-	Cmp Edx, 10
-	Jl ChangeAttack_1
-	Cmp Edx, 21
-	Jge ChangeAttack_1
-	Sub Edx, 10
+	Push 1
+	Push 0
+	Mov Ecx, Esi
+	Push 1
+	Call KillObject_GetResourceFloat
+	Sub Esp, 4H
+	Fstp DWord Ptr Ss:[Esp]
+	Mov Ecx, Esi
+	Push 0
+	Call KillObject_GetResourceFloat
+	Sub Esp, 4H
+	Fstp DWord Ptr Ss:[Esp]
 
-ChangeAttack_Table_:
-	Movsx Edx, Word Ptr Ds:[Edx * 2 + 11111111H]
-	Cmp Edx, 0H
-	Je ChangeAttack_3
-	Test Edx, 1000H
-	Jne ChangeAttack_Loop2_Begin
-ChangeAttack_Loop: ; NOTE: All attributes are WORD size!
-	Mov Ecx, DWord Ptr Ds:[Edi + 10H]
-	Mov Esi, DWord Ptr Ss:[Ebp]
-	Mov Eax, DWord Ptr Ds:[Esi + 8H]
-	Cmp Byte Ptr Ds:[Eax + 4H], 46H
-	Jb ChangeAttack_Loop_
-	Mov Word Ptr Ds:[Eax + Edx], Cx
-ChangeAttack_Loop_:
-	Mov Eax, DWord Ptr Ss:[Esp + 10H]
-	Inc Ebx
-	Add Ebp, 4
-	Cmp Ebx, Eax
-	Jl ChangeAttack_Loop
-ChangeAttack_3:
-	FakeJmp 007D8AEBH
+	Mov Ecx, Esi
+	Push Edi
+CreateUnit_3:
+	FakeCall SUB_DROPUNIT
 
-ChangeAttack_Loop2_Begin:
-	And Edx, 0FFFH
-ChangeAttack_Loop2: ; For Special: Garrison Cap.
-	Mov Ecx, DWord Ptr Ds:[Edi + 10H]
-	Mov Esi, DWord Ptr Ss:[Ebp]
-	Mov Eax, DWord Ptr Ds:[Esi + 8H]
-	Cmp Byte Ptr Ds:[Eax + 4H], 46H
-	Jb ChangeAttack_Loop_
-	Mov Byte Ptr Ds:[Eax + Edx], Cl
-ChangeAttack_Loop2_:
-	Mov Eax, DWord Ptr Ss:[Esp + 10H]
-	Inc Ebx
-	Add Ebp, 4
-	Cmp Ebx, Eax
-	Jl ChangeAttack_Loop2
-	Jmp ChangeAttack_3
-
-; HP, Displayed Atk, Displayed Melee, Displayed Pierce, Train Time
-; Cost 1, Cost 2, Cost 3, Resource Cap., Garrison Cap.
-; Max ProjCount
-ChangeAttack_Table:
-	DW 02AH, 162H, 160H, 188H, 182H
-	DW 172H, 178H, 17EH, 084H, 1030H
-	DW 19CH
+	Jmp CreateUnitArray_Skip
 
 
 ; Change Player LoS
@@ -1051,50 +850,6 @@ ChangeDiplomacy_Civil:
 	Jmp ChangeDiplomacy_2
 
 
-; Change Float Attributes
-ChangeSpeed: ; 007DD43Eh
-	Lea Ebx, [Esp + 94H]
-	Mov Eax, [Edi + 64H]
-	Cmp Eax, 10
-	Jl ChangeSpeed_1
-	Cmp Eax, 26
-	Jge ChangeSpeed_1
-	Sub Eax, 10
-
-ChangeSpeed_Table_:
-	Movsx Edx, Word Ptr Ds:[Eax * 2 + 11111111H]
-	Fild Word Ptr Ds:[Edi + 10H]
-	Fdiv DWord Ptr Ds:[Float100]
-ChangeSpeed_Loop:
-	Mov Esi, DWord Ptr Ds:[Ebx]
-	Mov Esi, DWord Ptr Ds:[Esi + 8H]
-	Cmp Byte Ptr Ds:[Esi + 4H], 46H
-	Jb ChangeSpeed_Loop_
-	Fst DWord Ptr Ds:[Esi + Edx]
-ChangeSpeed_Loop_:
-	Mov Eax, DWord Ptr Ss:[Esp + 10H]
-	Inc Ebp
-	Add Ebx, 4
-	Cmp Ebp, Eax
-	Jl ChangeSpeed_Loop
-	Fstp St
-ChangeSpeed_2:
-	FakeJmp 007DD4A9H
-
-ChangeSpeed_1:
-	FakeJmp 007DD445H
-
-; Speed, Range, WorkRate, DecayRate, LoS(Causing Unrevealable Black Areas!)
-; Stored1, Stored2, Stored3, ProjCount, BlastRadius
-; Radius1, Radius2, EditorRd1, EditorRd2, SelectRd1
-; SelectRd2
-ChangeSpeed_Table:
-	DW 0C8H, 138H, 108H, 088H, 02CH
-	DW 078H, 07CH, 080H, 198H, 13CH
-	DW 034H, 038H, 064H, 068H, 0BCH
-	DW 0C0H
-
-
 ; Send Chat
 ; 1 - make cheats from source player
 SendChat: ; 043764F
@@ -1112,7 +867,128 @@ SendChat_2:
 SendChat_0:
 	FakeJmp 00437655H
 
+
+; Kill Object: Change Protounit Properties
+; 100~399 - set attr of selected
+; 400~699 - add attr of selected
+; 700~999 - set attr by resource of selected
+; +1000 - of protounit
+KillObject: ;004379CFh
+	Mov Ebx, DWord Ptr Ds:[Edi + 64H] ;ebx = Number
+	Cmp Ebx, 100
+	Jge KillObject_Change
+	Cmp Ebx, 10
+	Jge KillObject_Change2
+	Mov Eax, DWord Ptr Ss:[Esp + 10H]
+	Xor Esi, Esi
+KillObject_Other:
+	FakeJmp 004379D5H
+
+KillObject_Change:
+	Lea Esi, [Esp + 94H]
+	Sub Ebx, 100
+	Mov Ecx, DWord Ptr Ss:[Esp + 18H]
+	Push DWord Ptr Ss:[Esp + 10H]
+	.If Ebx >= 1000
+		Sub Ebx, 1000
+		Push 0
+	.Else
+		Push Esi
+	.EndIf
+	Push Edi ; trigger
+	.If Ebx >= 600
+		Sub Ebx, 600
+		Push 2
+	.ElseIf Ebx >= 300
+		Sub Ebx, 300
+		Push 1
+	.Else
+		Push 0 ; mode
+	.EndIf
+
+	.If Ebx > ATTRIBUTES_COUNT
+		Mov Ebx, DEFAULT_ATTRIBUTE
+	.EndIf
+
+KillObject_Table_:
+	Mov Ebx, [Ebx * 4 + 11111111H]
+
+	Xor Edx, Edx
+	Mov Dx, Bx ; Offset
+	Shr Ebx, 10H
+	Xor Eax, Eax
+	Mov Al, Bl ; Min "Type"
+	Push Eax
+	Push Edx
+	Shr Ebx, 8H
+KillObject_CallTable_:
+	Call DWord Ptr Ds:[Ebx * 4 + 11111111H]
+	Pop Edi
+	Pop Esi
+	Pop Ebp
+	Mov Al, 1
+	Pop Ebx
+	Add Esp, 2034H
+	Retn 4
+
+__KillObject_Functions__
+
+KillObject_CallTable:
+	DD O KillObject_Char, O KillObject_Word, O KillObject_DWord, O KillObject_Float
+	DD O KillObject_Image, O KillObject_Sound, O KillObject_Attack, O KillObject_Defense, 0
+
+KillObject_Table:
+	__KillObject_Table__
+
+KillObject_Change2:
+	Lea Esi, [Esp + 94H]
+	Sub Ebx, 10
+	Mov Ecx, DWord Ptr Ss:[Esp + 18H]
+	Push DWord Ptr Ss:[Esp + 10H]
+	Push Esi
+	Push Edi ; trigger
+	.If Ebx >= 60
+		Sub Ebx, 60
+		Push 2
+	.ElseIf Ebx >= 30
+		Sub Ebx, 30
+		Push 1
+	.Else
+		Push 0 ; mode
+	.EndIf
+
+	.If Ebx > ATTRIBUTES_COUNT2
+		Mov Ebx, 0
+	.EndIf
+
+KillObject_Table2_:
+	Mov Ebx, [Ebx * 4 + 11111111H]
+
+	Xor Edx, Edx
+	Mov Dx, Bx ; Offset
+	Shr Ebx, 10H
+	Xor Eax, Eax
+	Mov Al, Bl ; Min "Type"
+	Push Eax
+	Push Edx
+	Shr Ebx, 8H
+KillObject_CallTable2_:
+	Call DWord Ptr Ds:[Ebx * 4 + 11111111H]
+	Pop Edi
+	Pop Esi
+	Pop Ebp
+	Mov Al, 1
+	Pop Ebx
+	Add Esp, 2034H
+	Retn 4
+
+KillObject_CallTable2:
+	DD O KillObject2_Char, O KillObject2_Word, O KillObject2_DWord, O KillObject2_Float, 0
+
+KillObject_Table2:
+	__KillObject_Table2__
+
+
+
 __PatchEffectsEnd:
-
-
 
