@@ -702,6 +702,7 @@ PatchIsReady:
 			Invoke  WriteJmp, CreateUnit@, $CreateUnit
 			Invoke  WriteJmp, ChangeDiplomacy@, $ChangeDiplomacy
 			Invoke  WriteJmp, SendChat@, $SendChat
+			Invoke  WriteJmp, RemoveUnit@, $RemoveUnit
 
 		.EndIf
 

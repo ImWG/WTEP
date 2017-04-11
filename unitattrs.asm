@@ -22,6 +22,8 @@ T_SND Equ 5
 T_ATK Equ 6
 T_DEF Equ 7
 
+T_ANG Equ 4
+
 __KillObject_Table__ Macro
 	ATTR T_INT, 10, 016H ;Class
 	ATTR T_INT, 10, 010H ;ID 1
@@ -219,6 +221,18 @@ EndM
 
 ATTRIBUTES_COUNT Equ 191
 DEFAULT_ATTRIBUTE Equ 21 ; default is hp
+
+
+__KillObject_Table2__ Macro
+	ATTR T_LNG, 10, 004H ;Unit Id
+	ATTR T_ANG, 10, 035H ;Grpahic Angle
+	ATTR T_FLT, 10, 044H ;Resource Quantity
+	ATTR T_FLT, 10, 17CH ;Projectile Quantity
+	ATTR T_INT, 10, 04CH ;Resource Type
+	ATTR T_CHR, 10, 036H ;Selection Effect
+EndM
+ATTRIBUTES_COUNT2 Equ 3
+
 
 
 __KillObject_Functions__ Macro
@@ -535,6 +549,16 @@ KillObject_Image:
 				.If Al <= Byte Ptr Ds:[Esi + 04H]
 					Mov DWord Ptr Ds:[Esi + Ebp], Edi
 				.EndIf
+				; Refresh
+				Push Ecx
+				Push Edx
+				Push Esi
+				Mov Ecx, Ebx
+KillObject_Image_1:
+				FakeCall SUB_REFRESH_GRAPHIC
+				Pop Edx
+				Pop Ecx
+
 				add edx, 4h
 				Dec Ecx
 			.Until Zero?
@@ -789,16 +813,6 @@ KillObject_GetResourceFloat:
 	Retn 4H
 
 
-__KillObject_Table2__ Macro
-	ATTR T_CHR, 10, 035H ;Grpahic Angle
-	ATTR T_LNG, 10, 004H ;Unit Id
-	ATTR T_CHR, 10, 036H ;Selection Effect
-	ATTR T_INT, 10, 04CH ;Resource Type
-	ATTR T_FLT, 10, 044H ;Resource Quantity
-	ATTR T_FLT, 10, 17CH ;Projectile Quantity
-EndM
-ATTRIBUTES_COUNT2 Equ 3
-
 
 KillObject2_Char:
 	push ebx
@@ -942,6 +956,54 @@ KillObject2_Float:
 		.Until Zero?
 	.EndIf
 KillObject2_Float_:
+	Pop Edi
+	pop esi
+	pop ebp
+	Pop Ebx
+	Retn 18H
+
+
+KillObject2_Angle:
+	push ebx
+	push ebp
+	push esi
+	push edi
+	
+	Mov Esi, Ecx
+	Mov Edi, DWord Ptr Ss:[Esp + 20H] ; trigger
+	;Mov Ebp, DWord Ptr Ss:[Esp + 14H] ; offset
+	Mov Ebp, DWord Ptr Ss:[Esp + 24H]
+	Mov Ecx, DWord Ptr Ss:[Esp + 28H]
+	.If Ecx > 0
+		.Repeat
+			Mov Ebx, [Ebp]
+			Mov Eax, DWord Ptr Ds:[Edi + 10H]
+			.If DWord Ptr Ss:[Esp + 1CH] == 2
+				Push Ecx
+				Push Eax
+				Mov Ecx, Esi
+				Call KillObject_GetResource
+				Pop Ecx
+			.ElseIf DWord Ptr Ss:[Esp + 1CH] == 1
+				Movzx Dx, Byte Ptr Ds:[Ebx + 035H]
+				Add Ax, Dx
+			.EndIf
+
+			Mov Edx, [Ebx + 10H]
+			Mov Dl, Byte Ptr Ds:[Edx + 60H] ; Divide By Angle Count
+			IDiv Dl
+			Mov Al, Ah
+			Cmp Al, 0
+			Jge KillObject2_Angle__
+			Add Al, Dl
+KillObject2_Angle__:
+
+			Mov Byte Ptr Ds:[Ebx + 035H], Al
+			Add Ebp, 4H
+			Dec Ecx
+		.Until Zero?
+	.EndIf
+KillObject2_Angle_:
 	Pop Edi
 	pop esi
 	pop ebp

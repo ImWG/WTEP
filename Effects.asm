@@ -19,6 +19,7 @@ DamageUnit2@ 		DD 00437D36H
 CreateUnit@			DD 007D8BB3H
 ChangeDiplomacy@	DD 00437605H
 SendChat@			DD 0043764FH
+RemoveUnit@			DD 00437A06H
 
 ; Isolated patches
 EnableTaskProj@		DD 00437973H ; Enable Task Object for projectiles.
@@ -45,12 +46,13 @@ $TaskObject DD O TaskObject
 $KillObject DD O KillObject
 $MoveSight DD O MoveSight
 $Tribute DD O Tribute
-$ShowInfo DD O ShowInfo
+;$ShowInfo DD O ShowInfo
 $DamageUnit DD O DamageUnit
 $DamageUnit2 DD O DamageUnit2
 $CreateUnit DD O CreateUnit
 $ChangeDiplomacy DD O ChangeDiplomacy
 $SendChat DD O SendChat
+$RemoveUnit DD O RemoveUnit
 
 $MoreResources_Table DD O MoreResources_Table
 
@@ -61,14 +63,17 @@ PatchEffectsAddresses DD O CustomColorInfo_White, O CustomColorInfo_Normal
 	DD O MoveSight_Jle
 	DD O Tribute_Other, O Tribute_End, O Tribute_Random
 	DD O MoreResources_1, O MoreResources_Back
-	DD O ShowInfo_1
+	;DD O ShowInfo_1
 	DD O DamageUnit_1, O DamageUnit_2
 	DD O CreateUnit_1, O CreateUnit_2, O CreateUnit_3
 	DD O ChangeDiplomacy_1, O ChangeDiplomacy_2, O ChangeDiplomacy_3
 	DD O SendChat_0, O SendChat_1, O SendChat_2
+	DD O KillObject_Image_1
+	DD O RemoveUnit_1, O RemoveUnit_2
 	DD 0H
 
-PatchEffectsAddresses2 DD O CreateUnit_01, O MoveSight_01, O TaskObject_01, 0H
+PatchEffectsAddresses2 DD O CreateUnit_01, O MoveSight_01, O TaskObject_01
+	DD O RemoveUnit_01, 0H
 
 PatchEffectsDirectAddresses DD O KillObject_Table_, O KillObject_Table, 3
 	DD O KillObject_Table2_, O KillObject_Table2, 3
@@ -163,6 +168,7 @@ EnableInputs:
 	Mov Byte Ptr Ds:[Edx + 1H], Al
 	Mov Edx, DWord Ptr Ds:[Edi + 3CH]
 	Mov Byte Ptr Ds:[Edx + 16H], Al
+	Mov Byte Ptr Ds:[Edx + 1H], Al
 	Mov Edx, DWord Ptr Ds:[Edi + 40H]
 	Mov Byte Ptr Ds:[Edx + 04H], Al
 	Mov Edx, DWord Ptr Ds:[Edi + 44H]
@@ -298,24 +304,27 @@ TaskObject_Teleport:
 	Mov Esi, DWord Ptr Ss:[Esp + 10H]
 .Repeat
 	Mov Ecx, DWord Ptr Ss:[Ebp]
-	Mov Edx, DWord Ptr Ds:[Esp + 24H]
-	Cmp Edx, 0H
-	Push 0
-	Jle TaskObject_Teleport_Point
-	Fld DWord Ptr Ds:[Edx + 38H]
-	Fld DWord Ptr Ds:[Edx + 3CH]
-	Jmp TaskObject_Teleport_
-TaskObject_Teleport_Point:
-	Fild DWord Ptr Ds:[Edi + 44H]
-	Fild DWord Ptr Ds:[Edi + 48H]
-TaskObject_Teleport_:
-	Sub Esp, 8H
-	Fst DWord Ptr Ds:[Ecx + 0C8H]
-	Fstp DWord Ptr Ss:[Esp + 4H]
-	Fst DWord Ptr Ds:[Ecx + 0C0H]
-	Fstp DWord Ptr Ss:[Esp]
-TaskObject_Teleport_1:
-	FakeCall SUB_TELEPORT
+	Mov Ebx, [Ecx + 8H]
+	.If Byte Ptr Ds:[Ebx + 4H] >= 70
+		Mov Edx, DWord Ptr Ds:[Esp + 24H]
+		Cmp Edx, 0H
+		Push 0
+		Jle TaskObject_Teleport_Point
+		Fld DWord Ptr Ds:[Edx + 38H]
+		Fld DWord Ptr Ds:[Edx + 3CH]
+		Jmp TaskObject_Teleport_
+	TaskObject_Teleport_Point:
+		Fild DWord Ptr Ds:[Edi + 44H]
+		Fild DWord Ptr Ds:[Edi + 48H]
+	TaskObject_Teleport_:
+		Sub Esp, 8H
+		Fst DWord Ptr Ds:[Ecx + 0C8H]
+		Fstp DWord Ptr Ss:[Esp + 4H]
+		Fst DWord Ptr Ds:[Ecx + 0C0H]
+		Fstp DWord Ptr Ss:[Esp]
+	TaskObject_Teleport_1:
+		FakeCall SUB_TELEPORT
+	.EndIf
 	Add Ebp, 4H
 	Dec Esi
 .Until Zero?
@@ -323,6 +332,9 @@ TaskObject_Teleport_1:
 
 TaskObject_Garrison:
 	Mov Esi, DWord Ptr Ss:[Esp + 10H]
+	Mov Edx, DWord Ptr Ds:[Esp + 24H]
+	Test Edx, Edx
+.If !Zero?
 .Repeat
 	Mov Ecx, DWord Ptr Ss:[Ebp]
 	Mov Edx, DWord Ptr Ds:[Esp + 24H]
@@ -333,6 +345,7 @@ TaskObject_Garrison:
 	Add Ebp, 4H
 	Dec Esi
 .Until Zero?
+.EndIf
 TaskObject_Skip:
 	Pop Edi
 	Pop Esi
@@ -513,7 +526,7 @@ Tribute_Random:
 	Fimul DWord Ptr Ds:[Edi + 10H]
 	Fdiv DWord Ptr Ds:[Float100]
 	Add Esp, 4H
-	Cmp DWord Ptr Ss:[Edi + 64H], 5
+	Cmp DWord Ptr Ss:[Edi + 64H], 8
 	Je Tribute_
 	Mov Edx, DWord Ptr Ss:[Esp + 20H]
 	Mov Edx, DWord Ptr Ds:[Edx + 0A8H]
@@ -525,36 +538,36 @@ Tribute_End:
 	FakeJmp 004377E1H
 
 
-ShowInfo:
-	Movsx Eax, Word Ptr Ds:[Edi + 3CH]
-	Cmp Eax, 0H
-	Jge ShowInfo_
-	Xor Eax, Eax
-
-ShowInfo_:
-	Inc Eax
-	Mov Edx, DWord Ptr Ds:[Edi + 6CH]
-	Add Edx, Eax
-
-	Mov Ah, Byte Ptr Ds:[Edi + 3FH]
-	;Cmp Ah, 0FFH
-	;Je ShowInfo__
-	Mov Byte Ptr Ds:[Edx], Ah
-
-;ShowInfo__:
-
-	Mov Ah, Byte Ptr Ds:[Edx]
-	Xor Al, Al
-	Mov Byte Ptr Ds:[Edi + 3FH], Ah
-	Mov Byte Ptr Ds:[Edx], Al
-
-	Mov Ax, Word Ptr Ds:[Edi + 3CH]
-	Inc Ax
-	Mov Word Ptr Ds:[Edi + 3CH], Ax
-	Mov Eax, DWord Ptr Ds:[Edi + 34H]
-	Cmp Eax, Ebx
-ShowInfo_1:
-	FakeJmp 00437C14H
+;ShowInfo:
+;	Movsx Eax, Word Ptr Ds:[Edi + 3CH]
+;	Cmp Eax, 0H
+;	Jge ShowInfo_
+;	Xor Eax, Eax
+;
+;ShowInfo_:
+;	Inc Eax
+;	Mov Edx, DWord Ptr Ds:[Edi + 6CH]
+;	Add Edx, Eax
+;
+;	Mov Ah, Byte Ptr Ds:[Edi + 3FH]
+;	;Cmp Ah, 0FFH
+;	;Je ShowInfo__
+;	Mov Byte Ptr Ds:[Edx], Ah
+;
+;;ShowInfo__:
+;
+;	Mov Ah, Byte Ptr Ds:[Edx]
+;	Xor Al, Al
+;	Mov Byte Ptr Ds:[Edi + 3FH], Ah
+;	Mov Byte Ptr Ds:[Edx], Al
+;
+;	Mov Ax, Word Ptr Ds:[Edi + 3CH]
+;	Inc Ax
+;	Mov Word Ptr Ds:[Edi + 3CH], Ax
+;	Mov Eax, DWord Ptr Ds:[Edi + 34H]
+;	Cmp Eax, Ebx
+;ShowInfo_1:
+;	FakeJmp 00437C14H
 
 
 DamageUnit: ; ST(0) = Quantity
@@ -784,8 +797,6 @@ ChangeDiplomacy: ; 00437605h
 	Mov Eax, DWord Ptr Ds:[Edi + 64H]
 	Cmp Eax, 3
 	Je ChangeDiplomacy_Control
-	;Cmp Eax, 4
-	;Je ChangeDiplomacy_Civil
 	Cmp Eax, 1
 	Je ChangeDiplomacy_Field
 	Cmp Eax, 2
@@ -830,23 +841,6 @@ ChangeDiplomacy_3:
     Mov Eax, [Ecx]
     Push DWord Ptr Ds:[Edi + 2CH]
     Call DWord Ptr Ds:[Eax + 14H]
-	Jmp ChangeDiplomacy_2
-
-ChangeDiplomacy_Civil:
-	Push Ebp
-	Mov Ebp, Esp
-	Push Esi
-	Push Edx
-	Mov Esi, DWord Ptr Ss:[Ebp + 1CH]
-	Mov Edx, DWord Ptr Ss:[Ebp + 24H]
-
-	Mov Ecx, DWord Ptr Ds:[Edx + 74H]
-	Mov DWord Ptr Ds:[Esi + 74H], Ecx
-	Mov Cl, Byte Ptr Ds:[Edx + 15DH]
-	Mov Byte Ptr Ds:[Esi + 15DH], Cl
-	Pop Edx
-	Pop Esi
-	Pop Ebp
 	Jmp ChangeDiplomacy_2
 
 
@@ -983,10 +977,58 @@ KillObject_CallTable2_:
 	Retn 4
 
 KillObject_CallTable2:
-	DD O KillObject2_Char, O KillObject2_Word, O KillObject2_DWord, O KillObject2_Float, 0
+	DD O KillObject2_Char, O KillObject2_Word, O KillObject2_DWord, O KillObject2_Float, O KillObject2_Angle, 0
 
 KillObject_Table2:
 	__KillObject_Table2__
+
+
+; RemoveUnit:
+; 1 - Change units into certain unit
+RemoveUnit:
+	Mov Eax, DWord Ptr Ss:[Esp + 10H]
+	Xor Esi, Esi
+	Mov Ecx, DWord Ptr Ss:[Edi + 64H]
+	Cmp Ecx, 1
+RemoveUnit_01:
+	FakeJne 00437A0CH
+	Cmp Eax, Ebx
+	Jl RemoveUnit_
+	Mov Ebp, Eax
+	Mov Esi, DWord Ptr Ss:[Esp + 18H]
+
+	Mov Eax, DWord Ptr Ds:[Edi + 10H]
+	Cmp Eax, DWord Ptr Ds:[Esi + 70H]
+	Jae RemoveUnit_
+	Mov Ebx, DWord Ptr Ds:[Esi + 74H]
+	Mov Ebx, DWord Ptr Ds:[Eax * 4 + Ebx]
+	Test Ebx, Ebx
+	Je RemoveUnit_
+	Lea Edi, [Esp + 94H]
+.Repeat
+	Mov Ecx, DWord Ptr Ds:[Edi]
+	Mov Esi, [Ecx + 8H]
+	.If Byte Ptr Ds:[Esi + 4H] >= 70
+		Push Ebx
+RemoveUnit_1:
+		FakeCall SUB_TRANSFORM
+		Mov Ecx, DWord Ptr Ds:[Edi]
+		.If Esi != DWord Ptr Ds:[Ecx + 0CH]
+RemoveUnit_2:
+			FakeCall SUB_UNIQUEUNIT
+		.EndIf
+	.EndIf
+	Add Edi, 4
+	Dec Ebp
+.Until Zero?
+RemoveUnit_:
+	Pop Edi
+	Pop Esi
+	Pop Ebp
+	Mov Al, 1
+	Pop Ebx
+	Add Esp, 2034H
+	Retn 4
 
 
 

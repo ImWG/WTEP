@@ -140,7 +140,7 @@ $FreeGather        DD O FreeGatherPoint
 $MarketInit        DD O MarketInit
 $ExtendAttacks     DD O ExtendAttacks
 $VillCounterFix    DD O VillagerCounterFix
-$Repulse           DD O Repulse
+;$Repulse           DD O Repulse
 $PickRelic         DD O PickRelic
 $PickRelic2        DD O PickRelic2
 $PickRelic3        DD O PickRelic3
@@ -237,7 +237,7 @@ PatchModdingAddresses DD O NewButtons_0, O NewButtons_1, O NewButtons_2, O NewBu
 		DD O ExtendAttacks_1
 		DD O VillagerCounterFix_1
 		DD O MoreGarrisonTypes_0, O MoreGarrisonTypes_1, O MoreGarrisonTypes_2
-		DD O Repulse_2
+		;DD O Repulse_2
 		DD O PickRelic_1, O PickRelic2_1, O PickRelic3_1
 		DD O IFV_1, O IFV2_1
 		DD O RandomUnit_Villager, O RandomUnit_Other, O RandomUnit_1
@@ -852,15 +852,25 @@ AllHeal_1_:
 	Mov Eax, DWord Ptr Ds:[Ebx + 0CH]
 	Cmp Eax, DWord Ptr Ss:[Ebp + 0CH]
 	Jne AllHeal_2_
-	Mov Al, Byte Ptr Ds:[Ecx + 14CH]
-	Mov Ah, Al
-	And Al, 1FH
-	Cmp Al, 4 ; is with heal skill?
-	Je AllHeal_3_
-	And Ah, 0E0H
-	Cmp Al, 3 ; is with vice heal skill?
-	Je AllHeal_3_
-
+; Old Codes Below
+	;Mov Al, Byte Ptr Ds:[Ecx + 14CH]
+	;Mov Ah, Al
+	;And Al, 1FH
+	;Cmp Al, 4 ; is with heal skill?
+	;Je AllHeal_3_
+	;And Ah, 0E0H
+	;Cmp Al, 3 ; is with vice heal skill?
+	;Je AllHeal_3_
+; New Codes Below
+	Push Ecx
+	Push 1
+	Sub Esp, 8H
+	Push 105
+	Call GetAbility
+	Pop Ecx
+	Test Eax, Eax
+	Jne AllHeal_3_
+; New Codes Above
 AllHeal_2_:
 	Pop Ebx
 	Movsx Eax, Word Ptr Ds:[Ecx + 16H]
@@ -1406,45 +1416,45 @@ MoreGarrisonTypes_Custom:
 	Jmp MoreGarrisonTypes_1
 
 
-Repulse: ; [Esp] = Source, [Esp + 4] = Target
-	Push Eax
-	Push Ecx
-	Push Edx
-	Push Esi
-	Mov Esi, DWord Ptr Ds:[Esp + 10H]
-	Mov Edx, DWord Ptr Ds:[Esp + 14H]
-
-	Push Ebp
-	Sub Esp, 10H
-	Fld DWord Ptr Ds:[Edx + 38H]
-	Fsub DWord Ptr Ds:[Esi + 38H]
-	Fmul DWord Ptr Ds:[Float05]
-	Fadd DWord Ptr Ds:[Edx + 38H]
-	Fst DWord Ptr Ds:[Edx + 38H]
-	Fstp DWord Ptr Ds:[Edx + 0C0H]
-
-	Fld DWord Ptr Ds:[Edx + 3CH]
-	Fsub DWord Ptr Ds:[Esi + 3CH]
-	Fmul DWord Ptr Ds:[Float05]
-	Fadd DWord Ptr Ds:[Edx + 3CH]
-	Fst DWord Ptr Ds:[Edx + 3CH]
-	Fstp DWord Ptr Ds:[Edx + 0C8H]
-
-	;Xor Ecx, Ecx
-	;Mov [Esi + 40H], Ecx
-
-	Add Esp, 10H
-	Pop Ebp
-
-	Pop Esi
-	Pop Edx
-	Pop Ecx
-	Pop Eax
-	; Normal
-	Movsx Ecx, Word Ptr Ds:[Esi + 2H]
-	Mov DWord Ptr Ss:[Esp + 1CH], Ecx
-Repulse_2:
-	FakeJmp 005CE7E4H
+;Repulse: ; [Esp] = Source, [Esp + 4] = Target
+;	Push Eax
+;	Push Ecx
+;	Push Edx
+;	Push Esi
+;	Mov Esi, DWord Ptr Ds:[Esp + 10H]
+;	Mov Edx, DWord Ptr Ds:[Esp + 14H]
+;
+;	Push Ebp
+;	Sub Esp, 10H
+;	Fld DWord Ptr Ds:[Edx + 38H]
+;	Fsub DWord Ptr Ds:[Esi + 38H]
+;	Fmul DWord Ptr Ds:[Float05]
+;	Fadd DWord Ptr Ds:[Edx + 38H]
+;	Fst DWord Ptr Ds:[Edx + 38H]
+;	Fstp DWord Ptr Ds:[Edx + 0C0H]
+;
+;	Fld DWord Ptr Ds:[Edx + 3CH]
+;	Fsub DWord Ptr Ds:[Esi + 3CH]
+;	Fmul DWord Ptr Ds:[Float05]
+;	Fadd DWord Ptr Ds:[Edx + 3CH]
+;	Fst DWord Ptr Ds:[Edx + 3CH]
+;	Fstp DWord Ptr Ds:[Edx + 0C8H]
+;
+;	;Xor Ecx, Ecx
+;	;Mov [Esi + 40H], Ecx
+;
+;	Add Esp, 10H
+;	Pop Ebp
+;
+;	Pop Esi
+;	Pop Edx
+;	Pop Ecx
+;	Pop Eax
+;	; Normal
+;	Movsx Ecx, Word Ptr Ds:[Esi + 2H]
+;	Mov DWord Ptr Ss:[Esp + 1CH], Ecx
+;Repulse_2:
+;	FakeJmp 005CE7E4H
 
 
 ; Make various Monks (Archbishop, Friar Tuck, etc.) can restore correctly after pick and drop relic.
