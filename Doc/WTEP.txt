@@ -2,7 +2,7 @@
 
      WAIFor's Trigger & Extension Patch For UserPatch 1.4
                       For UserPatch 1.4
-                     Version 1.02.00.0000
+                     Version 1.02.02.0417
 
                      By WAIFor, 2016-2017
 
@@ -21,6 +21,9 @@ as well as allocations, making pathces able to place in.
 You can also install patches into exe file permanently instead of injecting, by
 modifying ini contents.
 
+You can set config ini file by command line arguments. For example, run
+"wtep setting.ini" means to use setting.ini as config file, instead of wtep.ini
+
 
 
 ----------------------------------------
@@ -34,17 +37,6 @@ modifying ini contents.
 
 - Key and values in section Effects:
 
-    [NewEffects=]
-    0 means no new effects, 1 is to enable them.
-
-    [ImprovedEditor=]
-    In order to enable some improvement of editor, please set this as 1 .
-
-    [TaskProjectiles=]
-    This item can enable "Task Object" to order projectiles when set as 1. You
-    can control projectiles' action now. However, don't worry about moving
-    projectiles shot by others unwillingly, because they're of negative ids!
-
     [CasualTerrain=]
     Activation of this item would make terrain editing more casually - creating 
     waters without generating shores, or on ridged base. Beaches would not be
@@ -52,11 +44,22 @@ modifying ini contents.
     Besides, it could affect generations of random map. So it is recommended that
     you activate this in the launcher instead of changing EXE.
 
+    [ImprovedEditor=]
+    In order to enable some improvement of editor, please set this as 1 .
+
     [MoreResources=]
     Activate more resources in trigger's tribute list, like berseker's healing
     rate, building rate, etc. You can also set language dlls in section
     "NewResourceLanguages".
     
+    [NewEffects=]
+    0 means no new effects, 1 is to enable them.
+
+    [TaskProjectiles=]
+    This item can enable "Task Object" to order projectiles when set as 1. You
+    can control projectiles' action now. However, don't worry about moving
+    projectiles shot by others unwillingly, because they're of negative ids!
+
 
 - New effects:
 
@@ -366,11 +369,16 @@ modifying ini contents.
         8th - Custom
         Those units can garrision into buildings via Garrision Button, or by alt+right-click.
         But, at present, animals has no ability to garrision.
-        Custom classes could be set in section [CustomGarrisiontypes]. The keys range from "1"
-        to "10". Here's an example:
+        Custom classes could be set in section [CustomGarrisiontypes]. Key ranges from
+        1 to 60.
+        You can also set specific classes to garrison by custom types. Using "ClassX=",
+        X is from 0 to 59. The value could be 0 to 8, 0 is no garrison type.
+        Here's an example:
         [CustomGarrisionTypes]
         1=0 ; Archer
         2=6 ; Infantry
+        class13=1; Siege Weapons with 1st type
+        class4=1; Villagers cannot garrison
     2 - Like 1, but another function added. In ability "Garrison Class #3" (required to 
         garrison in buildings), you can set an override class for garrison, by setting
         "Resource In" as a positive figure. For example, a cavalry can garrison like a archer
@@ -415,10 +423,10 @@ modifying ini contents.
 
     [RandomTrain=]
     0 - None.
-    1 - Enable "Random Train". When one unit was trained, there would be half of chance
-        to be another unit, just like Villager of male or female. The alternative unit
-        id is determined by "Unknown 1", negative value means no random unit.
-      * NOTE: In newer AGEs, "Unknown 1" is named "Portrait".
+    1 - Enable "Random Train". When one unit was trained, it would be probably changed 
+        into some other units.
+        To do so, use unit ability #164. "Unit" as another unit, "Resource In" as probablity,
+        ranging from 0 to 100. You can also set multi abilities, making more possibilities.
 
     [Regeneration=]
     0 - None.
@@ -459,7 +467,7 @@ modifying ini contents.
     IconDepositResource - Deposit resource
     IconGarrison - Garrison button. In offical version, the icon is a cursor in fact. If
         you set this value as a non-negative figure, the icon would be the certain frame
-        in resource #50721.
+        in resource #50721. You can set it without modding=1.
 
     [Description]
     DescSkillHeal - Skill of heal
@@ -507,6 +515,34 @@ modifying ini contents.
 
 
 ----------------------------------------
+  New Terrains
+----------------------------------------
+
+
+- As we know, there can be 42 terrains at most in AOKTC. New terrains created
+  by AGE would crash. So we provided a solution to this problem. By this, we
+  can append extra 52 terrains, 94 in total.
+  But, those new terrains can not be created by AGE. To do this, you need to
+  deflate DAT first, then modify data after 42 terrains, making it new terrains.
+  Finally inflate again.
+
+
+- If you understand, you can set General->terrains as 1, then arguments below
+  in [NewTerrains]:
+
+    [X=] (X ranged from 42 to 93)
+    Language DLL ids of new terrains. Those would be shown in Scenario Editor.
+    You should set them serially, because the list would be cut off at zero 
+    language id.
+
+    [MaxExtraTerrains=]
+    Set maximum of extra terrains, default is 52. You don't have to set this,
+    in fact. However, setting a appropriate number is more safe if your DAT is
+    in chaos.
+
+
+
+----------------------------------------
   Install Into EXE
 ----------------------------------------
 
@@ -531,6 +567,8 @@ modifying ini contents.
 
 - Daniel Pereira, the author of Portuguese Civ Mod and Trigger Patch 1.5. His PCM inspired
   me to modify assemble codes in EXE files, and I referred much from his source codes.
+
+- JustTesting1234, provider of patch of villager's third building page.
 
 - You can visit my GitHub to seek source code: https://github.com/ImWG/WTEP
 

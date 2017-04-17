@@ -37,6 +37,7 @@ hh              DD ?
 hProcess		DD ?
 
 fHandle			DD ?
+iniName			DB 256 Dup(?) ; ini File Name
 
 Wax	DD ? ; Virtual Registers :P
 Wbx	DD ?
@@ -53,10 +54,10 @@ szDllKernel     DB  'Kernel32.dll', 0
 szLoadLibrary   DB  'LoadLibraryA', 0
 
 szCaption       DB  'WTEP', 0
-szText          DB  'Failed to launch game.', 0
-szText1			DB	"This is the first time running WAIFor's Patch, we'll change allocations for patches...", 0
-szText2			DB	'Not an available UserPatch game!', 0
-szText3			DB	'WTEP will install patches into EXE file, are you sure to continue?', 0
+szText          DB  'Failed to launch game "%s".', 0
+szText1			DB	"This is the first time running WAIFor's Patch, we'll change allocations for patches of ", '"%s"...', 0
+szText2			DB	'"%s" is not an available UserPatch game!', 0
+szText3			DB	'WTEP will install patches into EXE file "%s", are you sure to continue?', 0
 szText4			DB	'Install completed.', 0
 
 _Jmp			DB 0E9H
@@ -64,6 +65,9 @@ _Call			DB 0E8H
 
 __PatchStart@	DD 00812000H ; = UPGameSize + PatchDelta
 __OffsetStart	DD 00000000H
+
+
+
 
 
 .Code
@@ -101,22 +105,21 @@ WritePatch Proc _lpBaseAddress, _lpBuffer, _nSize
 		Movzx Eax, Cl
 	.Else
 		Invoke getOffsetInFile, _lpBaseAddress
-		Mov Wbx, Eax ; address
+		; Eax = address
 
-		Invoke SetFilePointer, fHandle, Wbx, 0H, FILE_BEGIN
-		Invoke WriteFile, fHandle, _lpBuffer, _nSize, Addr Wcx, NULL
+		Invoke SetFilePointer, fHandle, Eax, 0H, FILE_BEGIN
+		Invoke WriteFile, fHandle, _lpBuffer, _nSize, Addr _nSize, NULL
 	.EndIf
 
 	ret
 WritePatch EndP
 
-WritePatchCode Proc _lpBaseAddress, _lpBuffer, _nEnd
+WritePatchCode Proc Uses Esi, _lpBaseAddress, _lpBuffer, _nEnd
 	Mov Eax, _nEnd
 	Sub Eax, _lpBuffer
-	Mov Wax, Eax
 
 	.If cInstall == 0
-		Invoke	WriteProcessMemory, stProcInfo.hProcess, _lpBaseAddress, _lpBuffer, Wax, 0
+		Invoke	WriteProcessMemory, stProcInfo.hProcess, _lpBaseAddress, _lpBuffer, Eax, 0
 		test	eax,eax
 		setnz	cl
 		Movzx Eax, Cl
@@ -124,13 +127,13 @@ WritePatchCode Proc _lpBaseAddress, _lpBuffer, _nEnd
 	.Else
 		Mov Eax, _nEnd
 		Sub Eax, _lpBuffer
-		Mov Wax, Eax ; size
+		Mov Esi, Eax ; size
 
 		Invoke getOffsetInFile, _lpBaseAddress
-		Mov Wbx, Eax ; address
+		; Eax = address
 
-		Invoke SetFilePointer, fHandle, Wbx, 0H, FILE_BEGIN
-		Invoke WriteFile, fHandle, _lpBuffer, Wax, Addr Wcx, NULL
+		Invoke SetFilePointer, fHandle, Eax, 0H, FILE_BEGIN
+		Invoke WriteFile, fHandle, _lpBuffer, Esi, Addr _nEnd, NULL
 	.EndIf
 
 	ret
@@ -186,7 +189,7 @@ WriteDirectAddresses Proc _jmpFroms
 WriteDirectAddresses EndP
 
 
-WriteDirectAddressArray Proc _jmpFrom
+WriteDirectAddressArray Proc Uses Esi, _jmpFrom
 	Mov Esi, _jmpFrom
 	Mov Eax, Esi
 	Sub Eax, __OffsetStart
@@ -364,6 +367,7 @@ WriteAddresses Proc _jmpFroms
 	Ret
 WriteAddresses EndP
 
+
 WriteAddresses2 Proc _jmpFroms
 	Mov Eax, _jmpFroms
 	Mov Wsi, Eax
@@ -380,7 +384,6 @@ WriteAddresses2 Proc _jmpFroms
 
 	Ret
 WriteAddresses2 EndP
-
 
 
 _WriteJmp Proc _jmpFrom, _jmpTo, _Function
@@ -567,21 +570,22 @@ SetCheat Proc, _iniCheat, _Target
 	Ret
 SetCheat EndP
 
-SetGarrisionType Proc, _iniKey
-	Invoke GetINI, Offset iniSection5, _iniKey, -1
-	.If Eax != -1
-		Mov Esi, Eax
-		Mov Eax, 8
-		Invoke WriteNumber, MoreGarrison2@, 1, Esi, 0
-		Xor Eax, Eax
-		Invoke WriteNumber, MoreGarrison4@, 1, Esi, 0
+SetGarrisionType Proc, _Class, _Type
+	.If _Type != -1
+		.If _Class <= 61
+			Mov Esi, _Class
+			Mov Eax, _Type
+			Invoke WriteNumber, MoreGarrison2@, 1, Esi, 0
+			.If _Type == 0
+				Mov Eax, 1
+			.Else
+				Xor Eax, Eax
+			.EndIf
+			Invoke WriteNumber, MoreGarrison4@, 1, Esi, 0
+		.EndIf
 	.EndIf
 	Ret
 SetGarrisionType EndP
-
-
-
-
 
 
 GetINIString Proc _iniSection, _iniKey, _defaultGame, _hGameName
@@ -595,9 +599,80 @@ GetINI Proc _iniSection, _iniKey, _defaultNumber
 GetINI EndP
 
 
+InnerStrCopy Proc Uses Esi Edi, _Source, _Target, _MaxLength
+	Local _Tail
+	Mov Esi, _Source
+	Mov Esi, _Source
+	Mov Edi, _Target
+	Mov Ecx, Esi
+	Add Ecx, _MaxLength
+	Mov _Tail, Ecx
+.Repeat
+	Mov Al, Byte Ptr Ds:[Esi]
+	Mov Byte Ptr Ds:[Edi], Al
+	Inc Esi
+	Inc Edi
+.Until Al == 0 || Esi >= _Tail
+
+	Ret
+InnerStrCopy EndP
+
+
+GetSeparatedStrings Proc Uses Esi Ebx, _Source, _Target, _Index
+	Mov Esi, _Source
+	Mov Ebx, 0
+	Mov Cl, 0 ; is last blank?
+.Repeat
+	Mov Al, Byte Ptr Ds:[Esi]
+	.If Al == 32 || Al == 9
+		.If Cl == 0
+			Mov Cl, 1
+			Inc Ebx
+		.EndIf
+	.ElseIf Al == '"'
+		.If Cl == 2
+			Mov Cl, 1
+		.Else
+			Mov Cl, 2
+		.EndIf
+	.Else
+		Mov Cl, 0
+		.If Ebx == _Index
+			Mov Ebx, Esi
+			.Repeat
+				Mov Al, [Ebx]
+				Inc Ebx
+			.Until Al == 32 || Al == 9
+			Sub Ebx, Esi
+			Invoke InnerStrCopy, Esi, _Target, Ebx
+			Mov Eax, 1
+			Ret
+		.EndIf
+	.EndIf
+	Inc Esi
+.Until Al == 0
+	Mov Eax, 0
+	Ret
+GetSeparatedStrings EndP
+
+
 
 Main:
 
+	; Load INI File Name
+	Invoke GetCommandLine
+	Mov Esi, Eax
+
+	Invoke GetSeparatedStrings, Eax, Addr Wst, 1
+	.If Eax == 0
+		Mov Eax, Offset Wst
+		Mov Wax, Eax
+		Invoke wsprintf, Addr iniName, Addr iniFormat, Addr Wst
+	.Else
+		Invoke InnerStrCopy, Addr defaultINI, Addr iniName, 255
+	.EndIf
+
+	; Begin
 	Invoke GetINIString, Offset iniSection0, Offset iniKeyGame, Offset defaultGame, Offset cGameName
 	Invoke GetINI, Offset iniSection0, Offset iniKeyInstall, 0
 	.If Eax == 1
@@ -626,11 +701,13 @@ Main:
 
 PatchIsUnavailable:
 	Invoke CloseHandle, fHandle
-	Invoke MessageBox, NULL, Offset szText2, Offset szCaption, MB_OK
+	Invoke wsprintf, Addr Wst, Addr szText2, Addr cGameName
+	Invoke MessageBox, NULL, Addr Wst, Addr szCaption, MB_OK
 	Invoke ExitProcess, NULL
 
 PatchIsAvailable:
-	Invoke MessageBox, NULL, Offset szText1, Offset szCaption, MB_OKCANCEL
+	Invoke wsprintf, Addr Wst, Addr szText1, Addr cGameName
+	Invoke MessageBox, NULL, Addr Wst, Addr szCaption, MB_OKCANCEL
 	Cmp Eax, IDOK
 	Jne Exit
 
@@ -666,7 +743,8 @@ PatchIsReady:
 		Inc Eax
 
 	.Else
-		Invoke MessageBox, NULL, Offset szText3, Offset szCaption, MB_YESNO
+		Invoke wsprintf, Addr Wst, Addr szText3, Addr cGameName
+		Invoke MessageBox, NULL, Addr Wst, Addr szCaption, MB_YESNO
 		Cmp Eax, IDYES
 		Jne Exit
 
@@ -757,6 +835,8 @@ PatchIsReady:
 		Invoke WriteDirectAddresses, Offset PatchEffectsDirectAddresses
 		Invoke WriteDirectAddressArrays, Offset PatchEffectsDirectAddressArrays
 
+
+		Invoke IncreasePatchAddress, $__PatchEffectsStart, $__PatchEffectsEnd
 	.EndIf
 
 	; Modding Patch
@@ -766,7 +846,6 @@ PatchIsReady:
 		Mov Eax, $__PatchModdingStart
 		Mov __OffsetStart, Eax
 
-		Invoke IncreasePatchAddress, $__PatchEffectsStart, $__PatchEffectsEnd
 		Invoke	WritePatchCode, __PatchStart@, $__PatchModdingStart, $__PatchModdingEnd
 		Invoke WriteAddresses, Addr PatchModdingAddresses
 		Invoke WriteAddresses2, Addr PatchModdingAddresses2
@@ -896,20 +975,32 @@ PatchIsReady:
 			Invoke WritePatch, MoreGarrison3@, Offset MoreGarrison3, MoreGarrison3N
 			Invoke WritePatch, MoreGarrison4@, Offset MoreGarrison4, MoreGarrison4N
 
-			Invoke SetGarrisionType, O iniKey1
-			Invoke SetGarrisionType, O iniKey2
-			Invoke SetGarrisionType, O iniKey3
-			Invoke SetGarrisionType, O iniKey4
-			Invoke SetGarrisionType, O iniKey5
-			Invoke SetGarrisionType, O iniKey6
-			Invoke SetGarrisionType, O iniKey7
-			Invoke SetGarrisionType, O iniKey8
-			Invoke SetGarrisionType, O iniKey9
-			Invoke SetGarrisionType, O iniKey10
+			; set Garrison Type 8
+			Mov Edi, 1
+			Mov Ebp, 0
+			.Repeat
+				Invoke wsprintf, Addr Wst, Addr iniNumberKeyF, Edi
+				Invoke GetINI, O iniSection5, O Wst, -1
+				Invoke SetGarrisionType, Eax, 8
+				Inc Edi
+				Add Ebp, 1
+			.Until Edi > MAX_GARRISON_CLASS + 1 ; From 1
+
+			; set Custom Garrison
+			Mov Edi, 0
+			Mov Ebp, 0
+			.Repeat
+				Invoke wsprintf, Addr Wst, Addr iniGarrClassF, Edi
+				Invoke GetINI, O iniSection5, O Wst, -1
+				Invoke SetGarrisionType, Edi, Eax
+				Inc Edi
+				Add Ebp, 1
+			.Until Edi > MAX_GARRISON_CLASS ; From 0
 
 		.EndIf
 
 		;Invoke WriteJmp, Repulse@, $Repulse
+
 		Invoke GetINI, Offset iniSection1, Offset iniKeyRelicMem, 0
 		.If Eax == 1
 			Invoke WriteJmps, Offset PickRelic@, $PickRelic
@@ -1025,16 +1116,20 @@ PatchIsReady:
 
 		Invoke	SetIcon, O iniPosDepositRes, $PosDepositRes, 1
 
-		Invoke GetINI, Offset iniSection3, Offset iniIconGarrison, -1
-		.If Eax <= 80000000H
-			Invoke WriteNumber, IconGarrison2@, 1, 0, 0
-			Invoke WritePatch, IconGarrison@, O IconGarrison, IconGarrisonN
-		.EndIf
-
 
 		Invoke WriteDirectAddresses, Offset PatchModdingDirectAddresses
 		Invoke WriteDirectAddressArrays, Offset PatchModdingDirectAddressArrays
 
+		Invoke IncreasePatchAddress, $__PatchModdingStart, $__PatchModdingEnd
+	.EndIf
+
+
+	; Set Garrison Icon
+	; An Independent Function
+	Invoke GetINI, Offset iniSection3, Offset iniIconGarrison, -1
+	.If Eax <= 80000000H
+		Invoke WriteNumber, IconGarrison2@, 1, 0, 0
+		Invoke WritePatch, IconGarrison@, O IconGarrison, IconGarrisonN
 	.EndIf
 
 
@@ -1044,7 +1139,6 @@ PatchIsReady:
 		Mov Eax, $__PatchCheatsStart
 		Mov __OffsetStart, Eax
 
-		Invoke IncreasePatchAddress, $__PatchModdingStart, $__PatchModdingEnd
 		Invoke	WritePatchCode, __PatchStart@, $__PatchCheatsStart, $__PatchCheatsEnd
 		Invoke WriteAddresses, Addr PatchCheatsAddresses
 		Invoke WriteDirectAddresses, Offset PatchCheatsDirectAddresses
@@ -1077,6 +1171,59 @@ PatchIsReady:
 		Invoke SetCheat, Offset iniCheatTech5, $Cheat_10
 		Invoke SetCheatUnit, Offset iniCheatRsrh5, $CheatEffect10_Unit, 1
 
+
+		Invoke IncreasePatchAddress, $__PatchCheatsStart, $__PatchCheatsEnd
+	.EndIf
+
+
+	; Terrains Patch
+	Invoke GetINI, Offset iniSection0, Offset iniKeyTerrains, 0
+	.If Eax == 1
+
+		Mov Eax, $__PatchTerrainsStart
+		Mov __OffsetStart, Eax
+
+		Invoke	WritePatchCode, __PatchStart@, $__PatchTerrainsStart, $__PatchTerrainsEnd
+		Invoke WriteAddresses, Addr PatchTerrainsAddresses
+		Invoke WriteDirectAddresses, Offset PatchTerrainsDirectAddresses
+		;Invoke WriteDirectAddressArrays, Offset PatchTerrainsDirectAddressArrays
+
+		Invoke WriteJmp, MoreTerrains@, $MoreTerrains
+		Invoke WriteJmp, MoreTerrains2@, $MoreTerrains2
+
+		; Max Terrains Restriction
+		Invoke GetINI, Offset iniSection7, O iniKeyMaxTerr, EXTRA_TERRAIN_COUNT
+		Mov Ebp, Eax
+		.If Ebp > EXTRA_TERRAIN_COUNT
+			Mov Ebp, EXTRA_TERRAIN_COUNT
+		.EndIf
+		Add Ebp, OLD_TERRAIN_COUNT
+
+		Mov Ecx, 1B4H
+		Mul Ecx
+		Add Eax, 467CH
+		Mov Wsi, Eax ; = 467C + N * 1B4H
+		Invoke WritePatch, TerrainsLoad@, O Wsi, 4
+
+		Mov Wsi, Ebp ; = 2A + N
+		Invoke WritePatch, TerrainsLoad2@, O Wsi, 4
+
+		Invoke WritePatch, SkipBorders@, O SkipBorders, SkipBordersN
+
+		; Set New Terrain Names: Empty is for Wiped Out
+		Mov Edi, OLD_TERRAIN_COUNT
+		Mov Ebx, 0
+		.Repeat
+			Invoke wsprintf, Addr Wst, Addr iniNumberKeyF, Edi
+			Invoke GetINI, Offset iniSection7, Offset Wst, 0
+			Invoke WriteNumber, $MoreTerrains_Table, 2, Ebx, 1
+			Inc Edi
+			Add Ebx, 2
+		.Until Edi >= Ebp
+		Mov Eax, 0
+		Invoke WriteNumber, $MoreTerrains_Table, 2, Ebx, 1
+
+		Invoke IncreasePatchAddress, $__PatchTerrainsStart, $__PatchTerrainsEnd
 	.EndIf
 
 
@@ -1097,11 +1244,11 @@ PatchIsReady:
 	Invoke ExitProcess, NULL
 
 FailedToRun:
-	Invoke MessageBox, NULL, Offset szText, Offset szCaption, MB_OK
+	Invoke wsprintf, Addr Wst, Addr szText, Addr cGameName
+	Invoke MessageBox, NULL, Addr Wst, Addr szCaption, MB_OK
 
 Exit:
 	Invoke ExitProcess, NULL
 
 End Main
-
 

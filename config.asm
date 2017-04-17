@@ -9,7 +9,8 @@
 
 .Data
 
-iniName			DB  '.\wtep.ini', 0
+iniFormat		DB  '.\%s', 0
+defaultINI		DB  '.\wtep.ini', 0
 iniSection0		DB  'General', 0
 iniSection1		DB  'Modding', 0
 iniSection2		DB  'Effects', 0
@@ -17,17 +18,7 @@ iniSection3		DB  'Buttons', 0
 iniSection4		DB  'Cheats', 0
 iniSection5		DB  'CustomGarrisionTypes', 0
 iniSection6		DB  'NewResourceLanguages', 0
-
-iniKey1			DB '1', 0
-iniKey2			DB '2', 0
-iniKey3			DB '3', 0
-iniKey4			DB '4', 0
-iniKey5			DB '5', 0
-iniKey6			DB '6', 0
-iniKey7			DB '7', 0
-iniKey8			DB '8', 0
-iniKey9			DB '9', 0
-iniKey10		DB '10', 0
+iniSection7		DB  'NewTerrains', 0
 
 defaultGame		DB	'age2_x1.exe', 0
 noCheat			DB  0
@@ -37,6 +28,8 @@ iniKeyInstall	DB  'install', 0
 iniKeyTriggers	DB  'triggers', 0
 iniKeyModding	DB  'modding', 0
 iniKeyCheats	DB  'cheats', 0
+iniKeyTerrains	DB  'terrains', 0
+iniNumberKeyF   DB  '%d', 0
 
 ; Scenario
 iniKeyCasualTerr DB 'CasualTerrain', 0
@@ -74,6 +67,7 @@ iniKeyRandomUnit DB 'RandomTrain', 0
 iniKeyNewHeal   DB 'Regeneration', 0
 iniKeyVillThird DB 'VillagerThirdPage', 0
 iniKeyVisInEd   DB 'VisbilityInEditor', 0
+iniGarrClassF   DB 'class%d', 0
 
 ; Icon Images
 iniIconDepositRes	DB 'IconDepositResource', 0
@@ -147,7 +141,11 @@ iniCheatTech5	DB 'CodeTech5', 0
 iniCheatRsrh5	DB 'Research5', 0
 
 
+; Terrains
+iniKeyMaxTerr   DB 'MaxExtraTerrains', 0
+
+
 cGameName		DB 256 Dup(0)
 cInstall		DD 00000000H
 
-.Code
+.Code

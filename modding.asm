@@ -3,6 +3,8 @@ Include	defines.asm
 
 .Const
 
+MAX_GARRISON_CLASS Equ 59
+
 SecondPageA@	DD 00528326H
 SecondPage2@	DD 0052830CH
 NewButtons@  	DD 00525A04H
@@ -240,7 +242,7 @@ PatchModdingAddresses DD O NewButtons_0, O NewButtons_1, O NewButtons_2, O NewBu
 		;DD O Repulse_2
 		DD O PickRelic_1, O PickRelic2_1, O PickRelic3_1
 		DD O IFV_1, O IFV2_1
-		DD O RandomUnit_Villager, O RandomUnit_Other, O RandomUnit_1
+		DD O RandomUnit_Other, O RandomUnit_1
 		DD O TerrFndn_1
 		DD O VisInEditor_1, O VisInEditor_2
 
@@ -267,6 +269,7 @@ PatchModdingAddresses2 DD O ExplosionUnit_01, O AllBuildFnd_01
 		DD O SelfDestructUnit_01, O SelfHealUnit_01
 		DD O VillagerCounterFix_01, O VillagerCounterFix_02
 		DD O AttackGround_01
+		DD O RandomUnit_01
 		DD 0H
 
 PatchModdingDirectAddresses DD NewButtons_Table_, O NewButtons_Table, 3
@@ -819,7 +822,6 @@ NewButtonsGr_2:
 	FakeJmp 00525D35H
 
 
-
 ; Initialize Displayed Market Prices
 MarketInit:
 	Je MarketInit_1
@@ -1004,7 +1006,6 @@ AttackGround2_1:
 	FakeJmp 00526129H
 
 
-
 ; Unlock Build restrictions on fish boat
 ; 8th Unit Attribute determines isolated build page
 CustomBuilder: ; ECX = Player Addr.
@@ -1109,7 +1110,6 @@ AdvancedTrainButton_1:
 	FakeCall SUB_DRAWBUTTON
 AdvancedTrainButton_2:
 	FakeJmp 00527E3DH
-
 
 
 ; Deposit carrying resource into buildings nearby - for villager pages
@@ -1293,7 +1293,7 @@ ExtendAttacks__:
 	Je ExtendAttacks_MaxHP
 	Cmp Ecx, -101
 	Je ExtendAttacks_CurrentHP
-	;Cmp Ecx, 102
+	;Cmp Ecx, -102
 	;Je ExtendAttacks_LostHP
 ExtendAttacks_LostHP:
 	Fild Word Ptr Ds:[Eax + 2AH]
@@ -1339,9 +1339,6 @@ VillagerCounterFix_1:
 	FakeJmp 005CF038H
 
 
-
-
-
 ; More Garrison Types
 ; Allowing more classes of units to garrison into buildings
 ; 5th bit: Animals (Prey, Predator, Domesticated Animals and Livestock) Currently no use
@@ -1367,7 +1364,7 @@ MoreGarrisonTypes__:
 	Pop Ecx
 	Mov Dl, Byte Ptr Ds:[Ecx + 208H]
 	Xor Esi, Esi
-	Cmp Eax, 3BH
+	Cmp Eax, MAX_GARRISON_CLASS
 	Ja MoreGarrisonTypes_2
 
 	Xor Ebx, Ebx
@@ -1739,31 +1736,80 @@ GetAbility_:
 	Retn 10H
 
 
+; Random Train
+; By Ability #164
 RandomUnit: ; 004B12ABh
 	Cmp Esi, 53H
-	Je RandomUnit_Villager
+RandomUnit_01:
+	FakeJe 004B12B0H ;Villager
+
+	Push Ebp
+	Push Ebx
+	Push Edi
+	Push Esi ; Unit
+	Push 0 ; Probablity
+
 	Mov Edx, [Edi + 08H]
-	Mov Edx, [Edx + 0CH]
-	Mov Edx, [Edx + 74H]
-	Mov Ecx, [Esi * 4 + Edx]
-	Movsx Ecx, Word Ptr Ds:[Ecx + 58H] ; Unknown 1
-	Cmp Ecx, 0
-	Jl RandomUnit_Other
-	Push Ecx
+	Mov Ebp, [Edx + 0CH]
+	Mov Ebp, [Ebp + 74H]
+	
 RandomUnit_1:
 	FakeCall SUB_RANDOM
 	Cdq
 	Mov Ecx, 64H
 	IDiv Ecx
-	Cmp Edx, 32H
-	Pop Ecx
-	Jl RandomUnit_Other
-	Mov Esi, Ecx
-RandomUnit_Other:
-	FakeJmp 004B12C7H
+	Mov [Esp], Edx
 
-RandomUnit_Villager:
-	FakeJmp 004B12B0H
+	Mov Ecx, [Esi * 4 + Ebp] ; ESI = Proto Unit Id
+; Commented Codes below are used to optimize running, but dat editing will be more complex.
+	;Mov Al, Byte Ptr Ds:[Ecx + 0A4H]
+	;Test Al, 40H ; 7th Attribute
+	;Je RandomUnit_Other
+RandomUnit_GetAbility:
+	Mov Edi, Ecx
+	Xor Ecx, Ecx
+	Mov Ebp, DWord Ptr Ds:[Edi + 0FCH]
+	Xor Eax, Eax
+	Test Ebp, Ebp
+	Je RandomUnit_GetAbility_
+	Mov Edi, DWord Ptr Ds:[Ebp + 04H]
+	Test Edi, Edi
+	Je RandomUnit_GetAbility_
+	Xor Esi, Esi
+
+RandomUnit_GetAbility_Loop:
+	Mov Edx, DWord Ptr Ds:[Edi]
+	Mov Bx, 164 ; Ability
+
+.If Bx == Word Ptr Ds:[Edx + 06H]
+	Mov Esi, [Esp]
+	Movsx Ecx, Word Ptr Ds:[Edx + 14H] ; Resource In
+	Cmp Esi, Ecx
+	jl RandomUnit_Set
+	Sub Esi, Ecx
+	Mov [Esp], Esi
+.EndIf
+	Add Edi, 4
+	Inc Eax
+	Cmp Eax, [Ebp + 8H]
+	Jl RandomUnit_GetAbility_Loop
+	Mov Eax, Esi
+
+RandomUnit_GetAbility_:
+	Add Esp, 4
+	pop esi
+	Pop Edi
+	Pop Ebx
+	Pop Ebp
+RandomUnit_Other:
+	FakeJmp 004B12C7H ; ESI = Proto Unit Id
+	
+RandomUnit_Set:
+	Movsx Ebx, Word Ptr Ds:[Edx + 0AH]
+	Cmp Ebx, 0
+	Jl RandomUnit_GetAbility_
+	Mov [Esp + 4H], Ebx
+	Jmp RandomUnit_GetAbility_
 
 
 ; Vacate Foundation Terrains for Modding

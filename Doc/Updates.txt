@@ -171,3 +171,16 @@ v1.02.00.0000:
   - "Tribute" can divide a resource by another now. You can make infinite
     resource by divide 0. Change civilization sub-effect is removed.
   - "Remove Unit" could be used for transforming units now.
+
+v1.02.02.0417:
+- New terrain function block.
+- Fixed one bug: when part of function blocks were disabled, others may
+  crash.
+- "IconGarrison" could be set without enabling modding now.
+- Improved "CustomGarrisionTypes". Now, you can set more than 10 of 8th
+  typed classes, or set other types of garrisons.
+- (!)Random Training rework. Now "Unknown 1 / Portrait" attribute is
+  obsoleted, use ability #164 instead.
+- You can use command arguments to confirm ini file now.
+- Improved prompts in patching. Now you can see exe file name in message
+  boxes.

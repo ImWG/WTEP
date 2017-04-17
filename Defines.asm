@@ -106,3 +106,10 @@ Float100 Equ 006355D8H
 Float05 Equ 00635978H
 Float0 Equ 006355C8H
 Float0001 Equ 00635970H
+
+
+PatchBlock Struct
+	Head DD ?
+	Tail DD ?
+
+PatchBlock EndS
