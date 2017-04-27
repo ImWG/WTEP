@@ -65,8 +65,10 @@ PatchCheatsDirectAddressArrays DD O CheatEffectTable, 0H
 .Code
 
 
+Align 4
 __PatchCheatsStart:
-	DB 'WAIFor cheats', 0
+
+
 
 ; Related To Cheats
 CheatCheck: ;00444572h
@@ -224,6 +226,8 @@ CheatEffectTable_:
     Jmp DWord Ptr Ds:[Eax * 4 + 11111111H]
 CheatEffect_0:
 	FakeJmp 0042BDEAH
+
+Align 4
 CheatEffectTable:
 	DD O CheatEffect1, O CheatEffect2, O CheatEffect3, O CheatEffect4, O CheatEffect5
 	DD O CheatEffect6, O CheatEffect7, O CheatEffect8, O CheatEffect9, O CheatEffect10
@@ -366,4 +370,5 @@ CheatEffect10:
 
 
 
+Align 4
 __PatchCheatsEnd:

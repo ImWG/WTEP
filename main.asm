@@ -389,7 +389,9 @@ WriteAddresses2 EndP
 _WriteJmp Proc _jmpFrom, _jmpTo, _Function
 	.If cInstall == 0
 
-		Invoke	WriteProcessMemory, stProcInfo.hProcess, _jmpFrom, _Function, 1, 0
+		.If _Function != 0
+			Invoke	WriteProcessMemory, stProcInfo.hProcess, _jmpFrom, _Function, 1, 0
+		.EndIf
 
 		Mov Eax, _jmpFrom
 		Inc Eax
@@ -424,8 +426,10 @@ _WriteJmp Proc _jmpFrom, _jmpTo, _Function
 		Sub Eax, 5
 		Mov Wbx, Eax ; dest
 
-		Invoke SetFilePointer, fHandle, Wax, 0H, FILE_BEGIN
-		Invoke WriteFile, fHandle, _Function, 1, Addr Wcx, NULL
+		.If _Function != 0
+			Invoke SetFilePointer, fHandle, Wax, 0H, FILE_BEGIN
+			Invoke WriteFile, fHandle, _Function, 1, Addr Wcx, NULL
+		.EndIf
 		Mov Eax, Wax
 		Inc Eax
 		Mov Wax, Eax
@@ -465,6 +469,13 @@ WriteCall Proc _jmpFrom, _jmpTo
 	Ret
 WriteCall EndP
 
+; For Conditional Jumps
+WriteJmp2 Proc _jmpFrom, _jmpTo
+	Mov Eax, _jmpFrom
+	Inc Eax
+	Invoke _WriteJmp, Eax, _jmpTo, 0
+	Ret
+WriteJmp2 EndP
 
 ; Mode: 0-Base, 1-Patch
 WriteNumber Proc _jmpFrom, _Length, _Offset, _Mode ; EAX = Number
@@ -621,22 +632,24 @@ InnerStrCopy EndP
 GetSeparatedStrings Proc Uses Esi Ebx, _Source, _Target, _Index
 	Mov Esi, _Source
 	Mov Ebx, 0
-	Mov Cl, 0 ; is last blank?
+	Mov Cl, 0 ; is last blank? 0-no, 1-yes, 2-qouted
 .Repeat
 	Mov Al, Byte Ptr Ds:[Esi]
-	.If Al == 32 || Al == 9
+	.If Al == 32 || Al == 9 ; if blank?
 		.If Cl == 0
 			Mov Cl, 1
 			Inc Ebx
 		.EndIf
-	.ElseIf Al == '"'
+	.ElseIf Al == '"' ; if qouted?
 		.If Cl == 2
 			Mov Cl, 1
 		.Else
 			Mov Cl, 2
 		.EndIf
 	.Else
-		Mov Cl, 0
+		.If Cl == 1
+			Mov Cl, 0
+		.EndIf
 		.If Ebx == _Index
 			Mov Ebx, Esi
 			.Repeat
@@ -663,14 +676,15 @@ Main:
 	Invoke GetCommandLine
 	Mov Esi, Eax
 
-	Invoke GetSeparatedStrings, Eax, Addr Wst, 1
-	.If Eax == 0
+	Invoke GetSeparatedStrings, Esi, Addr Wst, 1
+	.If Eax == 1
 		Mov Eax, Offset Wst
 		Mov Wax, Eax
 		Invoke wsprintf, Addr iniName, Addr iniFormat, Addr Wst
 	.Else
 		Invoke InnerStrCopy, Addr defaultINI, Addr iniName, 255
 	.EndIf
+
 
 	; Begin
 	Invoke GetINIString, Offset iniSection0, Offset iniKeyGame, Offset defaultGame, Offset cGameName
@@ -681,11 +695,13 @@ Main:
 		Mov cInstall, 0
 	.EndIf
 
+
 	; Load File
 	Invoke CreateFile, Offset cGameName, GENERIC_READ Or GENERIC_WRITE,
 				FILE_SHARE_READ, NULL, OPEN_EXISTING, NULL, NULL
 	Mov fHandle, Eax
 	;Invoke ReadFile, fHandle, Addr fBuffer, 20, Addr Wax, NULL
+
 
 	; Check size of allocations
 	Invoke SetFilePointer, fHandle, PatchVSize@, 0H, FILE_BEGIN
@@ -766,8 +782,12 @@ PatchIsReady:
 		Invoke WriteAddresses2, Addr PatchEffectsAddresses2
 
 		Invoke GetINI, Offset iniSection2, Offset iniKeyNewEffects, 0
-		.If Eax == 1
-			Invoke  WritePatch, ExpandNumberLength@, Offset ExpandNumberLength, ExpandNumberLengthN
+		.If Eax == 1 || Eax == 2
+			.If Eax == 1
+				Invoke  WritePatch, ExpandNumberLength@, Offset ExpandNumberLength, ExpandNumberLengthN
+			.Else
+				Invoke  WriteJmp, ExpandNumberLengthB@, $ExpandNumberLengthB
+			.EndIf
 			Invoke	WriteJmp, EnableInputs@, $EnableInputs
 			Invoke	WriteJmp, CustomColorInfo@, $CustomColorInfo
 
@@ -827,6 +847,14 @@ PatchIsReady:
 			Invoke	WritePatch, CasualTerrain@, Offset CasualTerrain, CasualTerrainN
 			Invoke	WritePatch, CasualTerrain2@, Offset CasualTerrain2, CasualTerrain2N
 			Invoke	WritePatch, CasualTerrain3@, Offset CasualTerrain3, CasualTerrain3N
+
+		.EndIf
+
+		Invoke GetINI, Offset iniSection2, Offset iniKeyIsoSiege, 0
+		.If Eax == 1
+			Invoke	WritePatch, IsoSiege@, Offset IsoSiege, IsoSiegeN
+			Invoke	WritePatch, IsoSiege2@, Offset IsoSiege2, IsoSiege2N
+			Invoke	WritePatch, IsoSiege3@, Offset IsoSiege3, IsoSiege3N
 
 		.EndIf
 
@@ -896,6 +924,14 @@ PatchIsReady:
 
 			;Invoke	WritePatch, MarketInit@, Offset MarketInit, MarketInitN
 			Invoke	WriteJmp, MarketInit@, $MarketInit
+
+			; Enable all classes to pack
+			Invoke  WritePatch, AllPack@, O AllPack, AllPackN
+			Invoke  WritePatch, AllPack2@, O AllPack2, AllPack2N
+			Invoke  WritePatch, AllPack3@, O AllPack3, AllPack3N
+			Invoke  WritePatch, AllPack4@, O AllPack4, AllPack4N
+
+			;Invoke	WriteJmp2, NewCommand@, $NewCommand
 
 		.EndIf
 
@@ -1207,6 +1243,7 @@ PatchIsReady:
 
 		Mov Wsi, Ebp ; = 2A + N
 		Invoke WritePatch, TerrainsLoad2@, O Wsi, 4
+		;Invoke WritePatch, TerrainsLoad3@, O Wsi, 1
 
 		Invoke WritePatch, SkipBorders@, O SkipBorders, SkipBordersN
 

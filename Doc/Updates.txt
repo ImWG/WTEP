@@ -184,3 +184,10 @@ v1.02.02.0417:
 - You can use command arguments to confirm ini file now.
 - Improved prompts in patching. Now you can see exe file name in message
   boxes.
+
+v1.02.03.0422:
+- Fixed one bug, now new skills of pack work well. But unpack is still
+  unusable on non-trebuchet-class units now.
+- Now "Number" input box can type 5 characters when Effects->NewEffects=2
+  and having ETP 1.5 installed.
+- New Siege Weapon Bug Fix function.

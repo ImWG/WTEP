@@ -11,6 +11,7 @@ MoreTerrains2@ DD 007BB955H ;007BB3B1H
 
 TerrainsLoad@ DD 00583A86H
 TerrainsLoad2@ DD 00583A8BH
+TerrainsLoad3@ DD 00584E1CH
 
 SkipBorders@ DD 0057F087H
 
@@ -40,6 +41,7 @@ SkipBordersN DD 2H
 .Code
 
 
+Align 4
 __PatchTerrainsStart:
 
 
@@ -98,10 +100,11 @@ MoreTerrains2_2:
 MoreTerrains2_1:
 	FakeJmp 007BB95AH ;007BB3B6H
 
-
+Align 2
 MoreTerrains_Table:
 	DW EXTRA_TERRAIN_COUNT + 1 Dup (0)
 
 
 
+Align 4
 __PatchTerrainsEnd:

@@ -36,6 +36,7 @@ iniKeyCasualTerr DB 'CasualTerrain', 0
 iniKeyImprovedEd DB 'ImprovedEditor', 0
 iniKeyMoreRes    DB 'MoreResources', 0
 iniKeyNewEffects DB 'NewEffects', 0
+iniKeyIsoSiege	 DB 'SiegeWeaponBugFix', 0
 iniKeyTaskProj	 DB 'TaskProjectiles', 0
 
 ; Un-hardcoding
@@ -148,4 +149,4 @@ iniKeyMaxTerr   DB 'MaxExtraTerrains', 0
 cGameName		DB 256 Dup(0)
 cInstall		DD 00000000H
 
-.Code
+.Code

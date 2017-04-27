@@ -29,10 +29,14 @@ GaiaForPlayer@		DD 007CE1C0H ; Allow set gaia civilization for players (shown as
 GaiaForPlayer2@		DD 007CE1DCH
 BuildingNameFix@	DD 004E1033H ; Fix buildings without language name shown as blank choices in trigger editor.
 ExpandNumberLength@	DD 004EADF9H ; Allow more figures to type in in "Number".
+ExpandNumberLengthB@ DD 004EADF2H ; For Daniel's 1.5 Patch
 CasualTerrain@		DD 00461A8AH ; Allow free terrain draw
 CasualTerrain2@		DD 00461444H
 CasualTerrain3@		DD 0045F984H
 HouseRotate@		DD 004CA4DCH ; Allow All Building's Rotation (Not only House #70)
+IsoSiege@			DD 0045BC2BH ; Avoid Isolated Siege Weapon's upgrade by Techs
+IsoSiege2@			DD 004C1A9CH
+IsoSiege3@			DD 004C18AFH ; Avoid Attribute Modification
 
 
 ; Interfaces
@@ -42,6 +46,7 @@ $__PatchEffectsEnd DD O __PatchEffectsEnd
 $EnableInputs DD O EnableInputs
 $MoreResources DD O MoreResources
 $CustomColorInfo DD O CustomColorInfo
+$ExpandNumberLengthB DD O ExpandNumberLengthB
 $TaskObject DD O TaskObject
 $KillObject DD O KillObject
 $MoveSight DD O MoveSight
@@ -70,6 +75,7 @@ PatchEffectsAddresses DD O CustomColorInfo_White, O CustomColorInfo_Normal
 	DD O SendChat_0, O SendChat_1, O SendChat_2
 	DD O KillObject_Image_1
 	DD O RemoveUnit_1, O RemoveUnit_2
+	DD O ExpandNumberLenB_1
 	DD 0H
 
 PatchEffectsAddresses2 DD O CreateUnit_01, O MoveSight_01, O TaskObject_01
@@ -123,14 +129,22 @@ CasualTerrain3N		DD 01H
 HouseRotate			DB 00H
 HouseRotateN		DD 01H
 
+IsoSiege			DB 0EBH
+IsoSiegeN			DD 1
+IsoSiege2			DB 90H, 90H
+IsoSiege2N			DD 2
+IsoSiege3			DB 0E9H, 0CCH, 00H, 00H, 00H, 90H
+IsoSiege3N			DD 6
+
 
 .Code
 
 
 
 ; Patch Content
+Align 4
 __PatchEffectsStart:
-	DB 'WAIFor effects', 0
+
 
 
 EnableInputs:
@@ -236,12 +250,20 @@ MoreResources_Back:
 ; Food Prod., Wood Prod., Gold Prod., Stone Prod., Trade Prod.
 ; berserker Heal, Faith Recharging, Relic Prod., Heal Range
 ; (Unused)Gathered Gold, Stone, Food, Wood, Map Reveal%
+Align 2
 MoreResources_Table:
 	DW 4, 9747, 195, 8054, 78, 8015, 6, 10336, 89, 4124
 	DW 190, 9906, 189, 9907, 47, 9909, 79, 9908, 10, 42040
 	DW 96, 8431, 35, 8220, 191, 9929, 90, 5620
 	;DW 188, 9909, 187, 9908, 185, 9906, 186, 9907, 22, 9919
 	DW - 1, -1
+
+
+ExpandNumberLengthB:
+	Lea Edi, [Esi + 0E44H]
+	Push 5
+ExpandNumberLenB_1:
+	FakeJmp 004EADFAH
 
 
 CustomColorInfo:
@@ -297,6 +319,7 @@ TaskObject_01:
 
 TaskObject_Table_:
 	Jmp DWord Ptr Ds:[Ecx * 4 + 11111111H]
+Align 4
 TaskObject_Table:
 	DD O TaskObject_Teleport, O TaskObject_Garrison, TaskObject_ByRes, 0 ;O TaskObject_Transform, 0
 
@@ -413,6 +436,7 @@ Tribute:
 	Jae Tribute_Default
 Tribute_Table_:
 	Jmp DWord Ptr Ds:[Edx * 4 + 11111111H]
+Align 4
 Tribute_Table:
 	DD O Tribute_Default, O Tribute_Instant, O Tribute_Multiply, O Tribute_Convert, O Tribute_Product
 	DD O Tribute_Division, O Tribute_Default, O Tribute_Default, O Tribute_Random, O Tribute_Random
@@ -585,6 +609,7 @@ DamageUnit_Table_:
 ; 5 - Set HP by current HP's permillage
 ; 6 - Save HP into Resource
 ; 7 - Load HP from Resource
+Align 4
 DamageUnit_Table:
 	DD O DamageUnit_, O DamageUnit_1, DamageUnit_Perm, DamageUnit_Perm, DamageUnit_LostPerm
 	DD O DamageUnit_CurrentPerm, 0 ;
@@ -927,10 +952,12 @@ KillObject_CallTable_:
 
 __KillObject_Functions__
 
+Align 4
 KillObject_CallTable:
 	DD O KillObject_Char, O KillObject_Word, O KillObject_DWord, O KillObject_Float
 	DD O KillObject_Image, O KillObject_Sound, O KillObject_Attack, O KillObject_Defense, 0
 
+Align 4
 KillObject_Table:
 	__KillObject_Table__
 
@@ -976,9 +1003,11 @@ KillObject_CallTable2_:
 	Add Esp, 2034H
 	Retn 4
 
+Align 4
 KillObject_CallTable2:
 	DD O KillObject2_Char, O KillObject2_Word, O KillObject2_DWord, O KillObject2_Float, O KillObject2_Angle, 0
 
+Align 4
 KillObject_Table2:
 	__KillObject_Table2__
 
@@ -1032,5 +1061,6 @@ RemoveUnit_:
 
 
 
+Align 4
 __PatchEffectsEnd:
 

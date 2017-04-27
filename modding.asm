@@ -113,6 +113,13 @@ IconGarrison2@  DD 00525D26H
 MonkHealGraph@  DD 004B4ED0H
 MonkHealGraphId@ DD 004B4EDFH
 
+AllPack@	DD 00527138H
+AllPack2@	DD 005571DEH
+AllPack3@	DD 005571E6H
+AllPack4@	DD 00527125H
+
+;NewCommand@ DD 0051E612H
+
 
 ; Interfaces
 $__PatchModdingStart DD O __PatchModdingStart
@@ -170,6 +177,7 @@ $TypeInEditor8	   DD O TypeInEditor8
 $TypeInEditor9	   DD O TypeInEditor9
 $NewHealUnit       DD O NewHealUnit
 $AllBuildFnd       DD O AllBuildFnd
+;$NewCommand        DD O NewCommand
 
 ; Icons
 $IconHeal          DD O IconHeal
@@ -263,6 +271,8 @@ PatchModdingAddresses DD O NewButtons_0, O NewButtons_1, O NewButtons_2, O NewBu
 		DD O NewHealUnit_1, O NewHealUnit_2
 		DD O AllBuildFnd_1
 
+		;DD O NewCommand_1
+
 		DD 0H
 
 PatchModdingAddresses2 DD O ExplosionUnit_01, O AllBuildFnd_01
@@ -270,6 +280,7 @@ PatchModdingAddresses2 DD O ExplosionUnit_01, O AllBuildFnd_01
 		DD O VillagerCounterFix_01, O VillagerCounterFix_02
 		DD O AttackGround_01
 		DD O RandomUnit_01
+		;DD O NewCommand_01
 		DD 0H
 
 PatchModdingDirectAddresses DD NewButtons_Table_, O NewButtons_Table, 3
@@ -368,6 +379,17 @@ MonkHealGraph   DB 66H, 83H, 7AH, 10H, 7DH, 90H, 75H, 16H, 8BH, 51H, 0CH, 8BH, 5
 MonkHealGraphN  DD 1CH
 
 
+AllPack			DB 6AH, 02H, 6AH, 0FFH
+AllPackN		DD 4
+AllPack2		DB 7AH, 1AH
+AllPack2N		DD 2
+AllPack3		DB 7AH, 12H
+AllPack3N		DD 2
+AllPack4		DB 8BH, 0DH, 0A0H, 12H, 79H, 00H
+AllPack4N		DD 6
+
+
+
 
 .Code
 
@@ -436,9 +458,8 @@ SimpleButtonArgsBuild Macro _Type, _Function, _Position, _HotKey, _Arg10, _Arg11
 EndM
 
 
-
+Align 4
 __PatchModdingStart:
-	DB 'WAIFor modding', 0
 
 
 
@@ -540,6 +561,8 @@ NewButtons_Sub:
 
 NewButtons_Table_:
 	Jmp DWord Ptr Ds:[Eax * 4 + 11111111H]
+
+Align 4
 NewButtons_Table:
 DD O NewButtons_Other, O NewButtons_Deposit, O NewButtons_Transform, O NewButtons_Train, O NewButtons_Heal
 DD O NewButtons_Build, O NewButtons_Pack, O NewButtons_Unpack, O NewButtons_Ground, O NewButtons_Pack_
@@ -558,6 +581,8 @@ NewButtons_Done:
 
 NewButtons_Table2_: ; Vice Skill
 	Jmp DWord Ptr Ds:[Eax * 4 + 11111111H]
+
+Align 4
 NewButtons_Table2:
 DD O NewButtonsB_Other, O NewButtonsB_Ground, O NewButtonsB_Pack, O NewButtonsB_Heal, O NewButtonsB_Unload
 DD O NewButtonsB_Other, O NewButtonsB_Other, O NewButtonsB_Other, 0H
@@ -718,7 +743,7 @@ NewButtons_Unpack_:
 	Mov [Ebp], Eax
 NewButtons_Unpack:
 	Pop Eax
-	SimpleButtonArgs 1020H, [Ebp], 0CH, 6EH, 0A05FH, IconUnpack, _, DscUnpack ; Unpack
+	SimpleButtonArgs 1020H, [Ebp], 0DH, 6FH, 0A060H, IconUnpack, _, DscUnpack ; Unpack
 NewButtons_13:
 	FakeCall SUB_DRAWBUTTON
 	Jmp NewButtons_Done
@@ -2396,5 +2421,15 @@ NewHealUnit_Decrease_:
 	Retn
 
 
+;NewCommand: ; ECX = 0B5H
+;	Sub Ecx, 0B5H
+;	Cmp Ecx, 2H
+;NewCommand_01:
+;	FakeJa 0051F534H
+;NewCommand_1:
+;	FakeJmp 0051F534H
 
+
+
+Align 4
 __PatchModdingEnd:

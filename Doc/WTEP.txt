@@ -2,7 +2,7 @@
 
      WAIFor's Trigger & Extension Patch For UserPatch 1.4
                       For UserPatch 1.4
-                     Version 1.02.02.0417
+                     Version 1.02.03.0423
 
                      By WAIFor, 2016-2017
 
@@ -53,12 +53,18 @@ You can set config ini file by command line arguments. For example, run
     "NewResourceLanguages".
     
     [NewEffects=]
-    0 means no new effects, 1 is to enable them.
+    0 means no new effects, 1 is to enable them. 2 is to be compatible with Daniel
+    Pereira's ETP 1.5 - so that you can type 5 characters in "Number" box.
+
+    [SiegeWeaponBugFix=]
+    If enabled, when siege weapons have their owner/name/HP... changed by triggers,
+    researches will no longer restore them.
 
     [TaskProjectiles=]
     This item can enable "Task Object" to order projectiles when set as 1. You
-    can control projectiles' action now. However, don't worry about moving
-    projectiles shot by others unwillingly, because they're of negative ids!
+    can control projectiles' action now. Don't worry about moving projectiles
+    shot by others unwillingly, because they're of negative ids!
+    However, we don't recommand you to use this function, you can use Petrol instead.
 
 
 - New effects:
@@ -228,7 +234,7 @@ You can set config ini file by command line arguments. For example, run
     [AttackGround=]
     0 - Only units with id #36 (Bombard Cannon), #280 (Mangonel), #420 (Cannon Gallery),
         #550 (Onager), #588 (Siege Onager), or class=54 can attack ground.
-    1 - Units with Attack Mode=6 or skill 8 can attack ground.
+    1 - Units with Attack Mode / Attack Reaction=6 or skill 8 can attack ground.
 
     [CustomBuilder=]
     0 - When Command Id=9, units have #13 - Fishing Boat's build page.
@@ -246,7 +252,7 @@ You can set config ini file by command line arguments. For example, run
         or #706 (Saboteur) would do damage when they die.
     1 - Except units with ids above, if a unit has Unit Attribute 4th checked, it would
         do death damage as well.
-    2 - Only units with Unit Attribute 4th checked could do death damage.
+    2 - Only units with Unit Attributes / Unit Trait 4th checked could do death damage.
 
     [FixVillagerCounter=]
     0 - Class-4 units under attack by wild animals, if their Villager Mode is 1, they would
@@ -290,7 +296,6 @@ You can set config ini file by command line arguments. For example, run
     0 - Only units with id #440, #527, #528 or #706 would die hen they attacked.
     1 - Except units with ids above, if a unit's Attack Mode=5, the unit would die when attacked.
     2 - Only units with Attack Mode=5 would die when attacked.
-      * NOTE: In newer AGEs, "Attack Mode" is named "Attack Reaction".
 
     [SelfHealUnit=]
     0 - Besides heroes, only units with id #692 (Berserker), #694 (Elite Berserker) would
@@ -387,8 +392,8 @@ You can set config ini file by command line arguments. For example, run
     [NewSkills=]
     0 - None
     1 - Add new skills and skill buttons. Most skill buttons were placed at 15th, but
-        for buildings with second page enabled, they would be at 14th. "Tower Mode" in
-        Advanced Genie Editor determines unit's skill:
+        for buildings with second page enabled, they would be at 14th. "Tower Mode / Break
+        off Combat" in Advanced Genie Editor determines unit's skill:
         0 - None
         1 - Spawn. Object can spawn units confirmed by "Attribute Piece" (the same below)
             This attribute determines id of child unit. A positive value make units spawn
