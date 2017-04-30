@@ -73,7 +73,7 @@ PatchEffectsAddresses DD O CustomColorInfo_White, O CustomColorInfo_Normal
 	DD O CreateUnit_1, O CreateUnit_2, O CreateUnit_3
 	DD O ChangeDiplomacy_1, O ChangeDiplomacy_2, O ChangeDiplomacy_3
 	DD O SendChat_0, O SendChat_1, O SendChat_2
-	DD O KillObject_Image_1
+	DD O KillObject_Image_1, O KillObject_Other
 	DD O RemoveUnit_1, O RemoveUnit_2
 	DD O ExpandNumberLenB_1
 	DD 0H
@@ -893,10 +893,10 @@ SendChat_0:
 ; 700~999 - set attr by resource of selected
 ; +1000 - of protounit
 KillObject: ;004379CFh
-	Mov Ebx, DWord Ptr Ds:[Edi + 64H] ;ebx = Number
-	Cmp Ebx, 100
+	Mov Eax, DWord Ptr Ds:[Edi + 64H] ;ebx = Number
+	Cmp Eax, 100
 	Jge KillObject_Change
-	Cmp Ebx, 10
+	Cmp Eax, 10
 	Jge KillObject_Change2
 	Mov Eax, DWord Ptr Ss:[Esp + 10H]
 	Xor Esi, Esi
@@ -904,6 +904,7 @@ KillObject_Other:
 	FakeJmp 004379D5H
 
 KillObject_Change:
+	Mov Ebx, Eax
 	Lea Esi, [Esp + 94H]
 	Sub Ebx, 100
 	Mov Ecx, DWord Ptr Ss:[Esp + 18H]
@@ -962,6 +963,7 @@ KillObject_Table:
 	__KillObject_Table__
 
 KillObject_Change2:
+	Mov Ebx, Eax
 	Lea Esi, [Esp + 94H]
 	Sub Ebx, 10
 	Mov Ecx, DWord Ptr Ss:[Esp + 18H]
