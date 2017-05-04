@@ -191,3 +191,7 @@ v1.02.03.0422:
 - Now "Number" input box can type 5 characters when Effects->NewEffects=2
   and having ETP 1.5 installed.
 - New Siege Weapon Bug Fix function.
+
+v1.02.03.0430:
+- Fixed one crash bug in original "Kill Object" effect.
+- Alignments in extension codes.
