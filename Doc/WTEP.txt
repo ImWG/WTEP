@@ -2,7 +2,7 @@
 
      WAIFor's Trigger & Extension Patch For UserPatch 1.4
                       For UserPatch 1.4
-                     Version 1.02.03.0423
+                     Version 1.02.03.0430
 
                      By WAIFor, 2016-2017
 

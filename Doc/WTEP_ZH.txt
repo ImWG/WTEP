@@ -3,7 +3,7 @@
      WAIFor's Trigger & Extension Patch For UserPatch 1.4
                       For UserPatch 1.4
                   我是谁004的1.4触发与MOD扩展包
-                        1.02.03.0423
+                        1.02.03.0430
 
              作者 WAIFor（我是谁004）, 2016-2017
 
