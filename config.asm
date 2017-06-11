@@ -29,17 +29,21 @@ iniKeyTriggers	DB  'triggers', 0
 iniKeyModding	DB  'modding', 0
 iniKeyCheats	DB  'cheats', 0
 iniKeyTerrains	DB  'terrains', 0
+iniKeyGizmo		DB  'Gizmo', 0
 iniNumberKeyF   DB  '%d', 0
 
 ; Scenario
 iniKeyCasualTerr DB 'CasualTerrain', 0
+iniKeyDanielETP  DB 'ExtendedTriggerPatchLocation', 0
+iniKeyHotKeyFunc DB 'HotKeyFunctions', 0
 iniKeyImprovedEd DB 'ImprovedEditor', 0
+iniKeyIsoSiege	 DB 'SiegeWeaponBugFix', 0
 iniKeyMoreRes    DB 'MoreResources', 0
 iniKeyNewEffects DB 'NewEffects', 0
-iniKeyIsoSiege	 DB 'SiegeWeaponBugFix', 0
 iniKeyTaskProj	 DB 'TaskProjectiles', 0
 
 ; Un-hardcoding
+iniKeyAIUnitLim DB 'AIUnitLimit', 0
 iniKeyAllFnd	DB 'AllClassBuildFoundations', 0
 iniKeyAllHeal	DB 'AllClassHeal', 0
 iniKeyAttackGnd	DB 'AttackGround', 0

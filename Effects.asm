@@ -21,6 +21,15 @@ ChangeDiplomacy@	DD 00437605H
 SendChat@			DD 0043764FH
 RemoveUnit@			DD 00437A06H
 
+CasualTerrainB@		DD 00461A86H
+CasualTerrainB2@	DD 00461444H
+CasualTerrainB3@	DD 0045F980H
+HiddenUnit@			DD 004E0AAFH
+HiddenUnit2@		DD 004E0D8FH
+HiddenUnit3@		DD 004E5025H
+InternalName@		DD 004E1056H
+
+
 ; Isolated patches
 EnableTaskProj@		DD 00437973H ; Enable Task Object for projectiles.
 MoreTributeRes@		DD 004EE738H ; Make resources list same with Accumulate Attribute's.
@@ -37,6 +46,11 @@ HouseRotate@		DD 004CA4DCH ; Allow All Building's Rotation (Not only House #70)
 IsoSiege@			DD 0045BC2BH ; Avoid Isolated Siege Weapon's upgrade by Techs
 IsoSiege2@			DD 004C1A9CH
 IsoSiege3@			DD 004C18AFH ; Avoid Attribute Modification
+
+DanielETP@			DD 00628880H ; Set Daniel's ETP triggers.dll location
+HotKeySwitch@		DD 004F1F82H
+HotKeySwitch2@		DD 004F1F89H
+
 
 
 ; Interfaces
@@ -58,8 +72,17 @@ $CreateUnit DD O CreateUnit
 $ChangeDiplomacy DD O ChangeDiplomacy
 $SendChat DD O SendChat
 $RemoveUnit DD O RemoveUnit
+$CasualTerrainB DD O CasualTerrainB
+$CasualTerrainB2 DD O CasualTerrainB2
+$CasualTerrainB3 DD O CasualTerrainB3
+$HiddenUnit DD O HiddenUnit
+$HiddenUnit2 DD O HiddenUnit2
+$HiddenUnit3 DD O HiddenUnit3
+$InternalName DD O InternalName
 
 $MoreResources_Table DD O MoreResources_Table
+$HotKeySwitch DD O HotKeySwitch
+$HotKeySwitch2 DD O HotKeySwitch2
 
 
 PatchEffectsAddresses DD O CustomColorInfo_White, O CustomColorInfo_Normal
@@ -76,10 +99,18 @@ PatchEffectsAddresses DD O CustomColorInfo_White, O CustomColorInfo_Normal
 	DD O KillObject_Image_1, O KillObject_Other
 	DD O RemoveUnit_1, O RemoveUnit_2
 	DD O ExpandNumberLenB_1
+	DD O HotKeySwitch_CasualTerrain_1, O HotKeySwitch_HiddenUnit_1, O HotKeySwitch_InternalName_1
+	DD O CasualTerrainB_1, O CasualTerrainB2_1, O CasualTerrainB2_2, O CasualTerrainB3_1
+	DD O HiddenUnit_1, O HiddenUnit2_1, O HiddenUnit3_1
+	DD O InternalName_1
 	DD 0H
 
 PatchEffectsAddresses2 DD O CreateUnit_01, O MoveSight_01, O TaskObject_01
-	DD O RemoveUnit_01, 0H
+	DD O RemoveUnit_01
+	DD O CasualTerrainB_01, O CasualTerrainB2_01, O CasualTerrainB3_01, O CasualTerrainB3_02
+	DD O HiddenUnit_01, O HiddenUnit_02, O HiddenUnit2_01, O HiddenUnit2_02, O HiddenUnit3_01, O HiddenUnit3_02
+	DD O InternalName_01, O InternalName_02
+	DD 0H
 
 PatchEffectsDirectAddresses DD O KillObject_Table_, O KillObject_Table, 3
 	DD O KillObject_Table2_, O KillObject_Table2, 3
@@ -89,10 +120,13 @@ PatchEffectsDirectAddresses DD O KillObject_Table_, O KillObject_Table, 3
 	DD O Tribute_Table_, O Tribute_Table, 3
 	DD O DamageUnit_Table_, O DamageUnit_Table, 3
 	DD O MoreResources_Table_, O MoreResources_Table, 1
+	;DD O HotKeySwitch_CasualTerrain, O HotKeySwitch_Flag, 1
+	;DD O HotKeySwitch_CasualTerrain_Attr, O HotKeySwitch_Flag, 1
 	DD 0H
 
 PatchEffectsDirectAddressArrays DD O TaskObject_Table, O Tribute_Table, O DamageUnit_Table
 	DD O KillObject_CallTable, O KillObject_CallTable2
+	DD O HotKeySwitch2_Table
 	DD 0H
 
 
@@ -139,6 +173,7 @@ IsoSiege3N			DD 6
 
 .Code
 
+HotKeySwitchFlag Equ 7A5204H
 
 
 ; Patch Content
@@ -336,16 +371,16 @@ TaskObject_Teleport:
 		Fld DWord Ptr Ds:[Edx + 38H]
 		Fld DWord Ptr Ds:[Edx + 3CH]
 		Jmp TaskObject_Teleport_
-	TaskObject_Teleport_Point:
+TaskObject_Teleport_Point:
 		Fild DWord Ptr Ds:[Edi + 44H]
 		Fild DWord Ptr Ds:[Edi + 48H]
-	TaskObject_Teleport_:
+TaskObject_Teleport_:
 		Sub Esp, 8H
 		Fst DWord Ptr Ds:[Ecx + 0C8H]
 		Fstp DWord Ptr Ss:[Esp + 4H]
 		Fst DWord Ptr Ds:[Ecx + 0C0H]
 		Fstp DWord Ptr Ss:[Esp]
-	TaskObject_Teleport_1:
+TaskObject_Teleport_1:
 		FakeCall SUB_TELEPORT
 	.EndIf
 	Add Ebp, 4H
@@ -1060,6 +1095,151 @@ RemoveUnit_:
 	Pop Ebx
 	Add Esp, 2034H
 	Retn 4
+
+
+Align 4
+HotKeySwitch: ; Function Table
+	DB 00H, 0FH, 02H, 03H, 0FH, 0FH, 0FH, 11H, 0FH, 12H, 0FH, 0FH, 04H, 0FH, 05H, 06H ; A~P
+	DB 10H, 07H, 01H, 08H, 09H, 0AH, 0BH, 0CH, 0DH, 0EH, 0FH, 0FH, 0FH, 0FH, 0FH, 0FH ; Q~Z,[\]^_`
+	DB 0FH, 0FH, 0FH, 0FH, 0FH, 0FH, 0FH, 0FH, 0FH, 0FH, 0FH, 0FH, 0FH, 0FH, 0FH, 0FH ; a~p
+	DB 0FH, 0FH, 0FH, 0FH, 0FH, 0FH, 0FH, 0CH, 0DH, 0EH ; q~z
+
+Align 4
+HotKeySwitch2:
+	DD 004F1F8DH, 004F20EAH, 004F20AAH, 004F202AH
+	DD 004F1FAAH, 004F206AH, 004F1FEAH, 004F20CAH
+	DD 004F1FCAH, 004F200AH, 004F204AH, 004F208AH
+	DD 004F2135H, 004F2179H, 004F2157H, 004F2331H
+HotKeySwitch2_Table:
+	DD O HotKeySwitch_CasualTerrain, O HotKeySwitch_HiddenUnit, O HotKeySwitch_InternalName, 0H
+
+;Align 4
+;HotKeySwitch_Flag:
+;	DD 0H
+
+HotKeySwitch_CasualTerrain: ; Ctrl+Q
+	Mov Eax, DWord Ptr Ds:[HotKeySwitchFlag]
+	Xor Al, 1H
+	Xor Edi, Edi
+;HotKeySwitch_CasualTerrain_Attr:
+	Mov DWord Ptr Ds:[HotKeySwitchFlag], Eax
+	Mov Ecx, DWord Ptr Ds:[Plc]
+	Push Edi
+	Push Edi
+	Inc Edi
+	Push Edi
+HotKeySwitch_CasualTerrain_1:
+	FakeCall 005EB990H
+	Mov Eax, Edi
+	Pop Edi
+	Pop Esi
+	Retn 14H
+
+HotKeySwitch_HiddenUnit: ; Ctrl+H
+	Mov Eax, DWord Ptr Ds:[HotKeySwitchFlag]
+	Xor Al, 2H
+	Xor Edi, Edi
+;HotKeySwitch_CasualTerrain_Attr:
+	Mov DWord Ptr Ds:[HotKeySwitchFlag], Eax
+	Mov Ecx, DWord Ptr Ds:[Plc]
+	Push Edi
+	Push Edi
+	Inc Edi
+	Push Edi
+HotKeySwitch_HiddenUnit_1:
+	FakeCall 005EB990H
+	Mov Eax, Edi
+	Pop Edi
+	Pop Esi
+	Retn 14H
+
+HotKeySwitch_InternalName: ; Ctrl+J
+	Mov Eax, DWord Ptr Ds:[HotKeySwitchFlag]
+	Xor Al, 4H
+	Xor Edi, Edi
+;HotKeySwitch_CasualTerrain_Attr:
+	Mov DWord Ptr Ds:[HotKeySwitchFlag], Eax
+	Mov Ecx, DWord Ptr Ds:[Plc]
+	Push Edi
+	Push Edi
+	Inc Edi
+	Push Edi
+HotKeySwitch_InternalName_1:
+	FakeCall 005EB990H
+	Mov Eax, Edi
+	Pop Edi
+	Pop Esi
+	Retn 14H
+
+
+CasualTerrainB: ; 00461A86H
+	Mov Ecx, DWord Ptr Ss:[Esp + 58H]
+	Test DWord Ptr Ds:[HotKeySwitchFlag], 01H
+CasualTerrainB_01:
+	FakeJne 00461A96H
+	Push Eax
+CasualTerrainB_1:
+	FakeJmp 00461A8BH
+
+CasualTerrainB2: ; 00461444H
+	Test DWord Ptr Ds:[HotKeySwitchFlag], 01H
+CasualTerrainB2_01:
+	FakeJne 00461471H
+	Push Edx
+CasualTerrainB2_1:
+	FakeCall 00460BE0H
+CasualTerrainB2_2:
+	FakeJmp 0046144AH
+
+CasualTerrainB3: ; 0045F980H
+	Mov Eax, DWord Ptr Ss:[Esp + 1CH]
+CasualTerrainB3_01:
+	FakeJe 0045F9D7H
+	Test DWord Ptr Ds:[HotKeySwitchFlag], 01H
+CasualTerrainB3_02:
+	FakeJne 0045F9D7H
+CasualTerrainB3_1:
+	FakeJmp 0045F986H
+
+
+HiddenUnit: ; 004E0AAFH
+HiddenUnit_01:
+	FakeJne 004E0AB5H
+	Test DWord Ptr Ds:[HotKeySwitchFlag], 02H
+HiddenUnit_02:
+	FakeJe 004E0CC0H
+HiddenUnit_1:
+	FakeJmp 004E0AB5H
+
+HiddenUnit2: ; 004E0D8FH
+HiddenUnit2_01:
+	FakeJne 004E0D95H
+	Test DWord Ptr Ds:[HotKeySwitchFlag], 02H
+HiddenUnit2_02:
+	FakeJe 004E145DH
+HiddenUnit2_1:
+	FakeJmp 004E0D95H
+
+HiddenUnit3: ; 004E5025H
+	Test DWord Ptr Ds:[HotKeySwitchFlag], 02H
+HiddenUnit3_01:
+	FakeJe 004E502BH
+	Cmp Byte Ptr Ds:[Eax + 56H], 1
+HiddenUnit3_02:
+	FakeJe 004E5033H
+HiddenUnit3_1:
+	FakeJmp 004E502BH
+
+
+InternalName: ; 004E1056h
+	Test DWord Ptr Ds:[HotKeySwitchFlag], 04H
+InternalName_01:
+	FakeJe 004E105CH
+	Cmp Byte Ptr Ds:[Esi + Edx], 0
+InternalName_02:
+	FakeJne 004E108CH
+InternalName_1:
+	FakeJmp 004E105CH
 
 
 

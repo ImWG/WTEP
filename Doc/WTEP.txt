@@ -1,8 +1,8 @@
 =============================================================
 
-     WAIFor's Trigger & Extension Patch For UserPatch 1.4
-                      For UserPatch 1.4
-                     Version 1.02.03.0430
+               WAIFor's Trigger & Extension Patch
+                   Final Version For UP 1.4RC
+                     Version 1.03.01.0611
 
                      By WAIFor, 2016-2017
 
@@ -43,6 +43,17 @@ You can set config ini file by command line arguments. For example, run
     replaced while painting neighborhood.
     Besides, it could affect generations of random map. So it is recommended that
     you activate this in the launcher instead of changing EXE.
+
+    [ExtendedTriggerPatchLocation=]
+    Originally, the location of DLL file of Daniel Pereira's Extended Triggers
+    Patch is in "age2_x1\language.dll". You can change it, by typing a new path
+    here(e.g. Games\abcd\triggers.dll).
+
+    [HotKeyFunctions=]
+    Enable some hot key effects:
+    Ctrl+Q - Toggle casual terrain draw mode
+    Ctrl+H - Toggle appearance of hidden units
+    Ctrl+J - Toggle buildings shown as internal names
 
     [ImprovedEditor=]
     In order to enable some improvement of editor, please set this as 1 .
@@ -221,6 +232,13 @@ You can set config ini file by command line arguments. For example, run
 
 
 - Unhardcoding Functions:
+
+    [AIUnitLimit=]
+    WARNING: This is a test function. We don't recommend you to use that.
+    In original version, units with id >= 900 will be ignored by AI in counting and 
+    training location. So you can change the limitation by setting the value. For
+    example, set as 1500 will make units from #0 to #1499 available to AI. Default
+    is keep as it before.
 
     [AllClassBuildFoundations=]
     0 - Only units of class 4 can put foundations (except #125 - the Fish Trap), class 21
@@ -544,6 +562,28 @@ You can set config ini file by command line arguments. For example, run
     Set maximum of extra terrains, default is 52. You don't have to set this,
     in fact. However, setting a appropriate number is more safe if your DAT is
     in chaos.
+
+
+
+----------------------------------------
+  WTEP Gizmo
+----------------------------------------
+
+- This is a module allowing you to develop more! You can load custom DLL patches,
+  and adjust containing jumps and calls correctly via Gizmo. Besides, you can
+  load multiple custom trigger conditions & effects DLL packages, use them at the
+  same time.
+
+
+- To do this, you should have General->Gizmo as 1, then put Gizmo.dll at one of
+  the two following paths. Those paths will be searched in sequence until the DLL
+  is found. Configuration is located at the same path.
+
+    1 - <AOK Directory>\Games\<UP Name>\Data\Gizmo.dll
+    2 - <EXE Directory>\Gizmo.dll
+
+
+- For detailed developments, please see documents in WTEP Gizmo.
 
 
 

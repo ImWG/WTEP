@@ -195,3 +195,14 @@ v1.02.03.0422:
 v1.02.03.0430:
 - Fixed one crash bug in original "Kill Object" effect.
 - Alignments in extension codes.
+
+v1.02.04.0512:
+- Fixed one bug: when removed garrisoned units with ability 161 in 
+  scenario editor, the game would crash.
+- You can customize Daniel Pereira's ETP path now.
+- Limition of AI units (used to be 900) can be changed now. (just a
+  test function, should not be used in game)
+
+v1.03.01.0611: (Last version for Userpatch 1.4 RC)
+- New hot key functions in scenario editor.
+- Addrd Gizmo, a module to allow users attach plug-in patches or triggers.

@@ -842,14 +842,6 @@ PatchIsReady:
 
 		.EndIf
 
-		Invoke GetINI, Offset iniSection2, Offset iniKeyCasualTerr, 0
-		.If Eax == 1
-			Invoke	WritePatch, CasualTerrain@, Offset CasualTerrain, CasualTerrainN
-			Invoke	WritePatch, CasualTerrain2@, Offset CasualTerrain2, CasualTerrain2N
-			Invoke	WritePatch, CasualTerrain3@, Offset CasualTerrain3, CasualTerrain3N
-
-		.EndIf
-
 		Invoke GetINI, Offset iniSection2, Offset iniKeyIsoSiege, 0
 		.If Eax == 1
 			Invoke	WritePatch, IsoSiege@, Offset IsoSiege, IsoSiegeN
@@ -858,14 +850,43 @@ PatchIsReady:
 
 		.EndIf
 
+		Invoke GetINIString, Offset iniSection2, Offset iniKeyDanielETP, Offset noCheat, Offset Wst
+		Mov Esi, Offset Wst
+		.If Byte Ptr Ds:[Esi] != 0
+			Invoke WritePatch, DanielETP@, Offset Wst, 256
+		.EndIf
+
+		Invoke GetINI, Offset iniSection2, Offset iniKeyHotKeyFunc, 0
+		.If Eax == 1
+			Invoke  WriteDirectAddressReverse, HotKeySwitch@, $HotKeySwitch
+			Invoke  WriteDirectAddressReverse, HotKeySwitch2@, $HotKeySwitch2
+			Invoke  WriteJmp, CasualTerrainB@, $CasualTerrainB
+			Invoke  WriteJmp, CasualTerrainB2@, $CasualTerrainB2
+			Invoke  WriteJmp, CasualTerrainB3@, $CasualTerrainB3
+			Invoke  WriteJmp, HiddenUnit@, $HiddenUnit
+			Invoke  WriteJmp, HiddenUnit2@, $HiddenUnit2
+			Invoke  WriteJmp, HiddenUnit3@, $HiddenUnit3
+			Invoke  WriteJmp, InternalName@, $InternalName
+
+		.Else
+			Invoke GetINI, Offset iniSection2, Offset iniKeyCasualTerr, 0
+			.If Eax == 1
+				Invoke	WritePatch, CasualTerrain@, Offset CasualTerrain, CasualTerrainN
+				Invoke	WritePatch, CasualTerrain2@, Offset CasualTerrain2, CasualTerrain2N
+				Invoke	WritePatch, CasualTerrain3@, Offset CasualTerrain3, CasualTerrain3N
+
+			.EndIf
+
+		.EndIf
+
 		;Invoke	WriteJmp, ShowInfo@, $ShowInfo
 
 		Invoke WriteDirectAddresses, Offset PatchEffectsDirectAddresses
 		Invoke WriteDirectAddressArrays, Offset PatchEffectsDirectAddressArrays
 
-
 		Invoke IncreasePatchAddress, $__PatchEffectsStart, $__PatchEffectsEnd
 	.EndIf
+
 
 	; Modding Patch
 	Invoke GetINI, Offset iniSection0, Offset iniKeyModding, 0
@@ -1113,6 +1134,18 @@ PatchIsReady:
 			Invoke WriteNumber, MonkHealGraphId@, 4, 0, 0
 		.EndIf
 
+		Invoke GetINI, Offset iniSection1, Offset iniKeyAIUnitLim, 0
+		.If iniKeyAIUnitLim > 0
+			Mov Esi, Eax
+			Invoke WriteNumber, AIUnitLimit@, 2, 0, 0
+			Mov Eax, Esi
+			Invoke WriteNumber, AIUnitLimit2@, 2, 0, 0
+			Mov Eax, Esi
+			;Invoke WriteNumber, AIUnitLimit3@, 2, 0, 0
+		.EndIf
+
+		;Invoke WriteJmp, QSAttack@, $QSAttack
+
 
 		Invoke	SetIcon, O iniIconHeal, $IconHeal, 1
 		Invoke	SetIcon, O iniIconBuild, $IconBuild, 1
@@ -1261,6 +1294,22 @@ PatchIsReady:
 		Invoke WriteNumber, $MoreTerrains_Table, 2, Ebx, 1
 
 		Invoke IncreasePatchAddress, $__PatchTerrainsStart, $__PatchTerrainsEnd
+	.EndIf
+
+
+	; Gizmo
+	Invoke GetINI, Offset iniSection0, Offset iniKeyGizmo, 0
+	.If Eax == 1
+
+		Mov Eax, $__PatchGizmoStart
+		Mov __OffsetStart, Eax
+
+		Invoke	WritePatchCode, __PatchStart@, $__PatchGizmoStart, $__PatchGizmoEnd
+		Invoke  WriteAddresses, Addr PatchGizmoAddresses
+		Invoke  WriteJmp, Gizmo@, $Gizmo
+		Invoke  WriteDirectAddresses, Addr PatchGizmoDirectAddresses
+
+		Invoke  IncreasePatchAddress, $__PatchGizmoStart, $__PatchGizmoEnd
 	.EndIf
 
 

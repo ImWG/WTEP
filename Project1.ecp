@@ -25,6 +25,7 @@ Begin ECProject = WTEP
   Module=config.asm
   Module=Defines.asm
   Module=Effects.asm
+  Module=Gizmo.asm
   Module=main.asm
   Module=modding.asm
   Module=MoreTerrains.asm

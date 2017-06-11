@@ -118,7 +118,12 @@ AllPack2@	DD 005571DEH
 AllPack3@	DD 005571E6H
 AllPack4@	DD 00527125H
 
+AIUnitLimit@ DD 0048EA11H
+AIUnitLimit2@ DD 00557DD1H
+AIUnitLimit3@ DD 00557EE1H
+
 ;NewCommand@ DD 0051E612H
+QSAttack@ DD 005CE7B2H
 
 
 ; Interfaces
@@ -178,6 +183,7 @@ $TypeInEditor9	   DD O TypeInEditor9
 $NewHealUnit       DD O NewHealUnit
 $AllBuildFnd       DD O AllBuildFnd
 ;$NewCommand        DD O NewCommand
+$QSAttack		   DD O QSAttack
 
 ; Icons
 $IconHeal          DD O IconHeal
@@ -270,6 +276,8 @@ PatchModdingAddresses DD O NewButtons_0, O NewButtons_1, O NewButtons_2, O NewBu
 
 		DD O NewHealUnit_1, O NewHealUnit_2
 		DD O AllBuildFnd_1
+
+		DD O QSAttack_1, O QSAttack_2
 
 		;DD O NewCommand_1
 
@@ -1653,9 +1661,11 @@ IFV2: ;004D27F5h
 	Cmp Byte Ptr Ds:[Esi + 48H], 02H ; Unit must be living
 	Jne IFV2_
 
+	Mov Ecx, DWord Ptr Ds:[Esi + 0CH]
+	Test Ecx, Ecx
+	Je IFV2_
 	Push Eax
 	Movsx Eax, Word Ptr Ds:[Eax + 0AH]
-	Mov Ecx, DWord Ptr Ds:[Esi + 0CH]
 	Mov Ecx, DWord Ptr Ds:[Ecx + 74H]
 	Mov Ecx, DWord Ptr Ds:[Ecx + Eax * 4]
 	Push Ecx
@@ -1777,7 +1787,7 @@ RandomUnit_01:
 	Mov Edx, [Edi + 08H]
 	Mov Ebp, [Edx + 0CH]
 	Mov Ebp, [Ebp + 74H]
-	
+
 RandomUnit_1:
 	FakeCall SUB_RANDOM
 	Cdq
@@ -1810,7 +1820,7 @@ RandomUnit_GetAbility_Loop:
 	Mov Esi, [Esp]
 	Movsx Ecx, Word Ptr Ds:[Edx + 14H] ; Resource In
 	Cmp Esi, Ecx
-	jl RandomUnit_Set
+	Jl RandomUnit_Set
 	Sub Esi, Ecx
 	Mov [Esp], Esi
 .EndIf
@@ -1822,13 +1832,13 @@ RandomUnit_GetAbility_Loop:
 
 RandomUnit_GetAbility_:
 	Add Esp, 4
-	pop esi
+	Pop Esi
 	Pop Edi
 	Pop Ebx
 	Pop Ebp
 RandomUnit_Other:
 	FakeJmp 004B12C7H ; ESI = Proto Unit Id
-	
+
 RandomUnit_Set:
 	Movsx Ebx, Word Ptr Ds:[Edx + 0AH]
 	Cmp Ebx, 0
@@ -2273,7 +2283,7 @@ NewHealUnit_:
 	Jne NewHealUnit_2 ; Taken if HP <= 1
 
 	Cmp Byte Ptr Ds:[Edi + 4], 0
-	JNE NewHealUnit_Fast
+	Jne NewHealUnit_Fast
 	Mov Eax, DWord Ptr Ds:[Esi + 0CH]
 	Mov Ecx, DWord Ptr Ds:[Eax + 8CH]
 	Fld DWord Ptr Ds:[Ecx + 0A8H]
@@ -2428,6 +2438,128 @@ NewHealUnit_Decrease_:
 ;	FakeJa 0051F534H
 ;NewCommand_1:
 ;	FakeJmp 0051F534H
+
+
+; EDI = Defense Addr, ESI = Attack Addr, EBX = Defense Count
+; Local.2 = Attack Count, Local.3 = 1.0f
+Delta Equ 8H
+Local_0 Equ Esp + 1CH + Delta ; Accurate Value
+Local_1 Equ Esp + 18H + Delta ; Target Default Armor
+Local_2 Equ Esp + 14H + Delta ; Attack Index
+Local_3 Equ Esp + 10H + Delta ; 1.0f
+Arg_1 Equ Esp + 24H + Delta ; Attack Count
+Arg_2 Equ Esp + 28H + Delta ; Attack Addr.
+Arg_3 Equ Esp + 2CH + Delta ; Multipiler
+Local_4 Equ Esp ; Dodge Value
+Local_5 Equ Esp + 4H ; Defense Value
+DODGE_OFFSET Equ 100
+
+QSAttack:
+	Sub Esp, 8H
+.Repeat
+	Mov Dx, Word Ptr Ds:[Esi]
+	Cmp Dx, DODGE_OFFSET
+	Jge QSAttack_Skip
+
+	Mov Eax, DWord Ptr Ss:[Local_1]
+	Test Edi, Edi
+	Mov DWord Ptr Ss:[Local_5], Eax
+	Je QSAttack_NoDefense
+	Test Ebx, Ebx
+	Jle QSAttack_NoDefense
+
+; Find Defense Value -- EAX = Defense Addr, DX = Armor Class
+	Mov Eax, Edi
+	Mov Ecx, Ebx
+	.Repeat
+		.If Word Ptr Ds:[Eax] == Dx
+			Movsx Ebp, Word Ptr Ds:[Eax + 2H]
+			Mov DWord Ptr Ss:[Local_5], Ebp
+		.EndIf
+		Add Eax, 4H
+		Dec Ecx
+	.Until Zero?
+
+; Find Dodge Value -- EAX = Defense Addr, DX = Armor Class
+	Xor Eax, Eax
+	Mov DWord Ptr Ss:[Local_4], Eax
+	Add Dx, DODGE_OFFSET
+	Mov Eax, Edi
+	Mov Ecx, Ebx
+	.Repeat
+		.If Word Ptr Ds:[Eax] == Dx
+			Movsx Ebp, Word Ptr Ds:[Eax + 2H]
+			Mov DWord Ptr Ss:[Local_4], Ebp
+		.EndIf
+		Add Eax, 4H
+		Dec Ecx
+	.Until Zero?
+
+; Find Accurate Value -- EAX = Attack Addr, DX = Armor Class
+	Mov Eax, 100
+	Mov DWord Ptr Ss:[Local_0], Eax
+	Mov Eax, DWord Ptr Ss:[Arg_2]
+	Mov Ecx, DWord Ptr Ss:[Arg_1]
+	.Repeat
+		.If Word Ptr Ds:[Eax] == Dx
+			Movsx Ebp, Word Ptr Ds:[Eax + 2H]
+			Mov DWord Ptr Ss:[Local_0], Ebp
+		.EndIf
+		Add Eax, 4H
+		Dec Ecx
+	.Until Zero?
+
+QSAttack_NoDefense:
+	Movsx Ecx, Word Ptr Ds:[Esi + 2H]
+	Sub Ecx, DWord Ptr Ss:[Local_5]
+	Cmp Ecx, 0
+	Jle QSAttack_Skip
+	Mov DWord Ptr Ss:[Local_5], Ecx ; Attack Value - Defense Value
+
+	Mov Ecx, DWord Ptr Ss:[Local_0]
+	Sub Ecx, DWord Ptr Ss:[Local_4]
+	Cmp Ecx, 0
+	Jle QSAttack_Skip
+	Mov DWord Ptr Ss:[Local_0], Ecx ; Accurate Value - Dodge Value
+
+	Fild DWord Ptr Ss:[Local_5]
+	Fimul DWord Ptr Ss:[Local_0]
+
+	Fmul DWord Ptr Ss:[Local_3]
+	Fmul DWord Ptr Ss:[Arg_3]
+	Fcom QWord Ptr Ds:[6355D0H] ; FLOAT 0.0
+	Fstsw Ax
+	Test Ah, 41H
+	.If Zero?
+		.If Dx == 3 + DODGE_OFFSET || Dx == 4 + DODGE_OFFSET
+QSAttack_2: ; Random Factor
+			FakeCall SUB_RANDOM
+			Cdq
+			Mov Ecx, 64H
+			IDiv Ecx
+			Inc Edx
+			Mov [Local_0], Edx
+			Fimul DWord Ptr Ss:[Local_0]
+			Mov DWord Ptr Ss:[Local_0], 42C80000H ; 100.0
+			Fdiv DWord Ptr Ss:[Local_0]
+		.EndIf
+		Faddp St(1), St ; Plus
+	.Else
+		Fstp St
+	.EndIf
+
+QSAttack_Skip:
+	Mov Eax, DWord Ptr Ss:[Local_2]
+	Add Esi, 4H
+	Dec Eax
+	Mov DWord Ptr Ss:[Local_2], Eax
+.Until Zero?
+
+	Mov DWord Ptr Ss:[Local_0], 42C80000H ; 100.0 ; 461C4000H ; 10000.0
+	Fdiv DWord Ptr Ss:[Local_0]
+	Add Esp, 8H
+QSAttack_1:
+	FakeJmp 005CE817H
 
 
 
