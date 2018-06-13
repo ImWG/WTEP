@@ -1,4 +1,11 @@
 ;EasyCodeName=Gizmo,1
+; Gizmo Loader Module
+; Gizmo is a DLL file that can load other DLL patches of certain patterns. It would
+; write jumps and patches into original memory codes when game is launched.
+; Gizmo.dll can be placed at two locations:
+; 1 - Games\<GameName>\Data\
+; 2 - ..\Games\<GameName>\Data\
+
 Include	defines.asm
 
 .Const
@@ -6,19 +13,18 @@ Include	defines.asm
 Gizmo@ DD 007C282FH
 
 ; Interfaces
-$Gizmo DD O Gizmo
-$__PatchGizmoStart DD O __PatchGizmoStart
-$__PatchGizmoEnd DD O __PatchGizmoEnd
+$Gizmo DD Offset Gizmo
+$__PatchGizmoStart DD Offset __PatchGizmoStart
+$__PatchGizmoEnd DD Offset __PatchGizmoEnd
 
-PatchGizmoAddresses DD O Gizmo_1, O Gizmo_2, O Gizmo_3, O Gizmo_4, 0
+PatchGizmoAddresses DD Offset Gizmo_1, Offset Gizmo_2, Offset Gizmo_3, Offset Gizmo_4, 0
 
-PatchGizmoDirectAddresses DD O Gizmo_File_, O Gizmo_File, 1
-	DD O Gizmo_File2_, O Gizmo_File, 1
-	DD O Gizmo_File3_, O Gizmo_File, 1
-	DD O Gizmo_Pattern_, O Gizmo_Pattern, 1
-	DD O Gizmo_Pattern2_, O Gizmo_Pattern2, 2
+PatchGizmoDirectAddresses DD Offset Gizmo_File_, Offset Gizmo_File, 1
+	DD Offset Gizmo_File2_, Offset Gizmo_File, 1
+	;DD Offset Gizmo_File3_, Offset Gizmo_File, 1
+	DD Offset Gizmo_Pattern_, Offset Gizmo_Pattern + 1, 1
+	DD Offset Gizmo_Pattern2_, Offset Gizmo_Pattern, 1
 	DD 0
-
 
 
 .Data?
@@ -70,26 +76,23 @@ Gizmo_4:
 	Call DWord Ptr Ds:[6351E0H]
 	Test Eax, Eax
 
-.If Zero?
-; 3rd: Direct
-Gizmo_File3_:
-	Push 11111111H
-	Call DWord Ptr Ds:[6351E0H]
-.EndIf
-.EndIf
+;.If Zero?
+;; 3rd: Direct
+;Gizmo_File3_:
+;	Push 11111111H
+;	Call DWord Ptr Ds:[6351E0H]
+;.EndIf
 
+.EndIf
 	Add Esp, 100H
 Gizmo_2:
 	FakeJmp 007C2834H
-Nop
+	Nop
 
 Gizmo_File:
 	DB 'Gizmo.dll', 0
-
-Gizmo_Pattern2:
-	DB '..\age2_x1\.'
 Gizmo_Pattern:
-	DB '.\Games\%s\%s%s', 0
+	DB '..\Games\%s\%s%s', 0
 
 
 Align 4

@@ -6,6 +6,7 @@ Include	unitattrs.asm
 
 ; Combined patches
 CustomColorInfo@ 	DD 0051CF28H
+CustomColorInfo2@ 	DD 0051C8EEH
 MoreResources@		DD 004EE724H ; Add more resources in list
 
 EnableInputs@ 		DD 007DD2DDH
@@ -20,6 +21,7 @@ CreateUnit@			DD 007D8BB3H
 ChangeDiplomacy@	DD 00437605H
 SendChat@			DD 0043764FH
 RemoveUnit@			DD 00437A06H
+ChangeAttack@       DD 007D8A97H
 
 CasualTerrainB@		DD 00461A86H
 CasualTerrainB2@	DD 00461444H
@@ -46,6 +48,8 @@ HouseRotate@		DD 004CA4DCH ; Allow All Building's Rotation (Not only House #70)
 IsoSiege@			DD 0045BC2BH ; Avoid Isolated Siege Weapon's upgrade by Techs
 IsoSiege2@			DD 004C1A9CH
 IsoSiege3@			DD 004C18AFH ; Avoid Attribute Modification
+AIScriptGoal@       DD 007DD6D4H
+ChangeName@         DD 007DD714H
 
 DanielETP@			DD 00628880H ; Set Daniel's ETP triggers.dll location
 HotKeySwitch@		DD 004F1F82H
@@ -54,79 +58,85 @@ HotKeySwitch2@		DD 004F1F89H
 
 
 ; Interfaces
-$__PatchEffectsStart DD O __PatchEffectsStart
-$__PatchEffectsEnd DD O __PatchEffectsEnd
+$__PatchEffectsStart DD __PatchEffectsStart
+$__PatchEffectsEnd DD __PatchEffectsEnd
 
-$EnableInputs DD O EnableInputs
-$MoreResources DD O MoreResources
-$CustomColorInfo DD O CustomColorInfo
-$ExpandNumberLengthB DD O ExpandNumberLengthB
-$TaskObject DD O TaskObject
-$KillObject DD O KillObject
-$MoveSight DD O MoveSight
-$Tribute DD O Tribute
-;$ShowInfo DD O ShowInfo
-$DamageUnit DD O DamageUnit
-$DamageUnit2 DD O DamageUnit2
-$CreateUnit DD O CreateUnit
-$ChangeDiplomacy DD O ChangeDiplomacy
-$SendChat DD O SendChat
-$RemoveUnit DD O RemoveUnit
-$CasualTerrainB DD O CasualTerrainB
-$CasualTerrainB2 DD O CasualTerrainB2
-$CasualTerrainB3 DD O CasualTerrainB3
-$HiddenUnit DD O HiddenUnit
-$HiddenUnit2 DD O HiddenUnit2
-$HiddenUnit3 DD O HiddenUnit3
-$InternalName DD O InternalName
+$EnableInputs DD EnableInputs
+$CustomColorInfo DD CustomColorInfo
+$CustomColorInfo2 DD CustomColorInfo2
+$ExpandNumberLengthB DD ExpandNumberLengthB
+$TaskObject DD TaskObject
+$KillObject DD KillObject
+$MoveSight DD MoveSight
+$Tribute DD Tribute
+;$ShowInfo DD ShowInfo
+$DamageUnit DD DamageUnit
+$DamageUnit2 DD DamageUnit2
+$CreateUnit DD CreateUnit
+$ChangeDiplomacy DD ChangeDiplomacy
+$SendChat DD SendChat
+$RemoveUnit DD RemoveUnit
+$CasualTerrainB DD CasualTerrainB
+$CasualTerrainB2 DD CasualTerrainB2
+$CasualTerrainB3 DD CasualTerrainB3
+$HiddenUnit DD HiddenUnit
+$HiddenUnit2 DD HiddenUnit2
+$HiddenUnit3 DD HiddenUnit3
+$InternalName DD InternalName
+$ChangeAttack DD ChangeAttackPatch
+$AIScriptGoal DD AIScriptGoal
+$ChangeName DD ChangeName
 
-$MoreResources_Table DD O MoreResources_Table
-$HotKeySwitch DD O HotKeySwitch
-$HotKeySwitch2 DD O HotKeySwitch2
+
+$HotKeySwitch DD HotKeySwitch
+$HotKeySwitch2 DD HotKeySwitch2
 
 
-PatchEffectsAddresses DD O CustomColorInfo_White, O CustomColorInfo_Normal
-	DD O EnableInputs_Back
-	DD O TaskObject_Teleport_1
-	DD O MoveSight_Jle
-	DD O Tribute_Other, O Tribute_End, O Tribute_Random
-	DD O MoreResources_1, O MoreResources_Back
-	;DD O ShowInfo_1
-	DD O DamageUnit_1, O DamageUnit_2
-	DD O CreateUnit_1, O CreateUnit_2, O CreateUnit_3
-	DD O ChangeDiplomacy_1, O ChangeDiplomacy_2, O ChangeDiplomacy_3
-	DD O SendChat_0, O SendChat_1, O SendChat_2
-	DD O KillObject_Image_1, O KillObject_Other
-	DD O RemoveUnit_1, O RemoveUnit_2
-	DD O ExpandNumberLenB_1
-	DD O HotKeySwitch_CasualTerrain_1, O HotKeySwitch_HiddenUnit_1, O HotKeySwitch_InternalName_1
-	DD O CasualTerrainB_1, O CasualTerrainB2_1, O CasualTerrainB2_2, O CasualTerrainB3_1
-	DD O HiddenUnit_1, O HiddenUnit2_1, O HiddenUnit3_1
-	DD O InternalName_1
+PatchEffectsAddresses DD CustomColorInfo_1, CustomColorInfo_2, CustomColorInfo2_1, CustomColorInfo2_2
+	DD EnableInputs_Back
+	DD TaskObject_Teleport_1
+	DD MoveSight_Jle
+	DD Tribute_Other, Tribute_End, Tribute_Random
+	DD DamageUnit_1, DamageUnit_2
+	DD CreateUnit_1, CreateUnit_2, CreateUnit_3
+	DD ChangeDiplomacy_1, ChangeDiplomacy_2, ChangeDiplomacy_3
+	DD SendChat_0, SendChat_1, SendChat_2
+	DD KillObject_Image_1, KillObject_Other
+	DD RemoveUnit_1, RemoveUnit_2
+	DD ExpandNumberLenB_1
+	DD HotKeySwitch_CasualTerrain_1, HotKeySwitch_HiddenUnit_1, HotKeySwitch_InternalName_1
+	DD CasualTerrainB_1, CasualTerrainB2_1, CasualTerrainB2_2, CasualTerrainB3_1
+	DD HiddenUnit_1, HiddenUnit2_1, HiddenUnit3_1
+	DD InternalName_1
+	DD AIScriptGoal_1, AIScriptGoal_2, AIScriptGoal_3, AIScriptGoal_4, AIScriptGoal_5
+	DD TaskObject_Teleport_1, ChangeName_1
 	DD 0H
 
-PatchEffectsAddresses2 DD O CreateUnit_01, O MoveSight_01, O TaskObject_01
-	DD O RemoveUnit_01
-	DD O CasualTerrainB_01, O CasualTerrainB2_01, O CasualTerrainB3_01, O CasualTerrainB3_02
-	DD O HiddenUnit_01, O HiddenUnit_02, O HiddenUnit2_01, O HiddenUnit2_02, O HiddenUnit3_01, O HiddenUnit3_02
-	DD O InternalName_01, O InternalName_02
+PatchEffectsAddresses2 DD CreateUnit_01, MoveSight_01, TaskObject_01
+	DD RemoveUnit_01
+	DD CasualTerrainB_01, CasualTerrainB2_01, CasualTerrainB3_01, CasualTerrainB3_02
+	DD HiddenUnit_01, HiddenUnit_02, HiddenUnit2_01, HiddenUnit2_02, HiddenUnit3_01, HiddenUnit3_02
+	DD InternalName_01, InternalName_02
+	DD AIScriptGoal_01, AIScriptGoal_02
+	DD TaskObject_01, ChangeName_01, ChangeAttack_01
 	DD 0H
 
-PatchEffectsDirectAddresses DD O KillObject_Table_, O KillObject_Table, 3
-	DD O KillObject_Table2_, O KillObject_Table2, 3
-	DD O KillObject_CallTable_, O KillObject_CallTable, 3
-	DD O KillObject_CallTable2_, O KillObject_CallTable2, 3
-	DD O TaskObject_Table_, O TaskObject_Table, 3
-	DD O Tribute_Table_, O Tribute_Table, 3
-	DD O DamageUnit_Table_, O DamageUnit_Table, 3
-	DD O MoreResources_Table_, O MoreResources_Table, 1
-	;DD O HotKeySwitch_CasualTerrain, O HotKeySwitch_Flag, 1
-	;DD O HotKeySwitch_CasualTerrain_Attr, O HotKeySwitch_Flag, 1
+PatchEffectsDirectAddresses DD KillObject_Table_, KillObject_Table, 3
+	DD KillObject_Table2_, KillObject_Table2, 3
+	DD KillObject_CallTable_, KillObject_CallTable, 3
+	DD KillObject_CallTable2_, KillObject_CallTable2, 3
+	DD TaskObject_Table_, TaskObject_Table, 3
+	DD Tribute_Table_, Tribute_Table, 3
+	DD DamageUnit_Table_, DamageUnit_Table, 3
+	DD ChangeAttack_Table_, ChangeAttack_Table, 3
+	DD 007DD714H, Offset ChangeName, 0
+	;DD HotKeySwitch_CasualTerrain, HotKeySwitch_Flag, 1
+	;DD HotKeySwitch_CasualTerrain_Attr, HotKeySwitch_Flag, 1
 	DD 0H
 
-PatchEffectsDirectAddressArrays DD O TaskObject_Table, O Tribute_Table, O DamageUnit_Table
-	DD O KillObject_CallTable, O KillObject_CallTable2
-	DD O HotKeySwitch2_Table
+PatchEffectsDirectAddressArrays DD TaskObject_Table, Tribute_Table, DamageUnit_Table
+	DD KillObject_CallTable, KillObject_CallTable2, ChangeAttack_Table + 4
+	DD HotKeySwitch2_Table
 	DD 0H
 
 
@@ -174,6 +184,16 @@ IsoSiege3N			DD 6
 .Code
 
 HotKeySwitchFlag Equ 7A5204H
+
+__EffectPostfix__ Macro
+	Pop Edi
+	Pop Esi
+	Pop Ebp
+	Mov Al, 1
+	Pop Ebx
+	Add Esp, 2034H
+	Retn 4
+EndM
 
 
 ; Patch Content
@@ -248,52 +268,6 @@ EnableInputs_Back:
 	FakeJmp 007DD2E4H
 
 
-MoreResources:
-	Push Ebx
-	Push Esi
-	Push Edi
-MoreResources_Table_:
-	Mov Esi, 11111111H
-	Lea Ebx, [Esi + 2H]
-MoreResources_Loop:
-
-	Mov Ecx, DWord Ptr Ss:[Ebp] ; Pop Limitation
-	Movsx Edi, Word Ptr Ds:[Esi]
-	Cmp Edi, 0
-	Jl MoreResources_LoopEnd
-	Push Edi
-	Movsx Edi, Word Ptr Ds:[Ebx]
-	Push Edi
-MoreResources_1:
-	FakeCall 00550870H
-
-	Add Esi, 4H
-	Add Ebx, 4H
-	Jmp MoreResources_Loop
-
-MoreResources_LoopEnd:
-	Pop Edi
-	Pop Esi
-	Pop Ebx
-
-	Mov Ecx, DWord Ptr Ss:[Ebp]
-	Push 0
-MoreResources_Back:
-	FakeJmp 004EE729H
-
-; Pop Limitation, Building Rate, Market Rate, Current Age, Monk Heal Rate
-; Food Prod., Wood Prod., Gold Prod., Stone Prod., Trade Prod.
-; berserker Heal, Faith Recharging, Relic Prod., Heal Range
-; (Unused)Gathered Gold, Stone, Food, Wood, Map Reveal%
-Align 2
-MoreResources_Table:
-	DW 4, 9747, 195, 8054, 78, 8015, 6, 10336, 89, 4124
-	DW 190, 9906, 189, 9907, 47, 9909, 79, 9908, 10, 42040
-	DW 96, 8431, 35, 8220, 191, 9929, 90, 5620
-	;DW 188, 9909, 187, 9908, 185, 9906, 186, 9907, 22, 9919
-	DW - 1, -1
-
-
 ExpandNumberLengthB:
 	Lea Edi, [Esi + 0E44H]
 	Push 5
@@ -301,62 +275,154 @@ ExpandNumberLenB_1:
 	FakeJmp 004EADFAH
 
 
+; Message Color
+; Pattern: <=FFFF>
 CustomColorInfo:
 	Add Esp, 8
 	Test Eax, Eax
 	Je CustomColorInfo_Other
-
-CustomColorInfo_White:
+CustomColorInfo_1: ; White
 	FakeJmp 0051CF2FH
-
+; Esi = String Addr, [Esp + 14H] = Text Color, [Esp + 20H] = Outline Color
 CustomColorInfo_Other:
-	Cmp Byte Ptr Ds:[Esi], '<'
-	Jne CustomColorInfo_Normal
-	Cmp Byte Ptr Ds:[Esi + 5], '>'
-	Jne CustomColorInfo_Normal
 	Lea Edx, [Esp + 20H]
 	Lea Eax, [Esp + 14H]
-	Mov Cl, Byte Ptr Ds:[Esi + 1]
-	Sub Cl, 'A'
-	Cmp Cl, 0FH
-	Ja CustomColorInfo_Normal
-	Shl Cl, 4
-	Mov Ch, Byte Ptr Ds:[Esi + 2]
-	Sub Ch, 'A'
-	Cmp Ch, 0FH
-	Ja CustomColorInfo_Normal
-	Add Cl, Ch
-	Mov Byte Ptr Ds:[Eax], Cl
-	Mov Cl, Byte Ptr Ds:[Esi + 3]
-	Sub Cl, 'A'
-	Cmp Cl, 0FH
-	Ja CustomColorInfo_Normal
-	Shl Cl, 4
-	Mov Ch, Byte Ptr Ds:[Esi + 4]
-	Sub Ch, 'A'
-	Cmp Ch, 0FH
-	Ja CustomColorInfo_Normal
-	Add Cl, Ch
-	Mov Byte Ptr Ds:[Edx], Cl
-	Add Esi, 6
-
-CustomColorInfo_Normal:
+	Push Edx
+	Push Eax
+	Push Esi
+	Call CustomColorInfoAnalyze
+	Test Eax, Eax
+.If !Zero?
+	Add Esi, 7
+.EndIf
+CustomColorInfo_2: ; Normal
 	FakeJmp 0051CF36H
 
+; Chat Color
+CustomColorInfo2:
+	Add Esp, 8
+	Test Eax, Eax
+	Je CustomColorInfo2_Other
+CustomColorInfo2_1: ; White
+	FakeJmp 0051C8F9H
+; [Ebp] = String Addr, [Esp + 14H] = Text Color, [Esp + 20H] = Outline Color
+CustomColorInfo2_Other:
+	Mov Ecx, DWord Ptr Ss:[Ebp]
+	Lea Edx, [Esp + 20H]
+	Lea Eax, [Esp + 14H]
+	Push Ebx
+	Push Edi
+	Push Ecx
+	Call CustomColorInfoAnalyze
+	Test Eax, Eax
+.If !Zero?
+	Mov Ecx, DWord Ptr Ss:[Ebp]
+	Add Ecx, 7
+	Mov DWord Ptr Ss:[Ebp], Ecx
+.EndIf
+CustomColorInfo2_2: ; Normal
+	FakeJmp 0051C9F9H
 
+
+CustomColorInfoAnalyze:
+	Push Edi
+	Push Esi
+	Push Ebx
+	Push Edx
+	Push Ebp
+@StackSize Equ 18H
+
+	Mov Esi, DWord Ptr Ss:[Esp + @StackSize]
+	Cmp Byte Ptr Ds:[Esi], '<'
+	Jne CustomColorInfo_Normal
+	Cmp Byte Ptr Ds:[Esi + 1], '='
+	Jne CustomColorInfo_Normal
+	Cmp Byte Ptr Ds:[Esi + 6], '>'
+	Jne CustomColorInfo_Normal
+	Xor Ebx, Ebx
+	;Mov Ebp, DWord Ptr Ss:[Esp + @StackSize + 4H]
+
+	Mov Cl, Byte Ptr Ds:[Esi + 2]
+	Call GetHexValue
+	Cmp Ax, 0
+	Jl CustomColorInfo_Normal
+	Mov Bl, Al
+	Mov Cl, Byte Ptr Ds:[Esi + 3]
+	Call GetHexValue
+	Cmp Ax, 0
+	Jl CustomColorInfo_Normal
+	Shl Bl, 4
+	Or Bl, Al
+
+	Mov Cl, Byte Ptr Ds:[Esi + 4]
+	Call GetHexValue
+	Cmp Ax, 0
+	Jl CustomColorInfo_Normal
+	Mov Bh, Al
+	Mov Cl, Byte Ptr Ds:[Esi + 5]
+	Call GetHexValue
+	Cmp Ax, 0
+	Jl CustomColorInfo_Normal
+	Shl Bh, 4
+	Or Bh, Al
+
+	Mov Edi, DWord Ptr Ss:[Esp + @StackSize + 4H]
+	Mov Byte Ptr Ds:[Edi], Bl
+	Mov Edi, DWord Ptr Ss:[Esp + @StackSize + 8H]
+	Mov Byte Ptr Ds:[Edi], Bh
+
+	Xor Eax, Eax
+	Mov Al, 1
+	Jmp CustomColorInfo_
+CustomColorInfo_Normal:
+	Xor Eax, Eax
+CustomColorInfo_:
+	Pop Ebp
+	Pop Edx
+	Pop Ebx
+	Pop Esi
+	Pop Edi
+	Retn 0CH
+
+; CL - Hex char
+; return - value or -1(invalid)
+GetHexValue:
+	Xor Eax, Eax
+.If Cl <= '9'
+	Sub Cl, '0'
+	Cmp Cl, 9
+	Ja GetHexValue_Invalid
+.ElseIf Cl <= 'F'
+	Sub Cl, 'A'
+	Cmp Cl, 5
+	Ja GetHexValue_Invalid
+	Add Cl, 10
+.Else
+GetHexValue_Invalid:
+	Not Eax
+	Retn
+.EndIf
+	Mov Al, Cl
+	Retn
+
+
+; Task Object
+; 2 - Garrison Instantly
+; 3 - Move, locating by player's food and wood
+; 4 - Teleport all without restriction
 TaskObject:
 	Lea Ebp, [Esp + 94H]
 	Mov Ecx, DWord Ptr Ds:[Edi + 64H]
-	Dec Ecx
+	Sub Ecx, 2
 	Cmp Ecx, 3
 TaskObject_01:
-	FakeJa 00437972H
+	FakeJae 00437972H
 
 TaskObject_Table_:
 	Jmp DWord Ptr Ds:[Ecx * 4 + 11111111H]
 Align 4
 TaskObject_Table:
-	DD O TaskObject_Teleport, O TaskObject_Garrison, TaskObject_ByRes, 0 ;O TaskObject_Transform, 0
+	DD TaskObject_Garrison, TaskObject_ByRes, TaskObject_Teleport, 0
 
 TaskObject_Teleport:
 	Mov Esi, DWord Ptr Ss:[Esp + 10H]
@@ -473,9 +539,9 @@ Tribute_Table_:
 	Jmp DWord Ptr Ds:[Edx * 4 + 11111111H]
 Align 4
 Tribute_Table:
-	DD O Tribute_Default, O Tribute_Instant, O Tribute_Multiply, O Tribute_Convert, O Tribute_Product
-	DD O Tribute_Division, O Tribute_Default, O Tribute_Default, O Tribute_Random, O Tribute_Random
-	DD O Tribute_1000Div, O Tribute_Instant_1000Div, O Tribute_Multiply_1000Div, 0
+	DD Tribute_Default, O Tribute_Instant, O Tribute_Multiply, O Tribute_Convert, O Tribute_Product
+	DD Tribute_Division, O Tribute_Default, O Tribute_Default, O Tribute_Random, O Tribute_Random
+	DD Tribute_1000Div, O Tribute_Instant_1000Div, O Tribute_Multiply_1000Div, 0
 
 Tribute_1000Div:
 	Fild DWord Ptr Ds:[Edi + 10H]
@@ -646,8 +712,8 @@ DamageUnit_Table_:
 ; 7 - Load HP from Resource
 Align 4
 DamageUnit_Table:
-	DD O DamageUnit_, O DamageUnit_1, DamageUnit_Perm, DamageUnit_Perm, DamageUnit_LostPerm
-	DD O DamageUnit_CurrentPerm, 0 ;
+	DD DamageUnit_, O DamageUnit_1, DamageUnit_Perm, DamageUnit_Perm, DamageUnit_LostPerm
+	DD DamageUnit_CurrentPerm, 0 ;
 
 DamageUnit_:
 	Fsubr DWord Ptr Ds:[Eax + 30H]
@@ -923,6 +989,7 @@ SendChat_0:
 
 
 ; Kill Object: Change Protounit Properties
+; 1 - Make units invulnerable
 ; 100~399 - set attr of selected
 ; 400~699 - add attr of selected
 ; 700~999 - set attr by resource of selected
@@ -933,10 +1000,29 @@ KillObject: ;004379CFh
 	Jge KillObject_Change
 	Cmp Eax, 10
 	Jge KillObject_Change2
+	Cmp Eax, 1
+	Je KillObject_Invulnerable
 	Mov Eax, DWord Ptr Ss:[Esp + 10H]
 	Xor Esi, Esi
 KillObject_Other:
 	FakeJmp 004379D5H
+
+KillObject_Invulnerable:
+	Xor Esi, Esi
+	Mov Eax, DWord Ptr Ss:[Esp + 10H]
+	Cmp Eax, Ebx
+	Jle KillObject_Invulnerable_Skip
+	Lea Edi, [Esp + 94H]
+.Repeat
+	Mov Ecx, DWord Ptr Ds:[Edi]
+	Mov Eax, 7F800000H
+	Mov DWord Ptr Ds:[Ecx + 30H], Eax
+	Mov Eax, DWord Ptr Ss:[Esp + 10H]
+	Inc Esi
+	Add Edi, 4
+.Until Esi >= Eax
+KillObject_Invulnerable_Skip:
+	__EffectPostfix__
 
 KillObject_Change:
 	Mov Ebx, Eax
@@ -990,8 +1076,8 @@ __KillObject_Functions__
 
 Align 4
 KillObject_CallTable:
-	DD O KillObject_Char, O KillObject_Word, O KillObject_DWord, O KillObject_Float
-	DD O KillObject_Image, O KillObject_Sound, O KillObject_Attack, O KillObject_Defense, 0
+	DD KillObject_Char, O KillObject_Word, O KillObject_DWord, O KillObject_Float
+	DD KillObject_Image, O KillObject_Sound, O KillObject_Attack, O KillObject_Defense, 0
 
 Align 4
 KillObject_Table:
@@ -1042,7 +1128,7 @@ KillObject_CallTable2_:
 
 Align 4
 KillObject_CallTable2:
-	DD O KillObject2_Char, O KillObject2_Word, O KillObject2_DWord, O KillObject2_Float, O KillObject2_Angle, 0
+	DD KillObject2_Char, O KillObject2_Word, O KillObject2_DWord, O KillObject2_Float, O KillObject2_Angle, 0
 
 Align 4
 KillObject_Table2:
@@ -1097,6 +1183,185 @@ RemoveUnit_:
 	Retn 4
 
 
+; ChangeAttack
+; 2 - Add unit's projectile count
+; 3 - Set unit's projectile count
+ChangeAttackPatch:
+	Dec Edx
+	Cmp Edx, 3
+ChangeAttack:
+ChangeAttack_01:
+	FakeJae 00437F2BH
+ChangeAttack_Table_:
+	Jmp DWord Ptr Ds:[Edx * 4 + ChangeAttack_Table]
+ChangeAttack_SetPrj:
+	Fild DWord Ptr Ds:[Edi + 10H]
+	Xor Edx, Edx
+.Repeat
+	Mov Ecx, DWord Ptr Ds:[Ebp]
+	Fst DWord Ptr Ds:[Ecx + 17CH]
+	Inc Edx
+	Add Ebp, 4
+.Until Edx >= Eax
+	Fincstp
+	__EffectPostfix__
+
+ChangeAttack_AddPrj:
+	Sub Esp, 4H
+	Fild DWord Ptr Ds:[Edi + 10H]
+	Fst DWord Ptr Ss:[Esp]
+	Xor Edx, Edx
+.Repeat
+	Mov Ecx, DWord Ptr Ds:[Ebp]
+	Fadd DWord Ptr Ds:[Ecx + 17CH]
+	Fstp DWord Ptr Ds:[Ecx + 17CH]
+	Fld DWord Ptr Ss:[Esp]
+	Inc Edx
+	Add Ebp, 4
+.Until Edx >= Eax
+	Fincstp
+	Add Esp, 4H
+	__EffectPostfix__
+
+Align 4
+ChangeAttack_Table:
+	DD 007D8A9DH, ChangeAttack_AddPrj, ChangeAttack_SetPrj, 0
+
+
+; AIScriptGoal
+; 1 - Set goal off
+; 8 - Set player's color
+; 9 - Set player's civilization(Culture only, including new trained units)
+; In 8 and 9, goal #256 would change in random.
+AIScriptGoal:
+	Mov Ecx, DWord Ptr Ds:[Edi + 64H]
+	Test Ecx, Ecx
+AIScriptGoal_01:
+	FakeJle 00437895H
+	Cmp Ecx, 1
+	Je AIScriptGoal_Off
+	Cmp Ecx, 8
+	Je AIScriptGoal_Color
+	Cmp Ecx, 9
+AIScriptGoal_02:
+	FakeJne 00437895H
+
+AIScriptGoal_Civil:
+	Mov Esi, DWord Ptr Ss:[Esp + 18H]
+	Mov Ecx, DWord Ptr Ds:[Edi + 0CH]
+	Mov Eax, DWord Ptr Ds:[Esi + 8CH] ; Check maximum
+	Mov Eax, DWord Ptr Ds:[Eax + 50H]
+	Cmp Ecx, 255
+	Jl AIScriptGoal_Civil_
+	Je AIScriptGoal_Civil_NoGaia
+	Mov Ebp, Eax
+AIScriptGoal_4:
+	FakeCall SUB_RANDOM
+	Cdq
+	IDiv Ebp
+	Mov Cl, Dl
+	Mov Eax, Ebp
+	Jmp AIScriptGoal_Civil_
+AIScriptGoal_Civil_NoGaia:
+	Mov Ebp, Eax
+	Dec Ebp
+AIScriptGoal_5:
+	FakeCall SUB_RANDOM
+	Cdq
+	IDiv Ebp
+	Inc Dl
+	Mov Cl, Dl
+	Inc Ebp
+	Mov Eax, Ebp
+AIScriptGoal_Civil_:
+	Cmp Cl, Al
+	Jge AIScriptGoal_
+	Mov Byte Ptr Ds:[Esi + 15DH], Cl
+	Mov Ecx, DWord Ptr Ds:[Plc]
+AIScriptGoal_2:
+	FakeCall 005EAE80H
+    Mov Ecx, DWord Ptr Ds:[Plc]
+    Mov Ebx, [Ecx]
+    Push Eax
+    Call DWord Ptr Ds:[Ebx + 14H]
+	Jmp AIScriptGoal_
+
+AIScriptGoal_Off:
+    Mov Ecx, [Esp + 18H]
+    mov edx,[edi+0Ch]
+    push edx
+    mov eax,[ecx]
+    call AIScriptGoalOff
+    __EffectPostfix__
+
+AIScriptGoal_Color:
+	Mov Esi, DWord Ptr Ss:[Esp + 18H]
+	Mov Ebx, DWord Ptr Ds:[Edi + 0CH]
+	Mov Eax, DWord Ptr Ds:[Esi + 8CH] ; Check maximum
+	Mov Eax, DWord Ptr Ds:[Eax + 78H]
+	Cmp Ebx, 255
+	Jl AIScriptGoal_Color_
+	Je AIScriptGoal_Color_8P
+	Mov Ebp, Eax
+	Jmp AIScriptGoal_3
+AIScriptGoal_Color_8P:
+	Mov Ebp, 8
+AIScriptGoal_3:
+	FakeCall SUB_RANDOM
+	Cdq
+	IDiv Ebp
+	Mov Ebx, Edx
+	Mov Eax, Ebp
+AIScriptGoal_Color_:
+	Cmp Ebx, Eax
+	Jge AIScriptGoal_
+	Mov Ecx, Esi
+	Push Ebx
+AIScriptGoal_1:
+	FakeCall 00555E40H
+AIScriptGoal_:
+	__EffectPostfix__
+
+AIScriptGoalOff:
+    Mov Eax, [Esp + 04H]
+    Push Eax
+    Call UnsetAIScriptGoal
+    Pop Ecx
+    Retn 4
+UnsetAIScriptGoal:
+    Mov Eax, [Esp + 04H]
+    Mov DWord Ptr Ds:[Eax * 4 + 006B39A0H], 0
+    Retn
+
+
+; Change Name
+; 2 - Set Protounit's Name
+ChangeName:
+	Cmp DWord Ptr Ds:[Edi + 64H], 2
+ChangeName_01:
+	FakeJne 00437E3BH
+	Mov Esi, DWord Ptr Ss:[Esp + 18H]
+	Mov Eax, DWord Ptr Ds:[Edi + 24H] ; Protounit id
+	Mov Ecx, DWord Ptr Ds:[Esi + 70H]
+.If Eax < Ecx
+	Mov Ecx, DWord Ptr Ds:[Esi + 74H]
+	Mov Ebx, DWord Ptr Ds:[Ecx + Eax * 4]
+	Test Ebx, Ebx
+	.If !Zero?
+		Mov Cx, Word Ptr Ds:[Edi + 34H]
+		Mov Word Ptr Ds:[Ebx + 0CH], Cx
+		Mov Edx, DWord Ptr Ds:[Edi + 6CH]
+		Add Ebx, 8H
+		Push Edx
+		Push Ebx
+ChangeName_1:
+		FakeCall 00568590H
+		Add Esp, 8H
+	.EndIf
+.EndIf
+	__EffectPostfix__
+
+
 Align 4
 HotKeySwitch: ; Function Table
 	DB 00H, 0FH, 02H, 03H, 0FH, 0FH, 0FH, 11H, 0FH, 12H, 0FH, 0FH, 04H, 0FH, 05H, 06H ; A~P
@@ -1111,7 +1376,7 @@ HotKeySwitch2:
 	DD 004F1FCAH, 004F200AH, 004F204AH, 004F208AH
 	DD 004F2135H, 004F2179H, 004F2157H, 004F2331H
 HotKeySwitch2_Table:
-	DD O HotKeySwitch_CasualTerrain, O HotKeySwitch_HiddenUnit, O HotKeySwitch_InternalName, 0H
+	DD HotKeySwitch_CasualTerrain, O HotKeySwitch_HiddenUnit, O HotKeySwitch_InternalName, 0H
 
 ;Align 4
 ;HotKeySwitch_Flag:

@@ -790,6 +790,7 @@ PatchIsReady:
 			.EndIf
 			Invoke	WriteJmp, EnableInputs@, $EnableInputs
 			Invoke	WriteJmp, CustomColorInfo@, $CustomColorInfo
+			Invoke	WriteJmp, CustomColorInfo2@, $CustomColorInfo2
 
 			Invoke	WriteJmp, TaskObject@, $TaskObject
 			Invoke	WriteJmp, KillObject@, $KillObject
@@ -801,6 +802,9 @@ PatchIsReady:
 			Invoke  WriteJmp, ChangeDiplomacy@, $ChangeDiplomacy
 			Invoke  WriteJmp, SendChat@, $SendChat
 			Invoke  WriteJmp, RemoveUnit@, $RemoveUnit
+			Invoke  WriteJmp, ChangeAttack@, $ChangeAttack
+			Invoke  WriteDirectAddressReverse, AIScriptGoal@, $AIScriptGoal
+			Invoke  WriteDirectAddressReverse, ChangeName@, $ChangeName
 
 		.EndIf
 
@@ -814,27 +818,6 @@ PatchIsReady:
 			Invoke	WritePatch, HouseRotate@, Offset HouseRotate, HouseRotateN
 
 		.EndIf
-
-		Invoke GetINI, Offset iniSection2, Offset iniKeyMoreRes, 0
-		.If Eax == 1
-			Invoke	WriteJmp, MoreResources@, $MoreResources
-			Invoke	WritePatch, MoreTributeRes@, Offset MoreTributeRes, MoreTributeResN
-			Invoke	SetResource, O iniRDscPopLimit, $MoreResources_Table, 2
-			Invoke	SetResource, O iniRDscBuildRat, $MoreResources_Table, 6
-			Invoke	SetResource, O iniRDscMarketRt, $MoreResources_Table, 10
-			Invoke	SetResource, O iniRDscCurrAge, $MoreResources_Table, 14
-			Invoke	SetResource, O iniRDscMonkHeal, $MoreResources_Table, 18
-			Invoke	SetResource, O iniRDscFoodPrd, $MoreResources_Table, 22
-			Invoke	SetResource, O iniRDscWoodPrd, $MoreResources_Table, 26
-			Invoke	SetResource, O iniRDscGoldPrd, $MoreResources_Table, 30
-			Invoke	SetResource, O iniRDscStonePrd, $MoreResources_Table, 34
-			Invoke	SetResource, O iniRDscTradePrd, $MoreResources_Table, 38
-			Invoke	SetResource, O iniRDscBerserk, $MoreResources_Table, 42
-			Invoke	SetResource, O iniRDscFaithRc, $MoreResources_Table, 46
-			Invoke	SetResource, O iniRDscRelicPrd, $MoreResources_Table, 50
-			Invoke	SetResource, O iniRDscHealRang, $MoreResources_Table, 54
-		.EndIf
-
 
 		Invoke GetINI, Offset iniSection2, Offset iniKeyTaskProj, 0
 		.If Eax == 1
@@ -852,9 +835,9 @@ PatchIsReady:
 
 		Invoke GetINIString, Offset iniSection2, Offset iniKeyDanielETP, Offset noCheat, Offset Wst
 		Mov Esi, Offset Wst
-		.If Byte Ptr Ds:[Esi] != 0
-			Invoke WritePatch, DanielETP@, Offset Wst, 256
-		.EndIf
+		;.If Byte Ptr Ds:[Esi] != 0
+		;	Invoke WritePatch, DanielETP@, Offset Wst, 256
+		;.EndIf
 
 		Invoke GetINI, Offset iniSection2, Offset iniKeyHotKeyFunc, 0
 		.If Eax == 1
@@ -900,26 +883,26 @@ PatchIsReady:
 		Invoke WriteAddresses2, Addr PatchModdingAddresses2
 
 
-		Invoke GetINI, Offset iniSection1, Offset iniKeyExplUnit, 0
-		.If Eax == 1
-			Invoke	WriteJmp, ExplosionUnit1@, $ExplosionUnit1
-		.ElseIf Eax == 2
-			Invoke	WriteJmp, ExplosionUnit2@, $ExplosionUnit2
-		.EndIf
+		;Invoke GetINI, Offset iniSection1, Offset iniKeyExplUnit, 0
+		;.If Eax == 1
+		;	Invoke	WriteJmp, ExplosionUnit1@, $ExplosionUnit1
+		;.ElseIf Eax == 2
+		;	Invoke	WriteJmp, ExplosionUnit2@, $ExplosionUnit2
+		;.EndIf
 
-		Invoke GetINI, Offset iniSection1, Offset iniKeySelfDestruct, 0
-		.If Eax == 1
-			Invoke	WriteJmp, SelfDestructUnit1@, $SelfDestructUnit1
-		.ElseIf Eax == 2
-			Invoke	WriteJmp, SelfDestructUnit2@, $SelfDestructUnit2
-		.EndIf
+		;Invoke GetINI, Offset iniSection1, Offset iniKeySelfDestruct, 0
+		;.If Eax == 1
+		;	Invoke	WriteJmp, SelfDestructUnit1@, $SelfDestructUnit1
+		;.ElseIf Eax == 2
+		;	Invoke	WriteJmp, SelfDestructUnit2@, $SelfDestructUnit2
+		;.EndIf
 
-		Invoke GetINI, Offset iniSection1, Offset iniKeySelfHeal, 0
-		.If Eax == 1
-			Invoke	WriteJmp, SelfHealUnit1@, $SelfHealUnit1
-		.ElseIf Eax == 2
-			Invoke	WriteJmp, SelfHealUnit2@, $SelfHealUnit2
-		.EndIf
+		;Invoke GetINI, Offset iniSection1, Offset iniKeySelfHeal, 0
+		;.If Eax == 1
+		;	Invoke	WriteJmp, SelfHealUnit1@, $SelfHealUnit1
+		;.ElseIf Eax == 2
+		;	Invoke	WriteJmp, SelfHealUnit2@, $SelfHealUnit2
+		;.EndIf
 
 		Invoke GetINI, Offset iniSection1, Offset iniKey2ndPage, 0
 		.If Eax == 1
@@ -991,20 +974,6 @@ PatchIsReady:
 
 		;Invoke WritePatch, NegaTech@, Offset NegaTech, NegaTechN
 
-		Invoke GetINI, Offset iniSection1, Offset iniKeyHeroMode, 0
-		.If Eax == 1
-			Invoke	WriteJmp, HeroMode@, $HeroMode
-			Invoke	WriteJmp, HeroMode2@, $HeroMode2
-			Invoke WritePatch, HeroMode3@, Offset HeroMode3, HeroMode3N
-			Invoke WritePatch, HeroMode4@, Offset HeroMode4, HeroMode4N
-			Invoke WritePatch, HeroMode5@, Offset HeroMode5, HeroMode5N
-			Invoke WritePatch, HeroMode6@, Offset HeroMode6, HeroMode6N
-			Invoke WritePatch, HeroMode7@, Offset HeroMode7, HeroMode7N
-			Invoke WritePatch, HeroMode8@, Offset HeroMode8, HeroMode8N
-			Invoke WritePatch, HeroMode9@, Offset HeroMode9, HeroMode9N
-			;Invoke WritePatch, HeroMode10@, Offset HeroMode10, HeroMode10N
-		.EndIf
-
 		Invoke GetINI, Offset iniSection1, Offset iniKeyAdvTrain, 0
 		.If Eax == 1
 			Invoke	WriteJmp, AdvTrainButton@, $AdvTrainButton
@@ -1022,15 +991,10 @@ PatchIsReady:
 
 		Invoke GetINI, Offset iniSection1, Offset iniKeyXGarrison, 0
 		.If Eax == 1 || Eax == 2
-			.If Eax == 1
-				Invoke WriteJmp, MoreGarrison@, $MoreGarrisonTypes
-			.Else
-				Invoke WriteJmp, MoreGarrisonB@, $MoreGarrisonTypesB
-			.EndIf
+			Invoke WriteJmp, MoreGarrisonB@, $MoreGarrisonTypes
 
-			Invoke WritePatch, MoreGarrison2@, Offset MoreGarrison2, MoreGarrison2N
 			Invoke WritePatch, MoreGarrison3@, Offset MoreGarrison3, MoreGarrison3N
-			Invoke WritePatch, MoreGarrison4@, Offset MoreGarrison4, MoreGarrison4N
+			Invoke WriteJmp, MoreGarrison4@, $MoreGarrison4
 
 			; set Garrison Type 8
 			Mov Edi, 1
@@ -1246,7 +1210,8 @@ PatchIsReady:
 
 
 	; Terrains Patch
-	Invoke GetINI, Offset iniSection0, Offset iniKeyTerrains, 0
+	;Invoke GetINI, Offset iniSection0, Offset iniKeyTerrains, 0
+	Xor Eax, Eax
 	.If Eax == 1
 
 		Mov Eax, $__PatchTerrainsStart

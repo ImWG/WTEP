@@ -40,17 +40,6 @@ CornerIcon3@	DD 00520384H
 DepositRes@		DD 00525DACH
 DepositRes2@	DD 004BBF3BH
 
-HeroMode@		DD 0046D940H
-HeroMode2@		DD 004B7A79H
-HeroMode3@		DD 004B7C42H
-HeroMode4@		DD 0046F71DH
-HeroMode5@		DD 0047A3A0H
-HeroMode6@		DD 004C16C8H
-HeroMode7@		DD 004E0AD0H
-HeroMode8@ 		DD 004E0DBEH
-HeroMode9@		DD 004E0DB8H
-HeroMode10@		DD 0058FCAFH
-
 AdvTrainButton@	DD 00527E38H
 
 FreeGather@		DD 00468DABH
@@ -65,7 +54,7 @@ MoreGarrison@	DD 00434321H
 MoreGarrisonB@	DD 0043430EH ; with overriding
 MoreGarrison2@	DD 00434EB4H
 MoreGarrison3@	DD 004342AAH
-MoreGarrison4@	DD 00526A84H
+MoreGarrison4@	DD 00525CDCH
 
 Repulse@		DD 005CE7DCH
 PickRelic@ 		DD 004B080AH, 004B0824H, 004B083EH, 004B0858H, 004B0872H, 004B088CH
@@ -147,8 +136,6 @@ $CustomBuilder     DD O CustomBuilder
 $CustomBuilder2    DD O CustomBuilder2
 $CustomBuilder3    DD O CustomBuilder3
 $DepositResource   DD O DepositResource
-$HeroMode          DD O HeroMode
-$HeroMode2         DD O HeroMode2
 $AdvTrainButton    DD O AdvancedTrainButton
 $FreeGather        DD O FreeGatherPoint
 $MarketInit        DD O MarketInit
@@ -165,7 +152,7 @@ $RandomUnit        DD O RandomUnit
 $TerrFndn          DD O TerrFndn
 $VisInEditor       DD O VisInEditor
 $MoreGarrisonTypes DD O MoreGarrisonTypes
-$MoreGarrisonTypesB DD O MoreGarrisonTypesB
+$MoreGarrison4     DD O MoreGarrison4
 $VillThirdPage1    DD O VillThirdPage1
 $VillThirdPage2    DD O VillThirdPage2
 $VillThirdPage3    DD O VillThirdPage3
@@ -244,15 +231,13 @@ PatchModdingAddresses DD O NewButtons_0, O NewButtons_1, O NewButtons_2, O NewBu
 		DD O AttackGround_1, O AttackGround_2, O AttackGround2_1
 		DD O CustomBuilder_1, O CustomBuilder2_1, O CustomBuilder3_1
 		DD O DepositResource_1, O DepositResource_2
-		DD O HeroMode_0, O HeroMode_1, O HeroMode_2, O HeroMode_3
-		DD O HeroMode2_0, O HeroMode2_1
 		DD O AdvancedTrainButton_1, O AdvancedTrainButton_2
 		DD O FreeGatherPoint_0, O FreeGatherPoint_1, O FreeGatherPoint_2
 		DD O FreeGatherPoint_3, O FreeGatherPoint_4, O FreeGatherPoint_5
 		DD O MarketInit_1, O MarketInit_2
 		DD O ExtendAttacks_1
 		DD O VillagerCounterFix_1
-		DD O MoreGarrisonTypes_0, O MoreGarrisonTypes_1, O MoreGarrisonTypes_2
+		DD O MoreGarrisonTypes_1, O MoreGarrison4_1
 		;DD O Repulse_2
 		DD O PickRelic_1, O PickRelic2_1, O PickRelic3_1
 		DD O IFV_1, O IFV2_1
@@ -325,39 +310,8 @@ CornerIcon3N	DD 1
 DepositRes2		DB 10H
 DepositRes2N	DD 1
 
-HeroMode3		DB 3CH, 01H, 75H ; Self-healing
-HeroMode3N		DD 3
-HeroMode4		DB 3CH, 01H, 75H
-HeroMode4N		DD 3
-HeroMode5		DB 80H, 0B8H, 0B5H, 001H, 000H, 000H, 001H, 090H
-HeroMode5N		DD 8
-HeroMode6		DB 3CH, 01H, 0FH, 85H
-HeroMode6N		DD 4
-HeroMode7		DB 80H, 0BAH, 0B5H, 001H, 000H, 000H, 001H, 090H, 074H
-HeroMode7N		DD 9
-HeroMode8		DB 3CH, 01H, 0FH, 84H
-HeroMode8N		DD 4
-HeroMode9		DB 80H, 0B9H, 0B5H, 001H, 000H, 000H, 001H, 090H, 00FH, 084H
-HeroMode9N		DD 10
-HeroMode10		DB 80H, 0B8H, 0B5H, 001H, 000H, 000H, 001H, 090H, 075H
-HeroMode10N		DD 9
-
-MoreGarrison2	DB 00H, 04H, 07H, 04H, 01H, 04H, 00H, 04H, 04H, 05H
-				DB 05H, 04H, 02H, 06H, 04H, 04H, 04H, 04H, 03H, 01H
-				DB 07H, 07H, 07H, 02H, 04H, 04H, 04H, 04H, 04H, 05H
-				DB 04H, 04H, 04H, 04H, 04H, 00H, 02H, 04H, 04H, 04H
-				DB 04H, 04H, 04H, 03H, 00H, 00H, 00H, 02H, 04H, 04H
-				DB 00H, 06H, 04H, 07H, 06H, 06H, 00H, 02H, 05H, 01H
-MoreGarrison2N	DD 60
 MoreGarrison3	DB 8CH ; Allowing Type 80 to garrison into Type 80
 MoreGarrison3N	DD 1
-MoreGarrison4	DB 00H, 01H, 00H, 01H, 00H, 01H, 00H, 01H, 01H, 00H ; Button Activated
-				DB 00H, 01H, 00H, 00H, 01H, 01H, 01H, 01H, 00H, 00H
-				DB 00H, 00H, 00H, 00H, 01H, 01H, 01H, 01H, 01H, 00H
-				DB 01H, 01H, 01H, 01H, 01H, 00H, 00H, 01H, 01H, 01H
-				DB 01H, 01H, 01H, 00H, 00H, 00H, 00H, 00H, 01H, 01H
-				DB 00H, 00H, 01H, 00H, 00H, 00H, 00H, 00H, 00H, 00H
-MoreGarrison4N	DD 60
 
 ;MarketInit      DB 04H, 50H
 ;MarketInitN		DD 2
@@ -887,16 +841,6 @@ AllHeal_1_:
 	Mov Eax, DWord Ptr Ds:[Ebx + 0CH]
 	Cmp Eax, DWord Ptr Ss:[Ebp + 0CH]
 	Jne AllHeal_2_
-; Old Codes Below
-	;Mov Al, Byte Ptr Ds:[Ecx + 14CH]
-	;Mov Ah, Al
-	;And Al, 1FH
-	;Cmp Al, 4 ; is with heal skill?
-	;Je AllHeal_3_
-	;And Ah, 0E0H
-	;Cmp Al, 3 ; is with vice heal skill?
-	;Je AllHeal_3_
-; New Codes Below
 	Push Ecx
 	Push 1
 	Sub Esp, 8H
@@ -905,7 +849,6 @@ AllHeal_1_:
 	Pop Ecx
 	Test Eax, Eax
 	Jne AllHeal_3_
-; New Codes Above
 AllHeal_2_:
 	Pop Ebx
 	Movsx Eax, Word Ptr Ds:[Ecx + 16H]
@@ -1161,44 +1104,6 @@ DepositResource_2:
     FakeJmp 00525DC5H
 
 
-; Hero Mode For Conversion
-; 0 - Normal
-; 1 - Hero, cannot be converted
-; 2 - Not hero, cannot be converted
-; 3 - Not hero, can be converted after research 1
-; 4 - Not hero, can be converted after research 2
-; 3 and 4 DOESN'T work now.
-HeroMode:
-	Mov Cl, Byte Ptr Ds:[Edx + 1B5H]
-	Cmp Cl, 2
-	Je HeroMode_1
-	Cmp Cl, 3
-	Je HeroMode_2
-	Cmp Cl, 4
-	Je HeroMode_3
-	Mov Cx, Word Ptr Ds:[Edx + 10H]
-	Cmp Cx, 6DH
-HeroMode_0:
-	FakeJmp 0046D948H
-HeroMode_1:
-	FakeJmp 0046DA39H
-HeroMode_2:
-	FakeJmp 0046D9ACH
-HeroMode_3:
-	FakeJmp 0046DA00H
-
-HeroMode2:
-	Mov Cl, Byte Ptr Ds:[Eax + 1B5H]
-	Cmp Cl, 2
-	Je HeroMode2_1
-	Mov Cx, Word Ptr Ds:[Eax + 10H]
-	Cmp Cx, 6DH
-HeroMode2_0:
-	FakeJmp 004B7A81H
-HeroMode2_1:
-	FakeJmp 004B7E80H
-
-
 ; Units with Specific Tower Mode and Unit Attribute Piece:
 ; 14 - Can teleport to goal point, leaving a unit at source (Negative means no unit dropped)
 ; 15 - Can drop a unit in goal point
@@ -1373,12 +1278,8 @@ VillagerCounterFix_1:
 
 
 ; More Garrison Types
-; Allowing more classes of units to garrison into buildings
-; 5th bit: Animals (Prey, Predator, Domesticated Animals and Livestock) Currently no use
-; 6th bit: Veichles (Siege Weapon, Scorpion and Trebuchets)
-; 7th bit: Ships (Trade, Fishing, Transport, Warship and Boarding Boats)
-; 8th bit: Custom class
-MoreGarrisonTypesB: ; Eax = Unit Class, Dl = Garrision Type
+; Allowing type 80 units to garrison into buildings
+MoreGarrisonTypes: ; Eax = Unit Class, Dl = Garrision Type
 	Push Ecx
 	Mov Ecx, Ebp
 	Push 2
@@ -1388,103 +1289,42 @@ MoreGarrisonTypesB: ; Eax = Unit Class, Dl = Garrision Type
 	Call GetAbility
 	Cmp Word Ptr Ds:[Eax + 14H], 0 ; Unit Ability "Garrison" in class 3 can override garrison class by "Resource In".
 	Jl MoreGarrisonTypes_NoOverride
-	Movsx Eax, Byte Ptr Ds:[Eax + 14H]
-	Add Esp, 4H
-	Jmp MoreGarrisonTypes
+	Movsx Eax, Word Ptr Ds:[Eax + 14H]
+	Pop Ecx
+	Jmp MoreGarrisonTypes_
 MoreGarrisonTypes_NoOverride:
 	Movsx Eax, Word Ptr Ss:[Ebp + 16H]
-MoreGarrisonTypes__:
 	Pop Ecx
+MoreGarrisonTypes_:
 	Mov Dl, Byte Ptr Ds:[Ecx + 208H]
 	Xor Esi, Esi
-	Cmp Eax, MAX_GARRISON_CLASS
-	Ja MoreGarrisonTypes_2
+MoreGarrisonTypes_1:
+	FakeJmp 0043431FH
 
+; Display garrison button by checking ability
+MoreGarrison4:
+	Push Edx
+	Push Eax
 	Xor Ebx, Ebx
-MoreGarrisonTypes: ; Eax = Unit Class, Dl = Garrision Type
-	Mov Bl, Byte Ptr Ds:[Eax + 434EB4H]
-	Cmp Bl, 05H
-	Jge MoreGarrisonTypes_
-MoreGarrisonTypes_0:
-	FakeJmp 00434327H
-
-MoreGarrisonTypes_:
-	Je MoreGarrisonTypes_Animal
-	Cmp Bl, 06H
-	Je MoreGarrisonTypes_Veichle
-	Cmp Bl, 07H
-	Je MoreGarrisonTypes_Ship
-	Cmp Bl, 08H
-	Je MoreGarrisonTypes_Custom
-	Test Dl, 80H ; Custom Garrision
-	Je MoreGarrisonTypes_2
-	Jmp MoreGarrisonTypes_1
-
-MoreGarrisonTypes_1: ; Yes
-	FakeJmp 00434350H
-MoreGarrisonTypes_2: ; No
-	FakeJmp 00434355H
-
-MoreGarrisonTypes_Animal:
-	Test Dl, 10H
-	Je MoreGarrisonTypes_2
-	Jmp MoreGarrisonTypes_1
-
-MoreGarrisonTypes_Veichle:
-	Test Dl, 20H
-	Je MoreGarrisonTypes_2
-	Jmp MoreGarrisonTypes_1
-
-MoreGarrisonTypes_Ship:
-	Test Dl, 40H
-	Je MoreGarrisonTypes_2
-	Jmp MoreGarrisonTypes_1
-
-MoreGarrisonTypes_Custom:
-	Test Dl, 80H
-	Je MoreGarrisonTypes_2
-	Jmp MoreGarrisonTypes_1
-
-
-;Repulse: ; [Esp] = Source, [Esp + 4] = Target
-;	Push Eax
-;	Push Ecx
-;	Push Edx
-;	Push Esi
-;	Mov Esi, DWord Ptr Ds:[Esp + 10H]
-;	Mov Edx, DWord Ptr Ds:[Esp + 14H]
-;
-;	Push Ebp
-;	Sub Esp, 10H
-;	Fld DWord Ptr Ds:[Edx + 38H]
-;	Fsub DWord Ptr Ds:[Esi + 38H]
-;	Fmul DWord Ptr Ds:[Float05]
-;	Fadd DWord Ptr Ds:[Edx + 38H]
-;	Fst DWord Ptr Ds:[Edx + 38H]
-;	Fstp DWord Ptr Ds:[Edx + 0C0H]
-;
-;	Fld DWord Ptr Ds:[Edx + 3CH]
-;	Fsub DWord Ptr Ds:[Esi + 3CH]
-;	Fmul DWord Ptr Ds:[Float05]
-;	Fadd DWord Ptr Ds:[Edx + 3CH]
-;	Fst DWord Ptr Ds:[Edx + 3CH]
-;	Fstp DWord Ptr Ds:[Edx + 0C8H]
-;
-;	;Xor Ecx, Ecx
-;	;Mov [Esi + 40H], Ecx
-;
-;	Add Esp, 10H
-;	Pop Ebp
-;
-;	Pop Esi
-;	Pop Edx
-;	Pop Ecx
-;	Pop Eax
-;	; Normal
-;	Movsx Ecx, Word Ptr Ds:[Esi + 2H]
-;	Mov DWord Ptr Ss:[Esp + 1CH], Ecx
-;Repulse_2:
-;	FakeJmp 005CE7E4H
+	Mov Bl, 1
+	Mov Ecx, [Esi + 1080H + 4H * 4] ; Check if there is already a button
+	Cmp Byte Ptr Ds:[Ecx + 38H], 0
+.If !Zero?
+	Mov Ecx, Eax
+	Push 2
+	Push 0
+	Push 3
+	Push 3
+	Call GetAbility
+	Test Eax, Eax
+	.If !Zero?
+		Mov Bl, 0
+	.EndIf
+.EndIf
+	Pop Eax
+	Pop Edx
+MoreGarrison4_1:
+	FakeJmp 00525CEDH
 
 
 ; Make various Monks (Archbishop, Friar Tuck, etc.) can restore correctly after pick and drop relic.

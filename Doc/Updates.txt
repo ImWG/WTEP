@@ -206,3 +206,17 @@ v1.02.04.0512:
 v1.03.01.0611: (Last version for Userpatch 1.4 RC)
 - New hot key functions in scenario editor.
 - Addrd Gizmo, a module to allow users attach plug-in patches or triggers.
+
+v1.04.01.0611: (for 1.4 RC)
+- Extra triggers: AI Signal, Change Attack.
+- Changed custom color tags from A-P to 0-F, available in Send Chat too.
+
+v1.05.01.0611: (for 1.5)
+- Applied for Userpatch 1.5, some functions removed:
+  - Self destruct unit.
+  - Explosion unit.
+  - Self heal unit.
+  - AI unit id limitation.
+  - More resource types in editor.
+  - Default new garrison types.
+  - Extend terrains.

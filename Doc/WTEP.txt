@@ -1,10 +1,10 @@
 =============================================================
 
                WAIFor's Trigger & Extension Patch
-                   Final Version For UP 1.4RC
-                     Version 1.03.01.0611
+                    For UP 1.4RC & 1.5 Version
+                          1.04/05.01.0611
 
-                     By WAIFor, 2016-2017
+                     By WAIFor, 2016-2018
 
 =============================================================
 
@@ -14,8 +14,9 @@ then run "wtep.exe", you'll get some amazing new effects!
 Besides, you can use this for modding. You can set modding settings in ini file.
 Currently there are only one modding patch, making every building has page button.
 
-Please use newest UserPatch 1.4 RC core file. The size of main exe file should be 
-3,072 KB. Daniel Pereira's Trigger Patch 1.5 is okay, too.
+Please use UserPatch 1.4 RC(by 1.04.01.0611) or 1.5(by 1.05.01.0611) core file.
+The size of main exe file should be 3,072 KB. Daniel Pereira's Trigger Patch 1.5
+is okay, too.
 Before first run for one exe, this launcher would change size of the exe file,
 as well as allocations, making pathces able to place in.
 You can also install patches into exe file permanently instead of injecting, by
@@ -37,14 +38,14 @@ You can set config ini file by command line arguments. For example, run
 
 - Key and values in section Effects:
 
-    [CasualTerrain=]
+    [CasualTerrain=] (1.4 Only)
     Activation of this item would make terrain editing more casually - creating 
     waters without generating shores, or on ridged base. Beaches would not be
     replaced while painting neighborhood.
     Besides, it could affect generations of random map. So it is recommended that
     you activate this in the launcher instead of changing EXE.
 
-    [ExtendedTriggerPatchLocation=]
+    [ExtendedTriggerPatchLocation=] (1.4 Only)
     Originally, the location of DLL file of Daniel Pereira's Extended Triggers
     Patch is in "age2_x1\language.dll". You can change it, by typing a new path
     here(e.g. Games\abcd\triggers.dll).
@@ -56,9 +57,9 @@ You can set config ini file by command line arguments. For example, run
     Ctrl+J - Toggle buildings shown as internal names
 
     [ImprovedEditor=]
-    In order to enable some improvement of editor, please set this as 1 .
+    In order to enable some improvement of editor, please set this as 1.
 
-    [MoreResources=]
+    [MoreResources=] (1.4 Only)
     Activate more resources in trigger's tribute list, like berseker's healing
     rate, building rate, etc. You can also set language dlls in section
     "NewResourceLanguages".
@@ -84,11 +85,11 @@ You can set config ini file by command line arguments. For example, run
     inputs, like Kill Object, also has "quantity" box now.
 
   - In "Display Instructions", you can set 65536 types of color set for text. To do 
-    this, please add prefix "<????>". The four characters represent various colors.
-    Each character can be CAPTIAL A to P, AA to PP are colors #0 to #255 on palette
-    50500. The former 2 are for text color, while the latter 2 outline color. For
-    example, "<EDIH>" makes gold text and white outline. Specially, AB stands for
-    transparent color.
+    this, please add prefix "<=????>". The four characters represent various colors.
+    Each character can be CAPTIAL hexadecimal 0 to 9 and A to F, 00 to FF are colors
+    #0 to #255 on palette 50500. The former 2 are for text color, while the latter 2
+    outline color. For example, "<=4587>" makes gold text and white outline. Specially,
+    AB stands for transparent color.
 
   - New branch effects added in original ones.
 
@@ -106,7 +107,7 @@ You can set config ini file by command line arguments. For example, run
   - Rotating any buildings, not only Houses.
 
 
-- Custom Resource Names
+- Custom Resource Names (1.4 Only)
 
   - You can set lang DLLs of those resources in [NewResourceLanguages]:
     PopLimit - Population limitation
@@ -156,6 +157,15 @@ You can set config ini file by command line arguments. For example, run
    11 - Directly set destination player's resource quantity multiplied with 0.001.
    12 - Multiply with quantity permillages, from source to dest in confirmed resource.
 
+    [AI Script Goal]
+    1 - Turn off certain AI script goal¡£
+    8 - Set player's color. Color is determined by AI signal id, 0 is blue, 1 is red,
+        etc. 256 is a random color, while 255 is a random in 0 to 7.
+    9 - Set player's civilization. This would change player's interface, sounds and
+        graphics of following created units, but not tech tree.
+        Civilization id is determined by id, 0 is GAIA, 1 is Briton and so on. 256 is
+        a random civilization, while 255 excepts GAIA.
+
     [Create Object]
     3 - Now, there is a zone selector, choosed zone would replace target point in play 
         time, creating units in every cell without restriction. However, you must
@@ -164,11 +174,13 @@ You can set config ini file by command line arguments. For example, run
         restriction too.
 
     [Task Object]
-    1 - Teleport source units to destination point OR UNIT.
     2 - Garrison source units into destination unit.
     3 - Move units to the point located by player's food and wood.
+    4 - Teleport source units to destination point OR UNIT.
+        In 1.4, Number 1 can also do effect 4.
         
     [Kill Object]
+    1 - Make units invulnerable, with infinite hipoints.
     10~99 - Change units' properties. 10 to 39 would set, 40 to 69 add, 70 to 99 set
         by specified resource storage.
         Those properties includes:
@@ -211,6 +223,13 @@ You can set config ini file by command line arguments. For example, run
     7 - Load HP from Resource.
     NOTE: effect "Change Object HP" (with Number = 2) would trim overflowed HPs.
 
+    [Change Object Name]
+   #2 - Set protounit's names.
+
+    [Change Object Attack]
+    2 - Add units' projectile count.
+    3 - Set units' projectile count. Those two wouldn't isolate units.
+
     * These effects are unstable, they probably cause crashes, especially in returning 
       to the map editor.
    ** They are not robust, you must confirm the destination player, or bug splats.
@@ -233,7 +252,7 @@ You can set config ini file by command line arguments. For example, run
 
 - Unhardcoding Functions:
 
-    [AIUnitLimit=]
+    [AIUnitLimit=] (1.4 Only)
     WARNING: This is a test function. We don't recommend you to use that.
     In original version, units with id >= 900 will be ignored by AI in counting and 
     training location. So you can change the limitation by setting the value. For
@@ -265,7 +284,7 @@ You can set config ini file by command line arguments. For example, run
         pages, or else Build Page #118. If units have skill 5, they can enter specified
         building pages.
 
-    [ExplosionUnit=]
+    [ExplosionUnit=] (1.4 Only)
     0 - Only units with id #440 (Petard), #527 (Explosive Boat), #528 (Heavy Explosive Boat)
         or #706 (Saboteur) would do damage when they die.
     1 - Except units with ids above, if a unit has Unit Attribute 4th checked, it would
@@ -310,12 +329,12 @@ You can set config ini file by command line arguments. For example, run
     0 - None
     1 - All buildings have a corner next page button (unless covered by other button)
 
-    [SelfDestructUnit=]
+    [SelfDestructUnit=] (1.4 Only)
     0 - Only units with id #440, #527, #528 or #706 would die hen they attacked.
     1 - Except units with ids above, if a unit's Attack Mode=5, the unit would die when attacked.
     2 - Only units with Attack Mode=5 would die when attacked.
 
-    [SelfHealUnit=]
+    [SelfHealUnit=] (1.4 Only)
     0 - Besides heroes, only units with id #692 (Berserker), #694 (Elite Berserker) would
         retrieve their hitpoints.
     1 - Non-hero units with Unit Attribute 3th on can retrieve their HPs too.
@@ -406,6 +425,7 @@ You can set config ini file by command line arguments. For example, run
         garrison in buildings), you can set an override class for garrison, by setting
         "Resource In" as a positive figure. For example, a cavalry can garrison like a archer
         when his garrison ability "Resource In" equals 0.
+        * In 1.5, original garrison types won't be replaced by default bits.
 
     [NewSkills=]
     0 - None
@@ -538,7 +558,7 @@ You can set config ini file by command line arguments. For example, run
 
 
 ----------------------------------------
-  New Terrains
+  New Terrains (1.4 Only)
 ----------------------------------------
 
 
@@ -627,198 +647,198 @@ You can set config ini file by command line arguments. For example, run
 - Protounit Attributes Table: (Use AGE 20151211 names)
 
 Index Type MinUnitType Name
-  100   (s)   10   Class
-  101   (s)   10   ID 1
-  102   (s)   10   ID 2
-  103   (s)   10   ID 3
-  104   (s)   10   Language DLL Name
-  105   (s)   10   Language DLL Creation
-  106   (l)   10   Hotkey
-  107   (l)   10   Language DLL Help
-  108   (l)   10   Language DLL Hotkey Text
-  109   (s)   10   Icon
-  110   (s)   80  *Angle
-  111   (g)   10   Standing Graphics.1
-  112   (g)   10   Standing Graphics.2
-  113   (g)   10   Dying Graphics.1
-  114   (g)   10   Dying Graphics.2
-  115   (g)   30   Walking and Running Graphics.1
-  116   (g)   30   Walking and Running Graphics.2
-  117   (g)   80   Snow Graphic
-  118   (g)   80   Construction Graphic
-  119   (g)   60   Attack Graphic
-  120   (g)   70   Garrision Graphic
-  121   (s)   10  *Hit Points
-  122   (f)   20  *Speed
-  123   (f)   30   Rotation Speed
-  124   (f)   10  *Line  Of  Sight
-  125   (f)   60  *Search Radius
-  126   (f)   60  *Max Range
-  127   (f)   60  *Min Range
-  128   (f)   60   Displayed Range
-  129   (s)   60   Displayed Attack
-  130   (s)   60   Frame Delay
-  131   (s)   60  *Accuracy Percent
-  132   (f)   60   Accuracy Error Radius
-  133   (f)   60  *Reload Time
-  134   (f)   60   Displayed Reload Time
-  135   (f)   60  *Blast Radius
-  136   (b)   60   Blast Attack Level
-  137   (s)   60  *Default Armor
-  138   (s)   60  *Damage Terrain Restriction
-  139   (s)   60   Displayed Melee Armor
-  140   (s)   70   Displayed Pierce Armor
-  141   (b)   60   Blast Defense Level
-  142   (s)   10  *Resource Capacity
-  143   (f)   10   Resource Decay
-  144   (f)   60  *Work Rate
-  145   (b)   30  *Garrison Capacity
-  146   (b)   80   Garrision Type
-  147   (f)   80  *Garrision Heal Rate
-  148   (s)   60   Projectile Unit
-  149   (l)   70   Missle  Dupl.  Unit
-  150   (l)   70   Charging Graphic
-  151   (b)   70   Charging Mode
-  152   (f)   70  *Total Missiles
-  153   (l)   70  *Max  Total  Missiles
-  154   (f)   70   Missile Spawning Area.1
-  155   (f)   70   Missile Spawning Area.2
-  156   (f)   70   Missile Spawning Area.3
-  157   (f)   60   Graphic Displacement XYZ.1
-  158   (f)   60   Graphic Displacement XYZ.2
-  159   (f)   60   Graphic Displacement XYZ.3
-  160   (b)   60   Stretch Mode
-  161   (b)   60  *Compensation Mode
-  162   (b)   60   Drop Animation Mode
-  163   (b)   60   Penetration Mode
-  164   (b)   60   Unknown 24
-  165   (f)   60   Projectile Arc
-  166   (b)   10  *Enabled
-  167   (b)   10   Disabled
-  168   (b)   10   Death:Revives
-  169   (b)   10   Hide In Editor
-  170   (b)   10   Air Mode
-  171   (b)   10   Fly Mode
-  172   (b)   60   Animal Mode
-  173   (b)   60   Tower Mode
-  174   (b)   80   Adjacent Mode
-  175   (b)   80   Built: Vanishes
-  176   (b)   70   Hero Mode
-  177   (b)   10   Placement Mode
-  178   (b)   10   Hill Mode
-  179   (b)   10   Fog Visibility
-  180   (b)   10   Sub Type
-  181   (b)   10   Interaction Mode
-  182   (b)   10   Minimap Mode
-  183   (b)   10   Minimap Color
-  184   (b)   10   Attack Mode
-  185   (b)   10   Edible Meat?
-  186   (b)   60   Task  Swap  ID
-  187   (b)   10   Unit Attribute
-  188   (b)   10   Civilization
-  189   (s)   10   Attribute Piece
-  190   (s)   10   Dead Unit
-  191   (s)   10   Placement Terrain.1
-  192   (s)   10   Placement Terrain.2
-  193   (s)   10   Placement Side Terrain.1
-  194   (s)   10   Placement Side Terrain.2
-  195   (s)   10   Terrain Restriction
-  196   (s)   80   Foundation Terrain
-  197   (s)   80   Old Terrain
-  198   (s)   80   Initiates Research
-  199   (s)   60   Action  When  Discovered
-  200   (s)   60   Drop Site.1
-  201   (s)   60   Drop Site.2
-  202   (f)   10  *Collosion Size.1
-  203   (f)   10  *Collosion Size.2
-  204   (f)   10   Clearance Size.1
-  205   (f)   10   Clearance Size.2
-  206   (f)   10   Selection Shape Size.1
-  207   (f)   10   Selection Shape Size.2
-  208   (b)   10   Unselectable
-  209   (b)   10   Is a resource?
-  210   (b)   10   Unknown 7
-  211   (b)   10   Unknown 8
-  212   (b)   10   Selection Mask
-  213   (b)   10   Selection Shape Type
-  214   (b)   10   Selection Shape
-  215   (b)   10   Selection Effect
-  216   (b)   10   Editor Selection Color
-  217   (s)   30   Tracking Unit
-  218   (b)   30   Tracking Unit Used
-  219   (f)   30   Tracking Unit Density
-  220   (f)   30   Rotations in Radians.1
-  221   (f)   30   Rotations in Radians.2
-  222   (f)   30   Rotations in Radians.3
-  223   (f)   30   Rotations in Radians.4
-  224   (f)   30   Rotations in Radians.5
-  225   (b)   10   Command ID
-  226   (s)   70   Train Location
-  227   (s)   70  *Train Time
-  228   (b)   70   Train Button
-  229   (s)   10   Storage.Type.1
-  230   (s)   10   Storage.Type.2
-  231   (s)   10   Storage.Type.3
-  232   (f)   10   Storage.Amount.1
-  233   (f)   10   Storage.Amount.2
-  234   (f)   10   Storage.Amount.3
-  235   (b)   10   Storage.Enable Mode.1
-  236   (b)   10   Storage.Enable Mode.2
-  237   (b)   10   Storage.Enable Mode.3
-  238   (s)   70   Cost Type.1
-  239   (s)   70   Cost Type.2
-  240   (s)   70   Cost Type.3
-  241   (s)   70  *Cost Amount.1
-  242   (s)   70  *Cost Amount.2
-  243   (s)   70  *Cost Amount.3
-  244   (s)   70   Cost Used.1
-  245   (s)   70   Cost Used.2
-  246   (s)   70   Cost Used.3
-  247   (s)   80   Stack Unit
-  248   (s)   80   Head Unit
-  249   (s)   80   Transform Unit
-  250   (s)   80   Pile Unit
-  251   (s)   80   Annex Units.1
-  252   (s)   80   Annex Units.2
-  253   (s)   80   Annex Units.3
-  254   (s)   80   Annex Units.4
-  255   (f)   80   Annex.Units Misplacement.1
-  256   (f)   80   Annex.Units Misplacement.2
-  257   (f)   80   Annex.Units Misplacement.3
-  258   (f)   80   Annex.Units Misplacement.4
-  259   (f)   80   Annex.Units Misplacement.5
-  260   (f)   80   Annex.Units Misplacement.6
-  261   (f)   80   Annex.Units Misplacement.7
-  262   (f)   80   Annex.Units Misplacement.8
-  263   (b)   80   Looting Table.1
-  264   (b)   80   Looting Table.2
-  265   (b)   80   Looting Table.3
-  266   (b)   80   Looting Table.4
-  267   (b)   80   Looting Table.5
-  268   (b)   80   Looting Table.6
-  269   (v)   10   Selection Sound
-  270   (v)   10   Dying Sound
-  271   (v)   10   Train Sound.1
-  272   (v)   10   Train Sound.2
-  273   (v)   60   Attack Sound
-  274   (v)   60   Move Sound
-  275   (v)   80   Construction Sound
-  276   (v)   80   Unknown Sound
-  277   (f)   10   HP Bar Height 1
-  278   (f)   10   HP Bar Height 2
-  279   (s)   10   Unknown 1
-  280   (f)   10   Unknown 3A
-  281   (b)   30   Unknown 11
-  282   (b)   30   Unknown 11
-  283   (f)   70   Unknown 26
-  284   (f)   70   Unknown 27
-  285   (b)   80   Unknown Type
-  286   (b)   80   Unknown 33
-  287   (f)   80   Wonder Timer?
-  288   (w)   70  *Melee Attack
-  289   (w)   70  *Pierce Attack
-  290   (w)   70  *Melee Armor
-  291   (w)   70  *Pierce Armor
+  100   (s)   10    Class
+  101   (s)   10    ID 1
+  102   (s)   10    ID 2
+  103   (s)   10    ID 3
+  104   (s)   10  **Language DLL Name
+  105   (s)   10  **Language DLL Creation
+  106   (l)   10    Hotkey
+  107   (l)   10  **Language DLL Help
+  108   (l)   10    Language DLL Hotkey Text
+  109   (s)   10    Icon
+  110   (s)   80   *Angle
+  111   (g)   10    Standing Graphics.1
+  112   (g)   10    Standing Graphics.2
+  113   (g)   10    Dying Graphics.1
+  114   (g)   10    Dying Graphics.2
+  115   (g)   30    Walking and Running Graphics.1
+  116   (g)   30    Walking and Running Graphics.2
+  117   (g)   80    Snow Graphic
+  118   (g)   80    Construction Graphic
+  119   (g)   60    Attack Graphic
+  120   (g)   70    Garrision Graphic
+  121   (s)   10   *Hit Points
+  122   (f)   20   *Speed
+  123   (f)   30    Rotation Speed
+  124   (f)   10   *Line  Of  Sight
+  125   (f)   60   *Search Radius
+  126   (f)   60   *Max Range
+  127   (f)   60   *Min Range
+  128   (f)   60  **Displayed Range
+  129   (s)   60  **Displayed Attack
+  130   (s)   60  **Frame Delay
+  131   (s)   60   *Accuracy Percent
+  132   (f)   60    Accuracy Error Radius
+  133   (f)   60   *Reload Time
+  134   (f)   60    Displayed Reload Time
+  135   (f)   60   *Blast Radius
+  136   (b)   60  **Blast Attack Level
+  137   (s)   60   *Default Armor
+  138   (s)   60   *Damage Terrain Restriction
+  139   (s)   60  **Displayed Melee Armor
+  140   (s)   70   *Displayed Pierce Armor
+  141   (b)   60    Blast Defense Level
+  142   (s)   10   *Resource Capacity
+  143   (f)   10    Resource Decay
+  144   (f)   60   *Work Rate
+  145   (b)   30   *Garrison Capacity
+  146   (b)   80  **Garrision Type
+  147   (f)   80   *Garrision Heal Rate
+  148   (s)   60  **Projectile Unit
+  149   (l)   70    Missle  Dupl.  Unit
+  150   (l)   70    Charging Graphic
+  151   (b)   70    Charging Mode
+  152   (f)   70   *Total Missiles
+  153   (l)   70   *Max  Total  Missiles
+  154   (f)   70    Missile Spawning Area.1
+  155   (f)   70    Missile Spawning Area.2
+  156   (f)   70    Missile Spawning Area.3
+  157   (f)   60    Graphic Displacement XYZ.1
+  158   (f)   60    Graphic Displacement XYZ.2
+  159   (f)   60    Graphic Displacement XYZ.3
+  160   (b)   60    Stretch Mode
+  161   (b)   60   *Compensation Mode
+  162   (b)   60    Drop Animation Mode
+  163   (b)   60    Penetration Mode
+  164   (b)   60    Unknown 24
+  165   (f)   60    Projectile Arc
+  166   (b)   10   *Enabled
+  167   (b)   10    Disabled
+  168   (b)   10    Death:Revives
+  169   (b)   10    Hide In Editor
+  170   (b)   10    Air Mode
+  171   (b)   10    Fly Mode
+  172   (b)   60    Animal Mode
+  173   (b)   60    Tower Mode
+  174   (b)   80    Adjacent Mode
+  175   (b)   80    Built: Vanishes
+  176   (b)   70  **Hero Mode
+  177   (b)   10    Placement Mode
+  178   (b)   10    Hill Mode
+  179   (b)   10    Fog Visibility
+  180   (b)   10    Sub Type
+  181   (b)   10    Interaction Mode
+  182   (b)   10    Minimap Mode
+  183   (b)   10    Minimap Color
+  184   (b)   10    Attack Mode
+  185   (b)   10    Edible Meat?
+  186   (b)   60    Task  Swap  ID
+  187   (b)   10  **Unit Attribute
+  188   (b)   10  **Civilization
+  189   (s)   10  **Attribute Piece
+  190   (s)   10    Dead Unit
+  191   (s)   10    Placement Terrain.1
+  192   (s)   10    Placement Terrain.2
+  193   (s)   10    Placement Side Terrain.1
+  194   (s)   10    Placement Side Terrain.2
+  195   (s)   10    Terrain Restriction
+  196   (s)   80    Foundation Terrain
+  197   (s)   80    Old Terrain
+  198   (s)   80    Initiates Research
+  199   (s)   60    Action  When  Discovered
+  200   (s)   60    Drop Site.1
+  201   (s)   60    Drop Site.2
+  202   (f)   10   *Collosion Size.1
+  203   (f)   10   *Collosion Size.2
+  204   (f)   10    Clearance Size.1
+  205   (f)   10    Clearance Size.2
+  206   (f)   10    Selection Shape Size.1
+  207   (f)   10    Selection Shape Size.2
+  208   (b)   10    Unselectable
+  209   (b)   10    Is a resource?
+  210   (b)   10    Unknown 7
+  211   (b)   10    Unknown 8
+  212   (b)   10    Selection Mask
+  213   (b)   10    Selection Shape Type
+  214   (b)   10    Selection Shape
+  215   (b)   10    Selection Effect
+  216   (b)   10    Editor Selection Color
+  217   (s)   30    Tracking Unit
+  218   (b)   30    Tracking Unit Used
+  219   (f)   30    Tracking Unit Density
+  220   (f)   30    Rotations in Radians.1
+  221   (f)   30    Rotations in Radians.2
+  222   (f)   30    Rotations in Radians.3
+  223   (f)   30    Rotations in Radians.4
+  224   (f)   30    Rotations in Radians.5
+  225   (b)   10    Command ID
+  226   (s)   70  **Train Location
+  227   (s)   70   *Train Time
+  228   (b)   70  **Train Button
+  229   (s)   10    Storage.Type.1
+  230   (s)   10    Storage.Type.2
+  231   (s)   10    Storage.Type.3
+  232   (f)   10    Storage.Amount.1
+  233   (f)   10    Storage.Amount.2
+  234   (f)   10    Storage.Amount.3
+  235   (b)   10    Storage.Enable Mode.1
+  236   (b)   10    Storage.Enable Mode.2
+  237   (b)   10    Storage.Enable Mode.3
+  238   (s)   70  **Cost Type.1
+  239   (s)   70   *Cost Amount.1
+  240   (s)   70  **Cost Used.1
+  241   (s)   70  **Cost Type.2
+  242   (s)   70   *Cost Amount.2
+  243   (s)   70  **Cost Used.2
+  244   (s)   70  **Cost Type.3
+  245   (s)   70   *Cost Amount.3
+  246   (s)   70  **Cost Used.3
+  247   (s)   80    Stack Unit
+  248   (s)   80    Head Unit
+  249   (s)   80    Transform Unit
+  250   (s)   80    Pile Unit
+  251   (s)   80    Annex Units.1
+  252   (s)   80    Annex Units.2
+  253   (s)   80    Annex Units.3
+  254   (s)   80    Annex Units.4
+  255   (f)   80    Annex.Units Misplacement.1
+  256   (f)   80    Annex.Units Misplacement.2
+  257   (f)   80    Annex.Units Misplacement.3
+  258   (f)   80    Annex.Units Misplacement.4
+  259   (f)   80    Annex.Units Misplacement.5
+  260   (f)   80    Annex.Units Misplacement.6
+  261   (f)   80    Annex.Units Misplacement.7
+  262   (f)   80    Annex.Units Misplacement.8
+  263   (b)   80    Looting Table.1
+  264   (b)   80    Looting Table.2
+  265   (b)   80    Looting Table.3
+  266   (b)   80    Looting Table.4
+  267   (b)   80    Looting Table.5
+  268   (b)   80    Looting Table.6
+  269   (v)   10    Selection Sound
+  270   (v)   10    Dying Sound
+  271   (v)   10    Train Sound.1
+  272   (v)   10    Train Sound.2
+  273   (v)   60    Attack Sound
+  274   (v)   60    Move Sound
+  275   (v)   80    Construction Sound
+  276   (v)   80    Unknown Sound
+  277   (f)   10    HP Bar Height 1
+  278   (f)   10    HP Bar Height 2
+  279   (s)   10    Unknown 1
+  280   (f)   10    Unknown 3A
+  281   (b)   30    Unknown 11
+  282   (b)   30    Unknown 11
+  283   (f)   70  **Unknown 26
+  284   (f)   70    Unknown 27
+  285   (b)   80  **Unknown Type
+  286   (b)   80    Unknown 33
+  287   (f)   80    Wonder Timer?
+  288   (w)   70   *Melee Attack
+  289   (w)   70   *Pierce Attack
+  290   (w)   70   *Melee Armor
+  291   (w)   70   *Pierce Armor
   
 
 - Data Types:
@@ -830,4 +850,4 @@ Index Type MinUnitType Name
   v - sound (like graphic)
 
 - Many of them would not keep in save games, unless isolated.
-  Attributes with "*" would keep.
+  Attributes with "*" or "**" (1.5 only) would keep.

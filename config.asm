@@ -38,7 +38,7 @@ iniKeyDanielETP  DB 'ExtendedTriggerPatchLocation', 0
 iniKeyHotKeyFunc DB 'HotKeyFunctions', 0
 iniKeyImprovedEd DB 'ImprovedEditor', 0
 iniKeyIsoSiege	 DB 'SiegeWeaponBugFix', 0
-iniKeyMoreRes    DB 'MoreResources', 0
+;iniKeyMoreRes    DB 'MoreResources', 0
 iniKeyNewEffects DB 'NewEffects', 0
 iniKeyTaskProj	 DB 'TaskProjectiles', 0
 
@@ -49,22 +49,21 @@ iniKeyAllHeal	DB 'AllClassHeal', 0
 iniKeyAttackGnd	DB 'AttackGround', 0
 iniKeyBuilder	DB 'CustomBuilder', 0
 iniKeyBuilder2	DB 'CustomBuilderVillagers', 0
-iniKeyExplUnit	DB 'ExplosionUnit', 0
+;iniKeyExplUnit	DB 'ExplosionUnit', 0
 iniKeyVillCntr	DB 'FixVillagerCounter', 0
 iniKeyTypeInEd  DB 'ForcedTypeInEditor', 0
 iniKeyTerrFndn	DB 'FreeFoundationTerrain', 0
 iniKeyMonkHealGraph DB 'MonkHealGraphic', 0
 iniKeyMonkHealGraphId DB 'MonkHealGraphicId', 0
 iniKey2ndPage	DB 'SecondPage', 0
-iniKeySelfDestruct DB 'SelfDestructUnit', 0
-iniKeySelfHeal	DB 'SelfHealUnit', 0
+;iniKeySelfDestruct DB 'SelfDestructUnit', 0
+;iniKeySelfHeal	DB 'SelfHealUnit', 0
 
 ; Enhanced Functions
 iniKeyAdvTrain	DB 'AdvancedTrainButton', 0
 iniKeyDepositButton DB 'DepositButton', 0
 iniKeyXAtks		DB 'ExtendedAttacks', 0
 iniKeyIFV		DB 'FunctionGarrison', 0
-iniKeyHeroMode	DB 'HeroModeForConversion', 0
 iniKeyXGarrison	DB 'MoreGarrisonTypes', 0
 iniKeyRelicMem	DB 'MonkRelicMemory', 0
 iniKeyNewSkills	DB 'NewSkills', 0
@@ -107,20 +106,6 @@ iniDscUnpack	DB 'DescSkillUnpack', 0
 iniPosDepositRes	DB 'PosDepositResource', 0
 
 ; Resource Language Ids
-iniRDscBerserk  DB 'BerserkerHealRate', 0
-iniRDscBuildRat DB 'BuildRate', 0
-iniRDscCurrAge  DB 'CurrentAge', 0
-iniRDscFaithRc  DB 'FaithRecharge', 0
-iniRDscFoodPrd  DB 'FoodProduction', 0
-iniRDscGoldPrd  DB 'GoldProduction', 0
-iniRDscMarketRt DB 'MarketRate', 0
-iniRDscHealRang DB 'MonkHealRange', 0
-iniRDscMonkHeal DB 'MonkHealRate', 0
-iniRDscPopLimit DB 'PopLimit', 0
-iniRDscRelicPrd DB 'RelicProduction', 0
-iniRDscStonePrd DB 'StoneProduction', 0
-iniRDscTradePrd DB 'TradeProduction', 0
-iniRDscWoodPrd  DB 'WoodProduction', 0
 
 ; Cheats
 iniCheatSpawn1	DB 'CodeSpawn1', 0
