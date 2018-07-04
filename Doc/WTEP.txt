@@ -624,7 +624,7 @@ You can set config ini file by command line arguments. For example, run
 ----------------------------------------
 
 
-- Hawk AOC (www.hawkaoc.net). I met The Conquerors Expansion here, as well as UserPatch.
+- Hawk AOC (www.hawkaoe.net). I met The Conquerors Expansion here, as well as UserPatch.
   Also, members supported me much for this project.
 
 - UserPatch Group. I won't catch the idea of making branch effects by "Number" without
