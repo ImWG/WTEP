@@ -220,3 +220,6 @@ v1.05.01.0611: (for 1.5)
   - More resource types in editor.
   - Default new garrison types.
   - Extend terrains.
+
+v1.05.02.0710:
+- Fixed one bug causing game file too large and corrupted.

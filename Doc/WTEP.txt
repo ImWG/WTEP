@@ -2,7 +2,7 @@
 
                WAIFor's Trigger & Extension Patch
                     For UP 1.4RC & 1.5 Version
-                          1.04/05.01.0611
+                          1.04/05.02.0710
 
                      By WAIFor, 2016-2018
 

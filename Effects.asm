@@ -129,7 +129,6 @@ PatchEffectsDirectAddresses DD KillObject_Table_, KillObject_Table, 3
 	DD Tribute_Table_, Tribute_Table, 3
 	DD DamageUnit_Table_, DamageUnit_Table, 3
 	DD ChangeAttack_Table_, ChangeAttack_Table, 3
-	DD 007DD714H, Offset ChangeName, 0
 	;DD HotKeySwitch_CasualTerrain, HotKeySwitch_Flag, 1
 	;DD HotKeySwitch_CasualTerrain_Attr, HotKeySwitch_Flag, 1
 	DD 0H
