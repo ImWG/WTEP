@@ -19,11 +19,11 @@ $__PatchGizmoEnd DD Offset __PatchGizmoEnd
 
 PatchGizmoAddresses DD Offset Gizmo_1, Offset Gizmo_2, Offset Gizmo_3, Offset Gizmo_4, 0
 
-PatchGizmoDirectAddresses DD Offset Gizmo_File_, Offset Gizmo_File, 1
-	DD Offset Gizmo_File2_, Offset Gizmo_File, 1
-	;DD Offset Gizmo_File3_, Offset Gizmo_File, 1
-	DD Offset Gizmo_Pattern_, Offset Gizmo_Pattern + 1, 1
-	DD Offset Gizmo_Pattern2_, Offset Gizmo_Pattern, 1
+PatchGizmoDirectAddresses DD Offset Gizmo_File_ + 1, Offset Gizmo_File
+	DD Offset Gizmo_File2_ + 1, Offset Gizmo_File
+	;DD Offset Gizmo_File3_+1, Offset Gizmo_File
+	DD Offset Gizmo_Pattern_ + 1, Offset Gizmo_Pattern + 1
+	DD Offset Gizmo_Pattern2_ + 1, Offset Gizmo_Pattern
 	DD 0
 
 

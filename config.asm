@@ -35,6 +35,7 @@ iniNumberKeyF   DB  '%d', 0
 ; Scenario
 iniKeyCasualTerr DB 'CasualTerrain', 0
 iniKeyDanielETP  DB 'ExtendedTriggerPatchLocation', 0
+iniKeyDetailList DB 'DetailedUnitList', 0
 iniKeyHotKeyFunc DB 'HotKeyFunctions', 0
 iniKeyImprovedEd DB 'ImprovedEditor', 0
 iniKeyIsoSiege	 DB 'SiegeWeaponBugFix', 0
@@ -60,14 +61,17 @@ iniKey2ndPage	DB 'SecondPage', 0
 ;iniKeySelfHeal	DB 'SelfHealUnit', 0
 
 ; Enhanced Functions
+iniKeyAdvAdjanc DB 'AdvancedAdjacentMode', 0
 iniKeyAdvTrain	DB 'AdvancedTrainButton', 0
-iniKeyDepositButton DB 'DepositButton', 0
+iniKeyBuildSnd  DB 'BuilderSound', 0
+iniKeyCustomGar DB 'CustomGarrison', 0
+iniKeyDeposBtn  DB 'DepositButton', 0
 iniKeyXAtks		DB 'ExtendedAttacks', 0
 iniKeyIFV		DB 'FunctionGarrison', 0
 iniKeyXGarrison	DB 'MoreGarrisonTypes', 0
 iniKeyRelicMem	DB 'MonkRelicMemory', 0
 iniKeyNewSkills	DB 'NewSkills', 0
-iniKeyRandomUnit DB 'RandomTrain', 0
+iniKeyRandUnit  DB 'RandomTrain', 0
 iniKeyNewHeal   DB 'Regeneration', 0
 iniKeyVillThird DB 'VillagerThirdPage', 0
 iniKeyVisInEd   DB 'VisbilityInEditor', 0

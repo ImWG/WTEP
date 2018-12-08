@@ -15,18 +15,18 @@ TerrainsLoad3@ DD 00584E1CH
 
 SkipBorders@ DD 0057F087H
 
-$__PatchTerrainsStart DD O __PatchTerrainsStart
-$__PatchTerrainsEnd DD O __PatchTerrainsEnd
-$MoreTerrains DD O MoreTerrains
-$MoreTerrains2 DD O MoreTerrains2
-$MoreTerrains_Table DD O MoreTerrains_Table
+$__PatchTerrainsStart DD Offset __PatchTerrainsStart
+$__PatchTerrainsEnd DD Offset __PatchTerrainsEnd
+$MoreTerrains DD Offset MoreTerrains
+$MoreTerrains2 DD Offset MoreTerrains2
+$MoreTerrains_Table DD Offset MoreTerrains_Table
 
-PatchTerrainsAddresses DD O MoreTerrains, O MoreTerrains_1, O MoreTerrains_2
-	DD O MoreTerrains2, O MoreTerrains2_1, O MoreTerrains2_2
+PatchTerrainsAddresses DD Offset MoreTerrains, Offset MoreTerrains_1, Offset MoreTerrains_2
+	DD Offset MoreTerrains2, Offset MoreTerrains2_1, Offset MoreTerrains2_2
 	DD 0H
 
-PatchTerrainsDirectAddresses DD O MoreTerrains_Table_, O MoreTerrains_Table, 1
-	DD O MoreTerrains2_Table_, O MoreTerrains_Table, 1
+PatchTerrainsDirectAddresses DD Offset MoreTerrains_Table_ + 1, Offset MoreTerrains_Table
+	DD Offset MoreTerrains2_Table_ + 1, Offset MoreTerrains_Table
 	DD 0H
 
 

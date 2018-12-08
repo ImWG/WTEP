@@ -1,4 +1,6 @@
 ;EasyCodeName=Modding,1
+; Un-hardcoding and new functions in-game
+
 Include	defines.asm
 
 .Const
@@ -112,177 +114,203 @@ AIUnitLimit2@ DD 00557DD1H
 AIUnitLimit3@ DD 00557EE1H
 
 ;NewCommand@ DD 0051E612H
-QSAttack@ DD 005CE7B2H
+;QSAttack@ DD 005CE7B2H
+
+;MoreOnMinimap1@ DD 00432C61H
+;MoreOnMinimap2@ DD 00432F1EH
+;MoreOnMinimap3@ DD 004337C5H
+;ColoredUnit@ DD 005862A9H
+;ColoredUnit2@ DD 004CEDE7H
+CustomGarrison@ DD 0043429FH
+BuilderSound@ DD 00457304H
+;MoreLang@ DD 0044DE47H
+;AddUnitZPosition@ DD 00414ADAH
+AdvAdjacentMode@ DD 004C9E7DH
 
 
 ; Interfaces
-$__PatchModdingStart DD O __PatchModdingStart
-$__PatchModdingEnd   DD O __PatchModdingEnd
-$SecondPage        DD O SecondPage
-$NewButtons        DD O NewButtons
-$NewButtons2       DD O NewButtons2
-$NewButtonsGr      DD O NewButtonsGr
-$AllHeal		   DD O AllHeal
-$FreeDrop          DD O FreeDrop
-$ExplosionUnit1    DD O ExplosionUnit1
-$ExplosionUnit2    DD O ExplosionUnit2
-$SelfDestructUnit1 DD O SelfDestructUnit1
-$SelfDestructUnit2 DD O SelfDestructUnit2
-$SelfHealUnit1     DD O SelfHealUnit1
-$SelfHealUnit2     DD O SelfHealUnit2
-$AttackGround      DD O AttackGround
-$AttackGround2     DD O AttackGround2
-$CustomBuilder     DD O CustomBuilder
-$CustomBuilder2    DD O CustomBuilder2
-$CustomBuilder3    DD O CustomBuilder3
-$DepositResource   DD O DepositResource
-$AdvTrainButton    DD O AdvancedTrainButton
-$FreeGather        DD O FreeGatherPoint
-$MarketInit        DD O MarketInit
-$ExtendAttacks     DD O ExtendAttacks
-$VillCounterFix    DD O VillagerCounterFix
-;$Repulse           DD O Repulse
-$PickRelic         DD O PickRelic
-$PickRelic2        DD O PickRelic2
-$PickRelic3        DD O PickRelic3
-$PickRelic4        DD O PickRelic4
-$IFV               DD O IFV
-$IFV2              DD O IFV2
-$RandomUnit        DD O RandomUnit
-$TerrFndn          DD O TerrFndn
-$VisInEditor       DD O VisInEditor
-$MoreGarrisonTypes DD O MoreGarrisonTypes
-$MoreGarrison4     DD O MoreGarrison4
-$VillThirdPage1    DD O VillThirdPage1
-$VillThirdPage2    DD O VillThirdPage2
-$VillThirdPage3    DD O VillThirdPage3
-$VillThirdPage4    DD O VillThirdPage4
-$VillThirdPage5    DD O VillThirdPage5
-$TypeInEditor1	   DD O TypeInEditor1
-$TypeInEditor2	   DD O TypeInEditor2
-$TypeInEditor3	   DD O TypeInEditor3
-$TypeInEditor4	   DD O TypeInEditor4
-$TypeInEditor5	   DD O TypeInEditor5
-$TypeInEditor6	   DD O TypeInEditor6
-$TypeInEditor7	   DD O TypeInEditor7
-$TypeInEditor8	   DD O TypeInEditor8
-$TypeInEditor9	   DD O TypeInEditor9
-$NewHealUnit       DD O NewHealUnit
-$AllBuildFnd       DD O AllBuildFnd
-;$NewCommand        DD O NewCommand
-$QSAttack		   DD O QSAttack
+$__PatchModdingStart DD Offset __PatchModdingStart
+$__PatchModdingEnd   DD Offset __PatchModdingEnd
+$SecondPage        DD Offset SecondPage
+$NewButtons        DD Offset NewButtons
+$NewButtons2       DD Offset NewButtons2
+$NewButtonsGr      DD Offset NewButtonsGr
+$AllHeal		   DD Offset AllHeal
+$FreeDrop          DD Offset FreeDrop
+$ExplosionUnit1    DD Offset ExplosionUnit1
+$ExplosionUnit2    DD Offset ExplosionUnit2
+$SelfDestructUnit1 DD Offset SelfDestructUnit1
+$SelfDestructUnit2 DD Offset SelfDestructUnit2
+$SelfHealUnit1     DD Offset SelfHealUnit1
+$SelfHealUnit2     DD Offset SelfHealUnit2
+$AttackGround      DD Offset AttackGround
+$AttackGround2     DD Offset AttackGround2
+$CustomBuilder     DD Offset CustomBuilder
+$CustomBuilder2    DD Offset CustomBuilder2
+$CustomBuilder3    DD Offset CustomBuilder3
+$DepositResource   DD Offset DepositResource
+$AdvTrainButton    DD Offset AdvancedTrainButton
+$FreeGather        DD Offset FreeGatherPoint
+$MarketInit        DD Offset MarketInit
+$ExtendAttacks     DD Offset ExtendAttacks
+$VillCounterFix    DD Offset VillagerCounterFix
+;$Repulse           DD Offset Repulse
+$PickRelic         DD Offset PickRelic
+$PickRelic2        DD Offset PickRelic2
+$PickRelic3        DD Offset PickRelic3
+$PickRelic4        DD Offset PickRelic4
+$IFV               DD Offset IFV
+$IFV2              DD Offset IFV2
+$RandomUnit        DD Offset RandomUnit
+$TerrFndn          DD Offset TerrFndn
+$VisInEditor       DD Offset VisInEditor
+$MoreGarrisonTypes DD Offset MoreGarrisonTypes
+$MoreGarrison4     DD Offset MoreGarrison4
+$VillThirdPage1    DD Offset VillThirdPage1
+$VillThirdPage2    DD Offset VillThirdPage2
+$VillThirdPage3    DD Offset VillThirdPage3
+$VillThirdPage4    DD Offset VillThirdPage4
+$VillThirdPage5    DD Offset VillThirdPage5
+$TypeInEditor1	   DD Offset TypeInEditor1
+$TypeInEditor2	   DD Offset TypeInEditor2
+$TypeInEditor3	   DD Offset TypeInEditor3
+$TypeInEditor4	   DD Offset TypeInEditor4
+$TypeInEditor5	   DD Offset TypeInEditor5
+$TypeInEditor6	   DD Offset TypeInEditor6
+$TypeInEditor7	   DD Offset TypeInEditor7
+$TypeInEditor8	   DD Offset TypeInEditor8
+$TypeInEditor9	   DD Offset TypeInEditor9
+$NewHealUnit       DD Offset NewHealUnit
+$AllBuildFnd       DD Offset AllBuildFnd
+;$NewCommand        DD Offset NewCommand
+$QSAttack		   DD Offset QSAttack
+
+$MoreOnMinimap1    DD MoreOnMinimap1
+$MoreOnMinimap2    DD MoreOnMinimap2
+$MoreOnMinimap3    DD MoreOnMinimap3
+$ColoredUnit       DD ColoredUnit
+$ColoredUnit2      DD ColoredUnit2
+$CustomGarrison    DD CustomGarrison
+$BuilderSound      DD BuilderSound
+$MoreLang          DD MoreLang
+$AddUnitZPosition  DD AddUnitZPosition
+$AdvAdjacentMode   DD AdvAdjacentMode
 
 ; Icons
-$IconHeal          DD O IconHeal
-$IconDepositRes    DD O IconDepositResource
-$IconBuild         DD O IconBuild
-$IconGround        DD O IconGround
-$IconTrain         DD O IconTrain
-$IconUnload        DD O IconUnload
-$IconTeleport      DD O IconTeleport
-$IconDrop          DD O IconDrop
-$IconUnpack        DD O IconUnpack
-$IconPack          DD O IconPack
-$IconGetOut        DD O IconGetOut
-$IconScout         DD O IconScout
-$IconGround2       DD O IconGround2
-$IconPack2         DD O IconPack2
-$IconHeal2         DD O IconHeal2
-$IconUnload2       DD O IconUnload2
+$IconHeal          DD Offset IconHeal
+$IconDepositRes    DD Offset IconDepositResource
+$IconBuild         DD Offset IconBuild
+$IconGround        DD Offset IconGround
+$IconTrain         DD Offset IconTrain
+$IconUnload        DD Offset IconUnload
+$IconTeleport      DD Offset IconTeleport
+$IconDrop          DD Offset IconDrop
+$IconUnpack        DD Offset IconUnpack
+$IconPack          DD Offset IconPack
+$IconGetOut        DD Offset IconGetOut
+$IconScout         DD Offset IconScout
+$IconGround2       DD Offset IconGround2
+$IconPack2         DD Offset IconPack2
+$IconHeal2         DD Offset IconHeal2
+$IconUnload2       DD Offset IconUnload2
 ; Descripions
-$DscHeal           DD O DscHeal
-$DscDepositRes     DD O DscDepositRes
-$DscBuild          DD O DscBuild
-$DscGround         DD O DscGround
-$DscTrain          DD O DscTrain
-$DscUnload         DD O DscUnload
-$DscTeleport       DD O DscTeleport
-$DscDrop           DD O DscDrop
-$DscUnpack         DD O DscUnpack
-$DscPack           DD O DscPack
-$DscGetOut         DD O DscGetOut
-$DscScout          DD O DscScout
-$DscGround2        DD O DscGround2
-$DscPack2          DD O DscPack2
-$DscHeal2          DD O DscHeal2
-$DscUnload2        DD O DscUnload2
+$DscHeal           DD Offset DscHeal
+$DscDepositRes     DD Offset DscDepositRes
+$DscBuild          DD Offset DscBuild
+$DscGround         DD Offset DscGround
+$DscTrain          DD Offset DscTrain
+$DscUnload         DD Offset DscUnload
+$DscTeleport       DD Offset DscTeleport
+$DscDrop           DD Offset DscDrop
+$DscUnpack         DD Offset DscUnpack
+$DscPack           DD Offset DscPack
+$DscGetOut         DD Offset DscGetOut
+$DscScout          DD Offset DscScout
+$DscGround2        DD Offset DscGround2
+$DscPack2          DD Offset DscPack2
+$DscHeal2          DD Offset DscHeal2
+$DscUnload2        DD Offset DscUnload2
 
 ; Position
-$PosDepositRes     DD O PosDepositRes
+$PosDepositRes     DD Offset PosDepositRes
 
-$NewButtons2_Position DD O NewButtons2_Position
-$NewButtons2_Position2 DD O NewButtons2_Position2
+$NewButtons2_Position DD Offset NewButtons2_Position
+$NewButtons2_Position2 DD Offset NewButtons2_Position2
 
 
 ; Addresses for jmp or call
-PatchModdingAddresses DD O NewButtons_0, O NewButtons_1, O NewButtons_2, O NewButtons_3, O NewButtons_4
-		DD O NewButtons_5, O NewButtons_6, O NewButtons_7, O NewButtons_8
-		DD O NewButtons_Back, O NewButtons_Back2, O NewButtons_9, O NewButtons_10, O NewButtons_11
-		DD O NewButtons_12, O NewButtons_13, O NewButtons_14, O NewButtons_15, O NewButtons_16, O NewButtonsB_Create
-		DD O NewButtons2_Back
-		DD O NewButtons2_Market_1, O NewButtons2_Market_2, O NewButtons2_Market_3
-		DD O NewButtons2_Market_4, O NewButtons2_Market_5, O NewButtons2_Market_6
-		DD O NewButtonsGr_0, O NewButtonsGr_1, O NewButtonsGr_2
-		DD O AllHeal_Monk, O AllHeal_1, O AllHeal_2, O AllHeal_3
-		DD O FreeDrop_1, O FreeDrop_2, O FreeDrop_Back, O FreeDrop_Other
-		DD O ExplosionUnit_1
-		DD O SelfDestructUnit_1
-		DD O SelfHealUnit_1
-		DD O AttackGround_1, O AttackGround_2, O AttackGround2_1
-		DD O CustomBuilder_1, O CustomBuilder2_1, O CustomBuilder3_1
-		DD O DepositResource_1, O DepositResource_2
-		DD O AdvancedTrainButton_1, O AdvancedTrainButton_2
-		DD O FreeGatherPoint_0, O FreeGatherPoint_1, O FreeGatherPoint_2
-		DD O FreeGatherPoint_3, O FreeGatherPoint_4, O FreeGatherPoint_5
-		DD O MarketInit_1, O MarketInit_2
-		DD O ExtendAttacks_1
-		DD O VillagerCounterFix_1
-		DD O MoreGarrisonTypes_1, O MoreGarrison4_1
-		;DD O Repulse_2
-		DD O PickRelic_1, O PickRelic2_1, O PickRelic3_1
-		DD O IFV_1, O IFV2_1
-		DD O RandomUnit_Other, O RandomUnit_1
-		DD O TerrFndn_1
-		DD O VisInEditor_1, O VisInEditor_2
+PatchModdingAddresses DD Offset NewButtons_0, Offset NewButtons_1, Offset NewButtons_2, Offset NewButtons_3, Offset NewButtons_4
+		DD Offset NewButtons_5, Offset NewButtons_6, Offset NewButtons_7, Offset NewButtons_8
+		DD Offset NewButtons_Back, Offset NewButtons_Back2, Offset NewButtons_9, Offset NewButtons_10, Offset NewButtons_11
+		DD Offset NewButtons_12, Offset NewButtons_13, Offset NewButtons_14, Offset NewButtons_15, Offset NewButtons_16, Offset NewButtonsB_Create
+		DD Offset NewButtons2_Back
+		DD Offset NewButtons2_Market_1, Offset NewButtons2_Market_2, Offset NewButtons2_Market_3
+		DD Offset NewButtons2_Market_4, Offset NewButtons2_Market_5, Offset NewButtons2_Market_6
+		DD Offset NewButtonsGr_0, Offset NewButtonsGr_1, Offset NewButtonsGr_2
+		DD Offset AllHeal_Monk, Offset AllHeal_1, Offset AllHeal_2, Offset AllHeal_3
+		DD Offset FreeDrop_1, Offset FreeDrop_2, Offset FreeDrop_Back, Offset FreeDrop_Other
+		DD Offset ExplosionUnit_1
+		DD Offset SelfDestructUnit_1
+		DD Offset SelfHealUnit_1
+		DD Offset AttackGround_1, Offset AttackGround_2, Offset AttackGround2_1
+		DD Offset CustomBuilder_1, Offset CustomBuilder2_1, Offset CustomBuilder3_1
+		DD Offset DepositResource_1, Offset DepositResource_2
+		DD Offset AdvancedTrainButton_1, Offset AdvancedTrainButton_2
+		DD Offset FreeGatherPoint_0, Offset FreeGatherPoint_1, Offset FreeGatherPoint_2
+		DD Offset FreeGatherPoint_3, Offset FreeGatherPoint_4, Offset FreeGatherPoint_5
+		DD Offset MarketInit_1, Offset MarketInit_2
+		DD Offset ExtendAttacks_1
+		DD Offset VillagerCounterFix_1
+		DD Offset MoreGarrisonTypes_1, Offset MoreGarrison4_1
+		;DD Offset Repulse_2
+		DD Offset PickRelic_1, Offset PickRelic2_1, Offset PickRelic3_1
+		DD Offset IFV_1, Offset IFV2_1
+		DD Offset RandomUnit_Other, Offset RandomUnit_1
+		DD Offset TerrFndn_1
+		DD Offset VisInEditor_1, Offset VisInEditor_2
 
-		DD O VillThirdPage_1, O VillThirdPage_2, O VillThirdPage_3, O VillThirdPage_4, O VillThirdPage_5, O VillThirdPage_6
-		DD O VillThirdPage_7, O VillThirdPage_8, O VillThirdPage_9, O VillThirdPage_10, O VillThirdPage_11, O VillThirdPage_12
-		DD O VillThirdPage_13, O VillThirdPage_14, O VillThirdPage_15, O VillThirdPage_16
+		DD Offset VillThirdPage_1, Offset VillThirdPage_2, Offset VillThirdPage_3, Offset VillThirdPage_4, Offset VillThirdPage_5, Offset VillThirdPage_6
+		DD Offset VillThirdPage_7, Offset VillThirdPage_8, Offset VillThirdPage_9, Offset VillThirdPage_10, Offset VillThirdPage_11, Offset VillThirdPage_12
+		DD Offset VillThirdPage_13, Offset VillThirdPage_14, Offset VillThirdPage_15, Offset VillThirdPage_16
 
-		DD O TypeInEditor1_1, O TypeInEditor1_2, O TypeInEditor1_3
-		DD O TypeInEditor2_1, O TypeInEditor2_2, O TypeInEditor2_3
-		DD O TypeInEditor3_1, O TypeInEditor3_2, O TypeInEditor3_3
-		DD O TypeInEditor4_1, O TypeInEditor4_2, O TypeInEditor4_3
-		DD O TypeInEditor5_1, O TypeInEditor5_2, O TypeInEditor5_3
-		DD O TypeInEditor6_1, O TypeInEditor6_2, O TypeInEditor6_3
-		DD O TypeInEditor7_1, O TypeInEditor7_2, O TypeInEditor7_3
-		DD O TypeInEditor8_1, O TypeInEditor8_2, O TypeInEditor8_3
-		DD O TypeInEditor9_1
+		DD Offset TypeInEditor1_1, Offset TypeInEditor1_2, Offset TypeInEditor1_3
+		DD Offset TypeInEditor2_1, Offset TypeInEditor2_2, Offset TypeInEditor2_3
+		DD Offset TypeInEditor3_1, Offset TypeInEditor3_2, Offset TypeInEditor3_3
+		DD Offset TypeInEditor4_1, Offset TypeInEditor4_2, Offset TypeInEditor4_3
+		DD Offset TypeInEditor5_1, Offset TypeInEditor5_2, Offset TypeInEditor5_3
+		DD Offset TypeInEditor6_1, Offset TypeInEditor6_2, Offset TypeInEditor6_3
+		DD Offset TypeInEditor7_1, Offset TypeInEditor7_2, Offset TypeInEditor7_3
+		DD Offset TypeInEditor8_1, Offset TypeInEditor8_2, Offset TypeInEditor8_3
+		DD Offset TypeInEditor9_1
 
-		DD O NewHealUnit_1, O NewHealUnit_2
-		DD O AllBuildFnd_1
+		DD Offset NewHealUnit_1, Offset NewHealUnit_2
+		DD Offset AllBuildFnd_1
 
-		DD O QSAttack_1, O QSAttack_2
+		DD Offset QSAttack_1, Offset QSAttack_2
 
-		;DD O NewCommand_1
-
+		;DD Offset NewCommand_1
+		DD MoreOnMinimap1_1, MoreOnMinimap2_1, MoreOnMinimap3_1
+		DD ColoredUnit_1, ColoredUnit2_1, CustomGarrison_1, BuilderSound_1, MoreLang_1, AddUnitZPosition_1
+		DD AdvAdjacentMode_1, AdvAdjacentMode_2
 		DD 0H
 
-PatchModdingAddresses2 DD O ExplosionUnit_01, O AllBuildFnd_01
-		DD O SelfDestructUnit_01, O SelfHealUnit_01
-		DD O VillagerCounterFix_01, O VillagerCounterFix_02
-		DD O AttackGround_01
-		DD O RandomUnit_01
-		;DD O NewCommand_01
+PatchModdingAddresses2 DD Offset ExplosionUnit_01, Offset AllBuildFnd_01
+		DD Offset SelfDestructUnit_01, Offset SelfHealUnit_01
+		DD Offset VillagerCounterFix_01, Offset VillagerCounterFix_02
+		DD Offset AttackGround_01
+		DD Offset RandomUnit_01
+		;DD Offset NewCommand_01
+		DD MoreOnMinimap1_01, MoreOnMinimap2_01, MoreOnMinimap3_01, CustomGarrison_01
+		DD BuilderSound_01, BuilderSound_02, MoreLang_01
 		DD 0H
 
-PatchModdingDirectAddresses DD NewButtons_Table_, O NewButtons_Table, 3
-		DD NewButtons_Table2_, O NewButtons_Table2, 3
-		DD TypeInEditor9_Table_, O TypeInEditor9_Table, 3
+PatchModdingDirectAddresses DD NewButtons_Table_ + 3, NewButtons_Table
+		DD NewButtons_Table2_ + 3, NewButtons_Table2
+		DD TypeInEditor9_Table_ + 3, TypeInEditor9_Table
+		DD AdvAdjacentMode_Table_ + 3, AdvAdjacentMode_Table
  		DD 0H
 
-PatchModdingDirectAddressArrays DD O NewButtons_Table
-		DD O NewButtons_Table2
+PatchModdingDirectAddressArrays DD NewButtons_Table, NewButtons_Table2, AdvAdjacentMode_Table + 4
 		DD 0H
 
 .Data?
@@ -526,10 +554,10 @@ NewButtons_Table_:
 
 Align 4
 NewButtons_Table:
-DD O NewButtons_Other, O NewButtons_Deposit, O NewButtons_Transform, O NewButtons_Train, O NewButtons_Heal
-DD O NewButtons_Build, O NewButtons_Pack, O NewButtons_Unpack, O NewButtons_Ground, O NewButtons_Pack_
-DD O NewButtons_Unpack_, O NewButtons_SingleBuild, O NewButtons_Other, O NewButtons_Unload, O NewButtons_Teleport
-DD O NewButtons_Drop, O NewButtons_Market, O NewButtons_Convert, O NewButtons_Scout, O NewButtons_GetOut, 0H
+DD Offset NewButtons_Other, Offset NewButtons_Deposit, Offset NewButtons_Transform, Offset NewButtons_Train, Offset NewButtons_Heal
+DD Offset NewButtons_Build, Offset NewButtons_Pack, Offset NewButtons_Unpack, Offset NewButtons_Ground, Offset NewButtons_Pack_
+DD Offset NewButtons_Unpack_, Offset NewButtons_SingleBuild, Offset NewButtons_Other, Offset NewButtons_Unload, Offset NewButtons_Teleport
+DD Offset NewButtons_Drop, Offset NewButtons_Market, Offset NewButtons_Convert, Offset NewButtons_Scout, Offset NewButtons_GetOut, 0H
 
 NewButtons_Other:
 	Pop Eax
@@ -546,8 +574,8 @@ NewButtons_Table2_: ; Vice Skill
 
 Align 4
 NewButtons_Table2:
-DD O NewButtonsB_Other, O NewButtonsB_Ground, O NewButtonsB_Pack, O NewButtonsB_Heal, O NewButtonsB_Unload
-DD O NewButtonsB_Other, O NewButtonsB_Other, O NewButtonsB_Other, 0H
+DD Offset NewButtonsB_Other, Offset NewButtonsB_Ground, Offset NewButtonsB_Pack, Offset NewButtonsB_Heal, Offset NewButtonsB_Unload
+DD Offset NewButtonsB_Other, Offset NewButtonsB_Other, Offset NewButtonsB_Other, 0H
 
 NewButtonsB_Ground:
 	SimpleButtonArgs 1020H, [Ebp + 4], 60, 23, 4923, IconGround2, _, DscGround2 ; Attack Ground
@@ -2400,6 +2428,209 @@ QSAttack_Skip:
 	Add Esp, 8H
 QSAttack_1:
 	FakeJmp 005CE817H
+
+
+; Minimap mode: 11-lined square, 12-X
+MoreOnMinimap1: ; 00432C61h - Flare X
+	Cmp Byte Ptr Ds:[Edx + 096H], 12
+MoreOnMinimap1_01:
+	FakeJe 00432C69H
+	Cmp Word Ptr Ds:[Edx + 10H], 112H
+MoreOnMinimap1_1:
+	FakeJmp 00432C67H
+
+MoreOnMinimap2: ; 00432F1Eh - Wonder lined square
+	Cmp Byte Ptr Ds:[Eax + 096H], 11
+	Mov Eax, 4
+MoreOnMinimap2_01:
+	FakeJe 00432F2EH
+	Cmp Cx, 114H
+MoreOnMinimap2_1:
+	FakeJmp 00432F23H
+
+MoreOnMinimap3: ; 004337C7h - Wonder Patch 2
+	Cmp DWord Ptr Ss:[Esp + 10H], 11
+MoreOnMinimap3_01:
+	FakeJe 004337D6H
+MoreOnMinimap3_1:
+	FakeJmp 00433892H
+
+
+ColoredUnit: ;005862A9H
+	Push Ecx
+	Mov Ecx, Esi
+	Call ColoredUnit_GetColor
+	Pop Ecx
+ColoredUnit_1:
+	FakeJmp 005862AFH
+
+ColoredUnit2: ;004CEDE7H
+	Push Ecx
+	Mov Ecx, Esi
+	Call ColoredUnit_GetColor
+	Mov Edx, Eax
+	Pop Ecx
+ColoredUnit2_1:
+	FakeJmp 004CEDEDH
+
+
+ColoredUnit_GetColor:
+	Push Esi
+	Push Edi
+	Push Ebx
+	Push Edx
+	Mov Esi, Ecx
+	Mov Edi, DWord Ptr Ds:[Esi + 0CH]
+	Mov Eax, DWord Ptr Ds:[Esi + 08H]
+;	Cmp Byte Ptr Ds:[Eax + 4H], 70 ; Only 70+ Units
+;	Jl ColoredUnit_GetColor_Normal
+	;Mov Ax, Word Ptr Ds:[Eax + 0EH] ; (Unused)"Language DLL Creation", ColorMask = 0C800H(51200)
+	;Cmp Ah, 0C8H - 100H
+	Mov Al, Byte Ptr Ds:[Eax + 56H] ; "Hide In Editor", [64,127]
+.If Al >= 64
+	Sub Al, 64
+	Mov Ebx, DWord Ptr Ds:[Edi + 8CH]
+	Mov Ecx, DWord Ptr Ds:[Ebx + 78H]
+	Movzx Eax, Al
+	.If Al == 63
+		Mov Al, Byte Ptr Ds:[681A20H] ; Time
+		And Al, 7
+	.EndIf
+	.If Al >= Cl
+		Xor Al, Al
+	.EndIf
+	Mov Esi, DWord Ptr Ds:[Ebx + 7CH]
+	Mov Eax, DWord Ptr Ds:[Eax * 4 + Esi]
+.Else
+;ColoredUnit_GetColor_Normal:
+	Mov Eax, DWord Ptr Ds:[Edi + 160H]
+.EndIf
+	Pop Edx
+	Pop Ebx
+	Pop Edi
+	Pop Esi
+	Retn
+
+
+; Allow garrison by id of task
+CustomGarrison: ; 0043429FH, EDX = Shelter, EBP = Unit
+	Push Esi
+	Push Edi
+	Push Ebp
+	Push Eax
+
+	Mov Ax, Word Ptr Ds:[Edx + 10H]
+	Mov Edi, DWord Ptr Ds:[Ebp + 0FCH]
+	Test Edi, Edi
+	Je CustomGarrison_Skip
+	Mov Esi, DWord Ptr Ds:[Edi + 8H]
+	Test Esi, Esi
+	Je CustomGarrison_Skip
+	Mov Ebp, DWord Ptr Ds:[Edi + 4H]
+.Repeat
+	Mov Edi, DWord Ptr Ds:[Ebp]
+	Cmp Ax, Word Ptr Ds:[Edi + 0AH]
+	Je CustomGarrison_Do
+	Add Ebp, 4
+	Dec Esi
+.Until Zero?
+CustomGarrison_Skip:
+	Pop Eax
+	Pop Ebp
+	Pop Edi
+	Pop Esi
+	Cmp Byte Ptr Ds:[Edx + 4H], 50H
+CustomGarrison_01:
+	FakeJne 004343FCH
+CustomGarrison_1:
+	FakeJmp 004342A5H
+
+CustomGarrison_Do:
+	Add Esp, 10H
+	Mov Eax, Edi
+	Pop Edi
+	Pop Esi
+	Pop Ebp
+	Pop Ebx
+	Add Esp, 18H
+	Retn 20H
+
+; Allow Custom Builder Sound (Attack Sound)
+BuilderSound: ;00457304h
+	Mov Al, Byte Ptr Ds:[Ecx + 110H]
+	Cmp Al, 2
+BuilderSound_01:
+	FakeJe 0045730DH
+	Cmp Al, 1
+BuilderSound_02:
+	FakeJe 0045731EH
+	Push Esi
+	Mov Edx, DWord Ptr Ds:[Ecx]
+	Call DWord Ptr Ds:[Edx + 30H]
+BuilderSound_1:
+	FakeJmp 0045732DH
+
+
+; Allow units to have 32768 to 65534 lang ids
+MoreLang:  ;0044DE47h
+	Mov Ax, Word Ptr Ds:[Edx + 0CH]
+	Cmp Ax, -1
+MoreLang_01:
+	FakeJe 0044DEDDH
+MoreLang_1:
+	FakeJmp 0044DE54H
+
+
+AddUnitZPosition: ; 00414ADAh
+	Push 1H
+	Push 3F800000H
+	Push Ecx
+AddUnitZPosition_1:
+	FakeJmp 00414ADFH
+
+
+; Advanced Adjacent Mode
+AdvAdjacentMode: ; @004C9E7DH
+	Call DWord Ptr Ds:[Edx + 304H]
+	Mov Ecx, DWord Ptr Ds:[Esi + 8H]
+	Movzx Eax, Byte Ptr Ds:[Ecx + 1C8H] ; Adj.Mode
+	Dec Eax
+.If Al >= 2
+AdvAdjacentMode_1:
+	FakeJmp 004C9E83H
+.EndIf
+AdvAdjacentMode_Table_:
+	Jmp DWord Ptr Ds:[Eax * 4 + 11111111H]
+
+AdvAdjacentMode_Ortho: ; Like RA2
+	Xor Edx, Edx
+	Mov Eax, DWord Ptr Ss:[Esp + 10H]
+	Test Eax, Eax
+.If !Zero?
+	Or Dl, 1
+.EndIf
+	Mov Eax, DWord Ptr Ss:[Esp + 08H]
+	Test Eax, Eax
+.If !Zero?
+	Or Dl, 2
+.EndIf
+	Mov Eax, DWord Ptr Ss:[Esp + 0CH]
+	Test Eax, Eax
+.If !Zero?
+	Or Dl, 4
+.EndIf
+	Mov Eax, DWord Ptr Ss:[Esp + 04H]
+	Test Eax, Eax
+.If !Zero?
+	Or Dl, 8
+.EndIf
+	Push Edx
+	;Mov Ecx, Esi
+AdvAdjacentMode_2:
+	FakeJmp 004C9F04H
+
+AdvAdjacentMode_Table:
+	DD 004C9E83H, AdvAdjacentMode_Ortho, 0
 
 
 

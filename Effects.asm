@@ -1,4 +1,6 @@
 ;EasyCodeName=Effects,1
+; New trigger effects and extension to scenario editor
+
 Include	defines.asm
 Include	unitattrs.asm
 
@@ -29,7 +31,18 @@ CasualTerrainB3@	DD 0045F980H
 HiddenUnit@			DD 004E0AAFH
 HiddenUnit2@		DD 004E0D8FH
 HiddenUnit3@		DD 004E5025H
-InternalName@		DD 004E1056H
+;InternalName@		DD 004E1056H
+InternalName1@ DD 004E0E81H
+InternalName2@ DD 004E0F21H
+InternalName3@ DD 004E102FH
+InternalName4@ DD 004E10EDH
+InternalName5@ DD 004E119BH
+InternalName6@ DD 004E1230H
+InternalName7@ DD 004E12CCH
+InternalName8@ DD 004E1399H
+InternalName9@ DD 004E141FH
+
+
 
 
 ; Isolated patches
@@ -82,11 +95,20 @@ $CasualTerrainB3 DD CasualTerrainB3
 $HiddenUnit DD HiddenUnit
 $HiddenUnit2 DD HiddenUnit2
 $HiddenUnit3 DD HiddenUnit3
-$InternalName DD InternalName
+;$InternalName DD InternalName
 $ChangeAttack DD ChangeAttackPatch
 $AIScriptGoal DD AIScriptGoal
 $ChangeName DD ChangeName
 
+$InternalName1 DD InternalName1
+$InternalName2 DD InternalName2
+$InternalName3 DD InternalName3
+$InternalName4 DD InternalName4
+$InternalName5 DD InternalName5
+$InternalName6 DD InternalName6
+$InternalName7 DD InternalName7
+$InternalName8 DD InternalName8
+$InternalName9 DD InternalName9
 
 $HotKeySwitch DD HotKeySwitch
 $HotKeySwitch2 DD HotKeySwitch2
@@ -107,30 +129,35 @@ PatchEffectsAddresses DD CustomColorInfo_1, CustomColorInfo_2, CustomColorInfo2_
 	DD HotKeySwitch_CasualTerrain_1, HotKeySwitch_HiddenUnit_1, HotKeySwitch_InternalName_1
 	DD CasualTerrainB_1, CasualTerrainB2_1, CasualTerrainB2_2, CasualTerrainB3_1
 	DD HiddenUnit_1, HiddenUnit2_1, HiddenUnit3_1
-	DD InternalName_1
+	;DD InternalName_1
 	DD AIScriptGoal_1, AIScriptGoal_2, AIScriptGoal_3, AIScriptGoal_4, AIScriptGoal_5
 	DD TaskObject_Teleport_1, ChangeName_1
+	DD InternalName_1, InternalName_2, InternalName_3, InternalName_4, InternalName_5
+	DD InternalName_6, InternalName_7, InternalName_8, InternalName_9
+	DD InternalNameFormat_1, InternalNameFormat_2
 	DD 0H
 
 PatchEffectsAddresses2 DD CreateUnit_01, MoveSight_01, TaskObject_01
 	DD RemoveUnit_01
 	DD CasualTerrainB_01, CasualTerrainB2_01, CasualTerrainB3_01, CasualTerrainB3_02
 	DD HiddenUnit_01, HiddenUnit_02, HiddenUnit2_01, HiddenUnit2_02, HiddenUnit3_01, HiddenUnit3_02
-	DD InternalName_01, InternalName_02
+	;DD InternalName_01, InternalName_02
 	DD AIScriptGoal_01, AIScriptGoal_02
 	DD TaskObject_01, ChangeName_01, ChangeAttack_01
 	DD 0H
 
-PatchEffectsDirectAddresses DD KillObject_Table_, KillObject_Table, 3
-	DD KillObject_Table2_, KillObject_Table2, 3
-	DD KillObject_CallTable_, KillObject_CallTable, 3
-	DD KillObject_CallTable2_, KillObject_CallTable2, 3
-	DD TaskObject_Table_, TaskObject_Table, 3
-	DD Tribute_Table_, Tribute_Table, 3
-	DD DamageUnit_Table_, DamageUnit_Table, 3
-	DD ChangeAttack_Table_, ChangeAttack_Table, 3
-	;DD HotKeySwitch_CasualTerrain, HotKeySwitch_Flag, 1
-	;DD HotKeySwitch_CasualTerrain_Attr, HotKeySwitch_Flag, 1
+PatchEffectsDirectAddresses DD KillObject_Table_ + 3, KillObject_Table
+	DD KillObject_Table2_ + 3, KillObject_Table2
+	DD KillObject_CallTable_ + 3, KillObject_CallTable
+	DD KillObject_CallTable2_ + 3, KillObject_CallTable2
+	DD TaskObject_Table_ + 3, TaskObject_Table
+	DD Tribute_Table_ + 3, Tribute_Table
+	DD DamageUnit_Table_ + 3, DamageUnit_Table
+	DD ChangeAttack_Table_ + 3, ChangeAttack_Table
+	DD InternalNameFormat_Pattern1_ + 1, IntNamePattern1
+	DD InternalNameFormat_Pattern2_ + 1, IntNamePattern2
+	;DD HotKeySwitch_CasualTerrain+1, HotKeySwitch_Flag
+	;DD HotKeySwitch_CasualTerrain_Attr+1, HotKeySwitch_Flag
 	DD 0H
 
 PatchEffectsDirectAddressArrays DD TaskObject_Table, Tribute_Table, DamageUnit_Table
@@ -179,6 +206,10 @@ IsoSiege2N			DD 2
 IsoSiege3			DB 0E9H, 0CCH, 00H, 00H, 00H, 90H
 IsoSiege3N			DD 6
 
+InternalNameFormatB DB 90H
+InternalNameFormatBN DD 1
+InternalNameFormatB2 DB 10H
+InternalNameFormatB2N DD 1
 
 .Code
 
@@ -538,9 +569,9 @@ Tribute_Table_:
 	Jmp DWord Ptr Ds:[Edx * 4 + 11111111H]
 Align 4
 Tribute_Table:
-	DD Tribute_Default, O Tribute_Instant, O Tribute_Multiply, O Tribute_Convert, O Tribute_Product
-	DD Tribute_Division, O Tribute_Default, O Tribute_Default, O Tribute_Random, O Tribute_Random
-	DD Tribute_1000Div, O Tribute_Instant_1000Div, O Tribute_Multiply_1000Div, 0
+	DD Tribute_Default, Offset Tribute_Instant, Offset Tribute_Multiply, Offset Tribute_Convert, Offset Tribute_Product
+	DD Tribute_Division, Offset Tribute_Default, Offset Tribute_Default, Offset Tribute_Random, Offset Tribute_Random
+	DD Tribute_1000Div, Offset Tribute_Instant_1000Div, Offset Tribute_Multiply_1000Div, 0
 
 Tribute_1000Div:
 	Fild DWord Ptr Ds:[Edi + 10H]
@@ -711,7 +742,7 @@ DamageUnit_Table_:
 ; 7 - Load HP from Resource
 Align 4
 DamageUnit_Table:
-	DD DamageUnit_, O DamageUnit_1, DamageUnit_Perm, DamageUnit_Perm, DamageUnit_LostPerm
+	DD DamageUnit_, Offset DamageUnit_1, DamageUnit_Perm, DamageUnit_Perm, DamageUnit_LostPerm
 	DD DamageUnit_CurrentPerm, 0 ;
 
 DamageUnit_:
@@ -1075,8 +1106,8 @@ __KillObject_Functions__
 
 Align 4
 KillObject_CallTable:
-	DD KillObject_Char, O KillObject_Word, O KillObject_DWord, O KillObject_Float
-	DD KillObject_Image, O KillObject_Sound, O KillObject_Attack, O KillObject_Defense, 0
+	DD KillObject_Char, Offset KillObject_Word, Offset KillObject_DWord, Offset KillObject_Float
+	DD KillObject_Image, Offset KillObject_Sound, Offset KillObject_Attack, Offset KillObject_Defense, 0
 
 Align 4
 KillObject_Table:
@@ -1127,7 +1158,7 @@ KillObject_CallTable2_:
 
 Align 4
 KillObject_CallTable2:
-	DD KillObject2_Char, O KillObject2_Word, O KillObject2_DWord, O KillObject2_Float, O KillObject2_Angle, 0
+	DD KillObject2_Char, Offset KillObject2_Word, Offset KillObject2_DWord, Offset KillObject2_Float, Offset KillObject2_Angle, 0
 
 Align 4
 KillObject_Table2:
@@ -1287,10 +1318,10 @@ AIScriptGoal_2:
 
 AIScriptGoal_Off:
     Mov Ecx, [Esp + 18H]
-    mov edx,[edi+0Ch]
-    push edx
-    mov eax,[ecx]
-    call AIScriptGoalOff
+    Mov Edx, [Edi + 0CH]
+    Push Edx
+    Mov Eax, [Ecx]
+    Call AIScriptGoalOff
     __EffectPostfix__
 
 AIScriptGoal_Color:
@@ -1363,8 +1394,8 @@ ChangeName_1:
 
 Align 4
 HotKeySwitch: ; Function Table
-	DB 00H, 0FH, 02H, 03H, 0FH, 0FH, 0FH, 11H, 0FH, 12H, 0FH, 0FH, 04H, 0FH, 05H, 06H ; A~P
-	DB 10H, 07H, 01H, 08H, 09H, 0AH, 0BH, 0CH, 0DH, 0EH, 0FH, 0FH, 0FH, 0FH, 0FH, 0FH ; Q~Z,[\]^_`
+	DB 00H, 01H, 02H, 03H, 0FH, 0FH, 0FH, 11H, 0FH, 12H, 0FH, 0FH, 04H, 0FH, 05H, 06H ; A~P
+	DB 0FH, 07H, 01H, 08H, 09H, 0AH, 0BH, 0CH, 0DH, 0EH, 0FH, 0FH, 0FH, 0FH, 0FH, 0FH ; Q~Z,[\]^_`
 	DB 0FH, 0FH, 0FH, 0FH, 0FH, 0FH, 0FH, 0FH, 0FH, 0FH, 0FH, 0FH, 0FH, 0FH, 0FH, 0FH ; a~p
 	DB 0FH, 0FH, 0FH, 0FH, 0FH, 0FH, 0FH, 0CH, 0DH, 0EH ; q~z
 
@@ -1375,11 +1406,7 @@ HotKeySwitch2:
 	DD 004F1FCAH, 004F200AH, 004F204AH, 004F208AH
 	DD 004F2135H, 004F2179H, 004F2157H, 004F2331H
 HotKeySwitch2_Table:
-	DD HotKeySwitch_CasualTerrain, O HotKeySwitch_HiddenUnit, O HotKeySwitch_InternalName, 0H
-
-;Align 4
-;HotKeySwitch_Flag:
-;	DD 0H
+	DD HotKeySwitch_CasualTerrain, Offset HotKeySwitch_HiddenUnit, Offset HotKeySwitch_InternalName, 0H
 
 HotKeySwitch_CasualTerrain: ; Ctrl+Q
 	Mov Eax, DWord Ptr Ds:[HotKeySwitchFlag]
@@ -1495,16 +1522,158 @@ HiddenUnit3_1:
 	FakeJmp 004E502BH
 
 
-InternalName: ; 004E1056h
-	Test DWord Ptr Ds:[HotKeySwitchFlag], 04H
-InternalName_01:
-	FakeJe 004E105CH
-	Cmp Byte Ptr Ds:[Esi + Edx], 0
-InternalName_02:
-	FakeJne 004E108CH
-InternalName_1:
-	FakeJmp 004E105CH
+; Show internal names and ids in unit list in scenario editor.
+InternalNameFormat:
+	Push Ebp
+	Push Ebx
+	Push Edi
+	Push Esi
 
+	Mov Ebp, DWord Ptr Ss:[Esp + 14H]
+	Mov Edx, DWord Ptr Ds:[Ecx + 74H]
+	Mov Eax, DWord Ptr Ds:[Ebp * 4 + Edx]
+	Mov Edi, DWord Ptr Ds:[Eax + 8H]
+	Mov Esi, DWord Ptr Ss:[Esp + 18H]
+	Cmp Byte Ptr Ds:[Esi], 0
+.If Zero?
+	Push Ebp
+	Push Edi
+InternalNameFormat_Pattern2_:
+	Push 11111111H
+	Push 785FB8H ; Target Str
+InternalNameFormat_1:
+	FakeCall 0061442BH
+	Add Esp, 10H
+.Else
+	Push Ebp
+	Push Edi
+	Push Esi
+InternalNameFormat_Pattern1_:
+	Push 11111111H
+	Push 785FB8H ; Target Str
+InternalNameFormat_2:
+	FakeCall 0061442BH
+	Add Esp, 14H
+.EndIf
+	Mov Eax, 785FB8H
+	Pop Esi
+	Pop Edi
+	Pop Ebx
+	Pop Ebp
+	Retn 8H
+
+InternalName1: ; Units
+	Mov Ecx, DWord Ptr Ss:[Esp + 24H]
+	Push Esi
+	Push Ebp
+	Call InternalNameFormat
+	Mov Edi, Eax
+	Xor Eax, Eax
+	Or Ecx, 0FFFFFFFFH
+InternalName_1:
+	FakeJmp 004E0E9CH
+
+InternalName2: ; Units 2
+	Mov Ecx, DWord Ptr Ss:[Esp + 24H]
+	Push Esi
+	Push Ebp
+	Call InternalNameFormat
+	Mov Edi, Eax
+	Xor Eax, Eax
+	Or Ecx, 0FFFFFFFFH
+InternalName_2:
+	FakeJmp 004E0F3CH
+
+InternalName3: ; Buildings no-dll
+	Test Dx, Dx
+	Jle InternalName3_None
+	Mov Ecx, DWord Ptr Ds:[7912A0H]
+	Push 64H
+	Push Eax
+	Movsx Eax, Dx
+	Push Eax
+	Mov Edi, DWord Ptr Ds:[Ecx]
+	Push 2
+	Call DWord Ptr Ds:[Edi + 20H]
+InternalName3_None:
+	Mov Ecx, DWord Ptr Ss:[Esp + 24H]
+	Push Eax
+	Push Ebp
+	Call InternalNameFormat
+	Mov Edi, Eax
+	Xor Eax, Eax
+	Or Ecx, 0FFFFFFFFH
+InternalName_3:
+	FakeJmp 004E106EH
+
+InternalName4: ; Heroes
+	Mov Ecx, DWord Ptr Ss:[Esp + 24H]
+	Push Esi
+	Push Ebp
+	Call InternalNameFormat
+	Mov Edi, Eax
+	Xor Eax, Eax
+	Or Ecx, 0FFFFFFFFH
+InternalName_4:
+	FakeJmp 004E1108H
+
+InternalName5: ; Buildings
+	Mov Ecx, DWord Ptr Ss:[Esp + 24H]
+	Push Esi
+	Push Ebp
+	Call InternalNameFormat
+	Mov Edi, Eax
+	Xor Eax, Eax
+	Or Ecx, 0FFFFFFFFH
+InternalName_5:
+	FakeJmp 004E11B6H
+
+InternalName6: ; Heroes
+	Mov Ecx, DWord Ptr Ss:[Esp + 24H]
+	Push Esi
+	Push Ebp
+	Call InternalNameFormat
+	Mov Edi, Eax
+	Xor Eax, Eax
+	Or Ecx, 0FFFFFFFFH
+InternalName_6:
+	FakeJmp 004E124BH
+
+InternalName7: ; Heroes
+	Mov Ecx, DWord Ptr Ss:[Esp + 24H]
+	Push Esi
+	Push Ebp
+	Call InternalNameFormat
+	Mov Edi, Eax
+	Xor Eax, Eax
+	Or Ecx, 0FFFFFFFFH
+InternalName_7:
+	FakeJmp 004E12E3H
+
+InternalName8: ; Heroes
+	Mov Ecx, DWord Ptr Ss:[Esp + 24H]
+	Push Esi
+	Push Ebp
+	Call InternalNameFormat
+	Mov Edi, Eax
+	Xor Eax, Eax
+	Or Ecx, 0FFFFFFFFH
+InternalName_8:
+	FakeJmp 004E13B4H
+
+InternalName9: ; Heroes
+	Mov Ecx, DWord Ptr Ss:[Esp + 24H]
+	Push Ebx
+	Push Ebp
+	Call InternalNameFormat
+	Mov Edi, Eax
+	Xor Eax, Eax
+	Or Ecx, 0FFFFFFFFH
+InternalName_9:
+	FakeJmp 004E1436H
+
+IntNamePattern1 DB '%s|%s, %d', 0
+IntNamePattern2 DB '%s, %d', 0
 
 
 Align 4

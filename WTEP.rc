@@ -4,8 +4,8 @@ IDR_VERSION                   ICON	DISCARDABLE	"Res\\hawk.ico"
 
 
 IDR_VERSION VERSIONINFO
- FILEVERSION 1,5,1,061
- PRODUCTVERSION 1,5,1,061
+ FILEVERSION 1,5,3,120
+ PRODUCTVERSION 1,5,3,120
  FILEFLAGSMASK 0x3L
  FILEFLAGS 0x1L
  FILEOS 0x4L
@@ -19,12 +19,12 @@ BEGIN
             VALUE "Comments", "Programmed in assembly with Easy Code\0"
             VALUE "CompanyName", "WAIFor's Workshop\0"
             VALUE "FileDescription", "WAIFor's Trigger Effects & Modding Patch (Final Version For UP 1.4RC)\0"
-            VALUE "FileVersion", "1.05.1.0611\0"
+            VALUE "FileVersion", "1.05.3.1206\0"
             VALUE "InternalName", "WTEP\0"
             VALUE "LegalCopyright", "Copyright 2016 WAIFor\0"
             VALUE "OriginalFilename", "WTEP.exe\0"
             VALUE "ProductName", "WAIFor's Trigger Effects Patch\0"
-            VALUE "ProductVersion", "1.05.1.0611\0"
+            VALUE "ProductVersion", "1.05.3.1206\0"
         END
     END
     BLOCK "VarFileInfo"
