@@ -223,3 +223,10 @@ v1.05.01.0611: (for 1.5)
 
 v1.05.02.0710:
 - Fixed one bug causing game file too large and corrupted.
+
+v1.05.03.1208:
+- Now available on Userpatch 1.5 RC.
+- Added functions: Custom Garrison, Builder Sound, Advanced Adjacent
+  Mode and Detailed Unit List.
+- Gizmo module is contained in package.
+- Changed algorithm of writing direct addresses.

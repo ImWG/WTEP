@@ -1,8 +1,8 @@
 =============================================================
 
                WAIFor's Trigger & Extension Patch
-                    For UP 1.4RC & 1.5 Version
-                          1.04/05.02.0710
+                      For UP 1.4RC & 1.5RC
+                          1.04/05.03.1208
 
                      By WAIFor, 2016-2018
 
@@ -14,7 +14,7 @@ then run "wtep.exe", you'll get some amazing new effects!
 Besides, you can use this for modding. You can set modding settings in ini file.
 Currently there are only one modding patch, making every building has page button.
 
-Please use UserPatch 1.4 RC(by 1.04.01.0611) or 1.5(by 1.05.01.0611) core file.
+Please use UserPatch 1.4 RC(by 1.04.01.0611) or 1.5 RC(by 1.05.03.1208) core file.
 The size of main exe file should be 3,072 KB. Daniel Pereira's Trigger Patch 1.5
 is okay, too.
 Before first run for one exe, this launcher would change size of the exe file,
@@ -24,6 +24,7 @@ modifying ini contents.
 
 You can set config ini file by command line arguments. For example, run
 "wtep setting.ini" means to use setting.ini as config file, instead of wtep.ini
+Create a batch file(.bat) is convenient.
 
 
 
@@ -38,32 +39,20 @@ You can set config ini file by command line arguments. For example, run
 
 - Key and values in section Effects:
 
-    [CasualTerrain=] (1.4 Only)
-    Activation of this item would make terrain editing more casually - creating 
-    waters without generating shores, or on ridged base. Beaches would not be
-    replaced while painting neighborhood.
-    Besides, it could affect generations of random map. So it is recommended that
-    you activate this in the launcher instead of changing EXE.
-
-    [ExtendedTriggerPatchLocation=] (1.4 Only)
-    Originally, the location of DLL file of Daniel Pereira's Extended Triggers
-    Patch is in "age2_x1\language.dll". You can change it, by typing a new path
-    here(e.g. Games\abcd\triggers.dll).
+    [DetailedUnitList=] (1.5 Only)
+    If set to 1, unit lists in scenario editor would be detailed. They'd display
+    internal names and ids also, making trigger editing and distinguish of same
+    name units easier.
 
     [HotKeyFunctions=]
     Enable some hot key effects:
-    Ctrl+Q - Toggle casual terrain draw mode
+    Ctrl+Q - Toggle casual terrain draw mode (Not used in 1.5, use Ctrl+B instead)
     Ctrl+H - Toggle appearance of hidden units
     Ctrl+J - Toggle buildings shown as internal names
 
     [ImprovedEditor=]
     In order to enable some improvement of editor, please set this as 1.
 
-    [MoreResources=] (1.4 Only)
-    Activate more resources in trigger's tribute list, like berseker's healing
-    rate, building rate, etc. You can also set language dlls in section
-    "NewResourceLanguages".
-    
     [NewEffects=]
     0 means no new effects, 1 is to enable them. 2 is to be compatible with Daniel
     Pereira's ETP 1.5 - so that you can type 5 characters in "Number" box.
@@ -76,7 +65,25 @@ You can set config ini file by command line arguments. For example, run
     This item can enable "Task Object" to order projectiles when set as 1. You
     can control projectiles' action now. Don't worry about moving projectiles
     shot by others unwillingly, because they're of negative ids!
-    However, we don't recommand you to use this function, you can use Petrol instead.
+    However, we don't recommand you to use this function, you can use Petrol
+    instead.
+
+    [CasualTerrain=] (1.4 Only)
+    Activation of this item would make terrain editing more casually - creating 
+    waters without generating shores, or on ridged base. Beaches would not be
+    replaced while painting neighborhood.
+    Besides, it could affect generations of random map. So it is recommended that
+    you activate this in the launcher instead of changing EXE.
+
+    [ExtendedTriggerPatchLocation=] (1.4 Only)
+    Originally, the location of DLL file of Daniel Pereira's Extended Triggers
+    Patch is in "age2_x1\language.dll". You can change it, by typing a new path
+    here(e.g. Games\abcd\triggers.dll).
+
+    [MoreResources=] (1.4 Only)
+    Activate more resources in trigger's tribute list, like berseker's healing
+    rate, building rate, etc. You can also set language dlls in section
+    "NewResourceLanguages".
 
 
 - New effects:
@@ -252,13 +259,6 @@ You can set config ini file by command line arguments. For example, run
 
 - Unhardcoding Functions:
 
-    [AIUnitLimit=] (1.4 Only)
-    WARNING: This is a test function. We don't recommend you to use that.
-    In original version, units with id >= 900 will be ignored by AI in counting and 
-    training location. So you can change the limitation by setting the value. For
-    example, set as 1500 will make units from #0 to #1499 available to AI. Default
-    is keep as it before.
-
     [AllClassBuildFoundations=]
     0 - Only units of class 4 can put foundations (except #125 - the Fish Trap), class 21
         could put foundations of #125.
@@ -273,6 +273,11 @@ You can set config ini file by command line arguments. For example, run
         #550 (Onager), #588 (Siege Onager), or class=54 can attack ground.
     1 - Units with Attack Mode / Attack Reaction=6 or skill 8 can attack ground.
 
+    [BuilderSound=] (1.5 Only)
+    0 - Any units except female villager builder will use male builder sound when set
+        foundations.
+    1 - Units will use their attack sound as build sound.
+
     [CustomBuilder=]
     0 - When Command Id=9, units have #13 - Fishing Boat's build page.
     1 - When Command Id=9, if units have Unit Attribute 8th on, they have unique build
@@ -283,13 +288,6 @@ You can set config ini file by command line arguments. For example, run
     1 - When Command Id=3, if units have Unit Attribute 8th on, they have unique build
         pages, or else Build Page #118. If units have skill 5, they can enter specified
         building pages.
-
-    [ExplosionUnit=] (1.4 Only)
-    0 - Only units with id #440 (Petard), #527 (Explosive Boat), #528 (Heavy Explosive Boat)
-        or #706 (Saboteur) would do damage when they die.
-    1 - Except units with ids above, if a unit has Unit Attribute 4th checked, it would
-        do death damage as well.
-    2 - Only units with Unit Attributes / Unit Trait 4th checked could do death damage.
 
     [FixVillagerCounter=]
     0 - Class-4 units under attack by wild animals, if their Villager Mode is 1, they would
@@ -329,9 +327,23 @@ You can set config ini file by command line arguments. For example, run
     0 - None
     1 - All buildings have a corner next page button (unless covered by other button)
 
+    [AIUnitLimit=] (1.4 Only)
+    WARNING: This is a test function. We don't recommend you to use that.
+    In original version, units with id >= 900 will be ignored by AI in counting and 
+    training location. So you can change the limitation by setting the value. For
+    example, set as 1500 will make units from #0 to #1499 available to AI. Default
+    is keep as it before.
+
+    [ExplosionUnit=] (1.4 Only)
+    0 - Only units with id #440 (Petard), #527 (Explosive Boat), #528 (Heavy Explosive Boat)
+        or #706 (Saboteur) would do damage when they die.
+    1 - Except units with ids above, if a unit has Unit Attribute 4th checked, it would
+        do death damage as well.
+    2 - Only units with Unit Attributes / Unit Trait 4th checked could do death damage.
+
     [SelfDestructUnit=] (1.4 Only)
     0 - Only units with id #440, #527, #528 or #706 would die hen they attacked.
-    1 - Except units with ids above, if a unit's Attack Mode=5, the unit would die when attacked.
+    1 - Except units with ids above, if a unit's Attack Mode=5, the unit would die when         attacked.
     2 - Only units with Attack Mode=5 would die when attacked.
 
     [SelfHealUnit=] (1.4 Only)
@@ -343,12 +355,24 @@ You can set config ini file by command line arguments. For example, run
 
 - Enhancing Functions:
 
+    [AdvancedAdjacentMode=] (1.5 Only)
+    0 - None.
+    1 - If Adjacent Mode was 2, walls would change their directions from 16 by four
+        adjacent same walls, just like Command & Conquer: Tiberian Sun. Directions are
+        assigned by clockwise binary order: 0-single, 1-NE connected, 2-SE connected,
+        3-NE and SE, etc.
+
     [AdvancedTrainButton=]
     0 - None.
     1 - In train page, one unit of Type 80 would be set as foundation button, if conditions
         below satisfied:
         - The unit is not class 51 (Packed Siege Unit).
         - The unit's Train Time is less than 0.
+
+    [CustomGarrison=] (1.5 Only)
+    0 - None.
+    1 - Units can garrison into buildings specified by id in garrison task, no matter how
+        buildings set. One unit can have more than one tasks.
 
     [DepositButton=]
     0 - None.
