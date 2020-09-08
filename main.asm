@@ -943,6 +943,8 @@ PatchIsReady:
 			Invoke  WritePatch, AllPack2@, Offset AllPack2, AllPack2N
 			Invoke  WritePatch, AllPack3@, Offset AllPack3, AllPack3N
 			Invoke  WritePatch, AllPack4@, Offset AllPack4, AllPack4N
+			Invoke	WriteJmp, AllPack5@, $AllPack5
+			Invoke	WriteJmp, AllPack6@, $AllPack6
 
 			;Invoke	WriteJmp2, NewCommand@, $NewCommand
 

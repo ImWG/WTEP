@@ -226,8 +226,8 @@ Create a batch file(.bat) is convenient.
     3 - Set source units' current HP by their max HP's permillage.
     4 - Damage source units by their lost HP's permillage.
     5 - Set source units' current HP by their current HP's permillage.
-    6 - Save HP into Resource. You can save units' average HPs into certain resource.
-    7 - Load HP from Resource.
+    7 - Save HP into Resource. You can save units' average HPs into certain resource.
+    8 - Load HP from Resource.
     NOTE: effect "Change Object HP" (with Number = 2) would trim overflowed HPs.
 
     [Change Object Name]

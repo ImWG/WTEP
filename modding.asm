@@ -108,6 +108,9 @@ AllPack@	DD 00527138H
 AllPack2@	DD 005571DEH
 AllPack3@	DD 005571E6H
 AllPack4@	DD 00527125H
+AllPack5@   DD 004AF994H
+AllPack6@   DD 004AF865H
+AllPack7@   DD 00468350H
 
 AIUnitLimit@ DD 0048EA11H
 AIUnitLimit2@ DD 00557DD1H
@@ -195,6 +198,8 @@ $BuilderSound      DD BuilderSound
 $MoreLang          DD MoreLang
 $AddUnitZPosition  DD AddUnitZPosition
 $AdvAdjacentMode   DD AdvAdjacentMode
+$AllPack5          DD AllPack5
+$AllPack6          DD AllPack6
 
 ; Icons
 $IconHeal          DD Offset IconHeal
@@ -248,7 +253,7 @@ PatchModdingAddresses DD Offset NewButtons_0, Offset NewButtons_1, Offset NewBut
 		DD Offset NewButtons2_Market_4, Offset NewButtons2_Market_5, Offset NewButtons2_Market_6
 		DD Offset NewButtonsGr_0, Offset NewButtonsGr_1, Offset NewButtonsGr_2
 		DD Offset AllHeal_Monk, Offset AllHeal_1, Offset AllHeal_2, Offset AllHeal_3
-		DD Offset FreeDrop_1, Offset FreeDrop_2, Offset FreeDrop_Back, Offset FreeDrop_Other
+		DD Offset FreeDrop_1, Offset FreeDrop_Back, Offset FreeDrop_Other ;, FreeDrop_2
 		DD Offset ExplosionUnit_1
 		DD Offset SelfDestructUnit_1
 		DD Offset SelfHealUnit_1
@@ -292,6 +297,7 @@ PatchModdingAddresses DD Offset NewButtons_0, Offset NewButtons_1, Offset NewBut
 		DD MoreOnMinimap1_1, MoreOnMinimap2_1, MoreOnMinimap3_1
 		DD ColoredUnit_1, ColoredUnit2_1, CustomGarrison_1, BuilderSound_1, MoreLang_1, AddUnitZPosition_1
 		DD AdvAdjacentMode_1, AdvAdjacentMode_2
+		DD AllPack5_1, AllPack6_1, NewSkill_Transform_1
 		DD 0H
 
 PatchModdingAddresses2 DD Offset ExplosionUnit_01, Offset AllBuildFnd_01
@@ -302,6 +308,7 @@ PatchModdingAddresses2 DD Offset ExplosionUnit_01, Offset AllBuildFnd_01
 		;DD Offset NewCommand_01
 		DD MoreOnMinimap1_01, MoreOnMinimap2_01, MoreOnMinimap3_01, CustomGarrison_01
 		DD BuilderSound_01, BuilderSound_02, MoreLang_01
+		DD AllPack5_01, AllPack6_01
 		DD 0H
 
 PatchModdingDirectAddresses DD NewButtons_Table_ + 3, NewButtons_Table
@@ -556,7 +563,7 @@ Align 4
 NewButtons_Table:
 DD Offset NewButtons_Other, Offset NewButtons_Deposit, Offset NewButtons_Transform, Offset NewButtons_Train, Offset NewButtons_Heal
 DD Offset NewButtons_Build, Offset NewButtons_Pack, Offset NewButtons_Unpack, Offset NewButtons_Ground, Offset NewButtons_Pack_
-DD Offset NewButtons_Unpack_, Offset NewButtons_SingleBuild, Offset NewButtons_Other, Offset NewButtons_Unload, Offset NewButtons_Teleport
+DD Offset NewButtons_Unpack_, Offset NewButtons_SingleBuild, Offset NewButtons_SingleTrain, Offset NewButtons_Unload, Offset NewButtons_Teleport
 DD Offset NewButtons_Drop, Offset NewButtons_Market, Offset NewButtons_Convert, Offset NewButtons_Scout, Offset NewButtons_GetOut, 0H
 
 NewButtons_Other:
@@ -808,7 +815,8 @@ NewButtons2_Position2:
 	Push 13
 NewButtons2_Position:
 	Push 14
-	Push Ebx
+	Mov Ecx, [Edi + 0CH]
+	Push Ecx
 	Mov Ecx, Edi
 	Call NewButtons_Sub
 	Pop Ecx
@@ -940,42 +948,44 @@ FreeDrop_Back:
 
 FreeDrop_Transform:
 	Pop Ecx
-	Push Ebp
-	Push Edi
+	Mov Ecx, Esi
+	Call NewSkill_Transform
+;	Push Ebp
+;	Push Edi
 
-	Mov Ebp, DWord Ptr Ds:[Esi + 0CH]
-	Lea Ebp, DWord Ptr Ds:[Ebp + 1C4H]
-	Mov Edi, DWord Ptr Ds:[Ebp]
+;	Mov Ebp, DWord Ptr Ds:[Esi + 0CH]
+;	Lea Ebp, DWord Ptr Ds:[Ebp + 1C4H]
+;	Mov Edi, DWord Ptr Ds:[Ebp]
+;
+;FreeDrop_Transform_: ; Loop start
+;	Mov Edx, DWord Ptr Ds:[Edi + 0CH]
+;	Cmp Edx, DWord Ptr Ds:[Esi + 0CH]
+;	Jne FreeDrop_Transform__
+;	Mov Edx, DWord Ptr Ds:[Edi + 8H]
+;
+;	Mov Bl, Byte Ptr Ds:[Edx + 14CH]
+;	And Bl, 1FH
+;	Cmp Bl, 2
+;	Jne FreeDrop_Transform__
+;
+;	Movsx Eax, Word Ptr Ds:[Edx + 0A6H] ; Attribute Piece
+;
+;	Mov Ebx, DWord Ptr Ds:[Edi + 0CH]
+;	Mov Ebx, DWord Ptr Ds:[Ebx + 74H]
+;	Mov Ebx, DWord Ptr Ds:[Ebx + Eax * 4]
+;	Push Ebx
+;
+;	Mov Ecx, Edi
+;FreeDrop_2:
+;	FakeCall SUB_TRANSFORM ; ECX = Source Unit
+;FreeDrop_Transform__:
+;	Add Ebp, 4
+;	Mov Edi, DWord Ptr Ds:[Ebp]
+;	Test Edi, Edi
+;	Jne FreeDrop_Transform_
 
-FreeDrop_Transform_: ; Loop start
-	Mov Edx, DWord Ptr Ds:[Edi + 0CH]
-	Cmp Edx, DWord Ptr Ds:[Esi + 0CH]
-	Jne FreeDrop_Transform__
-	Mov Edx, DWord Ptr Ds:[Edi + 8H]
-
-	Mov Bl, Byte Ptr Ds:[Edx + 14CH]
-	And Bl, 1FH
-	Cmp Bl, 2
-	Jne FreeDrop_Transform__
-
-	Movsx Eax, Word Ptr Ds:[Edx + 0A6H] ; Attribute Piece
-
-	Mov Ebx, DWord Ptr Ds:[Edi + 0CH]
-	Mov Ebx, DWord Ptr Ds:[Ebx + 74H]
-	Mov Ebx, DWord Ptr Ds:[Ebx + Eax * 4]
-	Push Ebx
-
-	Mov Ecx, Edi
-FreeDrop_2:
-	FakeCall SUB_TRANSFORM ; ECX = Source Unit
-FreeDrop_Transform__:
-	Add Ebp, 4
-	Mov Edi, DWord Ptr Ds:[Ebp]
-	Test Edi, Edi
-	Jne FreeDrop_Transform_
-
-	Pop Edi
-	Pop Ebp
+;	Pop Edi
+;	Pop Ebp
 	Jmp FreeDrop_Back
 
 
@@ -1095,21 +1105,40 @@ CustomBuilder3__: ; Share another unit's page
 
 
 ; Advanced Train Button
+; (Requires Build Task)
 ; If one unit is Type 80, and not class 51 (Packed Siege Unit), it would be used as build.
-; (Not Used) If one unit is Type 80, class 51, but not positive hp, it would be used as build too.
+; (NOT USED) If one unit is Type 80, class 51, but not positive hp, it would be used as build too.
 ; If one unit is Type 80, class 51, but train time < 0, it would be used as build too.
 AdvancedTrainButton:
-	Cmp Byte Ptr Ds:[Edi + 4H], 50H
+	Cmp Byte Ptr Ds:[Edi + 4H], 50H ; Is type 70
 	Jl AdvancedTrainButton_1
-	Cmp Word Ptr Ds:[Edi + 16H], 33H
-	Jne AdvancedTrainButton_
+	Mov Al, Byte Ptr Ds:[Edi + 097H] ; If unit is of building interface, change its icon set
+	Cmp Al, 2
+	Je AdvancedTrainButton_
+	Cmp Al, 10
+	Je AdvancedTrainButton_
+	Cmp Al, 11
+	Je AdvancedTrainButton_
+
+	Push Ecx ; Check if build task exists
+	Push 1
+	Sub Esp, 8H
+	Push 101
+	Mov Ecx, Edi
+	Call GetAbility
+	Pop Ecx
+	Test Eax, Eax
+	Je AdvancedTrainButton_1
+
+.If Word Ptr Ds:[Edi + 16H] == 33H ; Is not #51
 	Cmp Word Ptr Ds:[Edi + 182H], 0H
 	Jge AdvancedTrainButton_1
+.EndIf
+	Mov Edx, 13H
+	Mov DWord Ptr Ss:[Esp + 0CH], Edx ; Set Function
 AdvancedTrainButton_:
 	Mov Edx, DWord Ptr Ds:[Esi + 102CH]
-	Mov DWord Ptr Ss:[Esp], Edx
-	Mov Edx, 13H
-	Mov DWord Ptr Ss:[Esp + 0CH], Edx
+	Mov DWord Ptr Ss:[Esp], Edx ; Set Icon Set
 AdvancedTrainButton_1:
 	FakeCall SUB_DRAWBUTTON
 AdvancedTrainButton_2:
@@ -1192,6 +1221,7 @@ FreeGatherPoint_Teleport_:
 	Mov Ecx, Esi
 FreeGatherPoint_1:
 	FakeCall SUB_TELEPORT
+	Fstp St
 ; This is a temporary solution
 ; Because SUB_TELEPORT would make one random unit teleported into the left corner and unable to move anymore.
 ;	Mov Ecx, [Edi + 0CH]
@@ -2631,6 +2661,57 @@ AdvAdjacentMode_2:
 
 AdvAdjacentMode_Table:
 	DD 004C9E83H, AdvAdjacentMode_Ortho, 0
+
+
+AllPack5: ; 004AF994H, Checking Annex Units
+	Mov Edx, [Eax + 8H]
+	Cmp Byte Ptr Ds:[Edx + 4H], 80
+AllPack5_01:
+	FakeJb 004AF9A0H
+	Mov Ecx, DWord Ptr Ds:[Esi + Eax]
+	Test Ecx, Ecx
+AllPack5_1:
+	FakeJmp 004AF999H
+
+AllPack6: ; 004AF865H
+	Mov Edx, [Eax + 8H]
+	Cmp Byte Ptr Ds:[Edx + 4H], 80
+AllPack6_01:
+	FakeJb 004AF8B4H
+	Movsx Ecx, Cx
+	Mov Edx, DWord Ptr Ds:[Eax + 0CH]
+AllPack6_1:
+	FakeJmp 004AF86BH
+
+
+
+; ECX - Unit
+NewSkill_Transform:
+	Push Esi
+	Push Ebx
+	Mov Esi, Ecx
+
+	Mov Edx, DWord Ptr Ds:[Esi + 8H]
+	Cmp Byte Ptr Ds:[Edx + 4H], 70 ; Type=70,80
+	Jb NewSkill_Transform_Skip
+	Mov Bl, Byte Ptr Ds:[Edx + 14CH] ; Break Off Combat
+	And Bl, 1FH
+	Cmp Bl, 2
+	Jne NewSkill_Transform_Skip
+
+	Movsx Eax, Word Ptr Ds:[Edx + 0A6H] ; Attribute Piece
+	Mov Ebx, DWord Ptr Ds:[Esi + 0CH]
+	Mov Ebx, DWord Ptr Ds:[Ebx + 74H]
+	Mov Ebx, DWord Ptr Ds:[Ebx + Eax * 4]
+	Push Ebx
+	Mov Ecx, Esi
+NewSkill_Transform_1:
+	FakeCall SUB_TRANSFORM ; ECX = Source Unit
+NewSkill_Transform_Skip:
+	Pop Ebx
+	Pop Esi
+	Retn
+
 
 
 
